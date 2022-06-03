@@ -6,9 +6,23 @@
       xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
       d:DataContext="{d:DesignInstance Type=viewModels:MainControlViewModel, IsDesignTimeCreatable=True}"
-      mc:Ignorable="d" Margin="15">
-    <Grid >
-        <TextBlock Text="Watch" Visibility="{c:Binding WatchMode, FalseToVisibility=Collapsed}"/>
-        <TextBlock Text="Search" Visibility="{c:Binding SearchMode, FalseToVisibility=Collapsed}"/>
+      mc:Ignorable="d">
+    <Grid>
+        <!--<TextBlock Text="Watch" Visibility="{c:Binding WatchMode, FalseToVisibility=Collapsed}"/>
+        <TextBlock Text="Search" Visibility="{c:Binding SearchMode, FalseToVisibility=Collapsed}"/>-->
+        <TabControl ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid>
+
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
     </Grid>
 </UserControl>

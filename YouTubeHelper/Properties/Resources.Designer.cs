@@ -70,6 +70,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Channel.
+        /// </summary>
+        public static string NewChannel {
+            get {
+                return ResourceManager.GetString("NewChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
         public static string Search {

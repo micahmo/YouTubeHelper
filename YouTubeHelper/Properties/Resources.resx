@@ -110,4 +110,7 @@
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="NewChannel" xml:space="preserve">
+    <value>New Channel</value>
+  </data>
 </root>
