@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
+      xmlns:properties="clr-namespace:YouTubeHelper.Properties"
       d:DataContext="{d:DesignInstance Type=viewModels:MainControlViewModel, IsDesignTimeCreatable=True}"
       mc:Ignorable="d">
     <Grid>
@@ -13,13 +14,51 @@
         <TabControl ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Text="{Binding Channel.Name}"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
+                        <Expander Grid.Row="0">
+                            <Expander.Header>
+                                <!-- Need to use this width hack in order for the header content to stretch horizontally -->
+                                <!-- https://stackoverflow.com/a/680512/4206279 -->
+                                <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="Channel Settings"/>
+                                    <Border Grid.Column="1" CornerRadius="2" Margin="10,8,24,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                </Grid>
+                            </Expander.Header>
+
+
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Label Grid.Column="0" Grid.Row="0" Content="Channel" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Channel.Name, UpdateSourceTrigger=PropertyChanged, Delay=1000}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                                <Button Grid.Column="0" Grid.Row="1" Content="Delete" Command="{Binding DeleteCommand}"/>
+                            </Grid>
+                        </Expander>
                     </Grid>
                 </DataTemplate>
             </TabControl.ContentTemplate>

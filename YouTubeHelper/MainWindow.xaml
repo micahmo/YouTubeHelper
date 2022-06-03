@@ -6,7 +6,9 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:properties="clr-namespace:YouTubeHelper.Properties"
         mc:Ignorable="d"
-        Title="{x:Static properties:Resources.ApplicationName}" Height="650" Width="950">
+        Title="{x:Static properties:Resources.ApplicationName}" Height="650" Width="950"
+        Closing="Window_Closing"
+        MouseDown="Window_MouseDown">
     <Grid>
         <ui:NavigationView x:Name="NavigationView" IsBackButtonVisible="Collapsed"
                            Loaded="NavigationView_Loaded"

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using ModernWpf.Controls;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
@@ -18,6 +19,7 @@ namespace YouTubeHelper
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
+            MainControlViewModel.Load();
             NavigationView.SelectedItem = NavigationView.MenuItems.OfType<NavigationViewItem>().First();
             NavigationView.Content = MainControl;
         }
@@ -33,7 +35,20 @@ namespace YouTubeHelper
                 MainControlViewModel.Mode = MainControlMode.Search;
             }
 
+            NavigationView.Content = args.IsSettingsInvoked ? null : MainControl;
             NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Deselects any control when the window is clicked
+            Keyboard.ClearFocus();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MainControlViewModel.Save();
+            DatabaseEngine.Shutdown();
         }
 
         private static readonly MainControlViewModel MainControlViewModel = new();

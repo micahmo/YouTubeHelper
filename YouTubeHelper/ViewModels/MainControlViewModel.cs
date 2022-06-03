@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 
@@ -12,16 +15,18 @@ namespace YouTubeHelper.ViewModels
         {
             PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(SelectedChannel) && SelectedChannel == NewChannelTab)
+                if (args.PropertyName == nameof(SelectedChannel) && SelectedChannel == _newChannelTab)
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        Channel channel = new Channel { Name = Resources.NewChannel };
-                        Channels.Insert(Channels.Count - 1, channel);
-                        SelectedChannel = channel;
+                        ChannelViewModel channelViewModel = new(new Channel { Name = Resources.NewChannel }, this);
+                        Channels.Insert(Channels.Count - 1, channelViewModel);
+                        SelectedChannel = channelViewModel;
                     });
                 }
             };
+
+            _newChannelTab = new(new Channel { Name = "+" }, this);
         }
 
         public MainControlMode Mode
@@ -40,16 +45,34 @@ namespace YouTubeHelper.ViewModels
 
         public bool SearchMode => Mode == MainControlMode.Search;
 
-        public ObservableCollection<Channel> Channels { get; } = new() { NewChannelTab };
+        public ObservableCollection<ChannelViewModel> Channels { get; } = new();
 
-        public Channel SelectedChannel
+        public ChannelViewModel SelectedChannel
         {
             get => _selectedChannel;
             set => SetProperty(ref _selectedChannel, value);
         }
-        private Channel _selectedChannel;
+        private ChannelViewModel _selectedChannel;
 
-        private static readonly Channel NewChannelTab = new() { Name = "+" };
+        private readonly ChannelViewModel _newChannelTab;
+
+        public void Save()
+        {
+            Channels.Where(c => c != _newChannelTab).ToList().ForEach(c =>
+            {
+                DatabaseEngine.ChannelCollection.Upsert(c.Channel);
+            });
+        }
+
+        public void Load()
+        {
+            DatabaseEngine.ChannelCollection.FindAll().ToList().ForEach(c =>
+            {
+                Channels.Add(new ChannelViewModel(c, this));
+            });
+
+            Channels.Add(_newChannelTab);
+        }
     }
 
     public enum MainControlMode
