@@ -90,6 +90,12 @@ namespace YouTubeHelper.ViewModels
             _mainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
             _mainControlViewModel.SelectedChannel = this;
             _mainControlViewModel.AllowCreateNewChannel = true;
+
+            _mainControlViewModel.Channels.ToList().ForEach(c =>
+            {
+                c.Channel.Index = _mainControlViewModel.Channels.IndexOf(c);
+                DatabaseEngine.ChannelCollection.Update(c.Channel);
+            });
         }
 
         public string SearchGlyph

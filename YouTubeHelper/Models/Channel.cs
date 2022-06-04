@@ -23,6 +23,13 @@ namespace YouTubeHelper.Models
         }
         private int _objectId;
 
+        public int Index
+        {
+            get => _index == -1 ? ObjectId : _index;
+            set => SetProperty(ref _index, value);
+        }
+        private int _index = -1;
+
         public string Identifier
         {
             get => _identifier;

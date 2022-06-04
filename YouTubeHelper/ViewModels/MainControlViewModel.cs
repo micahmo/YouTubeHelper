@@ -123,7 +123,7 @@ namespace YouTubeHelper.ViewModels
 
         public void Load()
         {
-            DatabaseEngine.ChannelCollection.FindAll().ToList().ForEach(c =>
+            DatabaseEngine.ChannelCollection.FindAll().OrderBy(c => c.Index).ToList().ForEach(c =>
             {
                 Channels.Add(new ChannelViewModel(c, this));
             });
