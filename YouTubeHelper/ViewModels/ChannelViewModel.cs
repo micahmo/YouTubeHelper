@@ -66,6 +66,32 @@ namespace YouTubeHelper.ViewModels
             }
         }
 
+        public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
+        private ICommand _moveRightCommand;
+
+        private void MoveRight()
+        {
+            _mainControlViewModel.AllowCreateNewChannel = false;
+            int previousIndex = _mainControlViewModel.Channels.IndexOf(this);
+            _mainControlViewModel.Channels.Remove(this);
+            _mainControlViewModel.Channels.Insert(Math.Min(_mainControlViewModel.Channels.Count - 1, previousIndex + 1), this);
+            _mainControlViewModel.SelectedChannel = this;
+            _mainControlViewModel.AllowCreateNewChannel = true;
+        }
+
+        public ICommand MoveLeftCommand => _moveLeftCommand ??= new RelayCommand(MoveLeft);
+        private ICommand _moveLeftCommand;
+
+        private void MoveLeft()
+        {
+            _mainControlViewModel.AllowCreateNewChannel = false;
+            int previousIndex = _mainControlViewModel.Channels.IndexOf(this);
+            _mainControlViewModel.Channels.Remove(this);
+            _mainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
+            _mainControlViewModel.SelectedChannel = this;
+            _mainControlViewModel.AllowCreateNewChannel = true;
+        }
+
         public string SearchGlyph
         {
             get => _searchGlyph;

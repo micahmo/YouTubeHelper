@@ -17,12 +17,15 @@ namespace YouTubeHelper.ViewModels
             {
                 if (args.PropertyName == nameof(SelectedChannel) && SelectedChannel == _newChannelTab)
                 {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                    if (AllowCreateNewChannel)
                     {
-                        ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel }, this);
-                        Channels.Insert(Channels.Count - 1, channelViewModel);
-                        SelectedChannel = channelViewModel;
-                    });
+                        Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                        {
+                            ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel }, this);
+                            Channels.Insert(Channels.Count - 1, channelViewModel);
+                            SelectedChannel = channelViewModel;
+                        });
+                    }
                 }
             };
 
@@ -115,6 +118,8 @@ namespace YouTubeHelper.ViewModels
                                                $"{(int)ActiveVideoRemainingTimeSpan.TotalHours:D2}:{ActiveVideoRemainingTimeSpan.Minutes:D2}:{ActiveVideoRemainingTimeSpan.Seconds:D2}";
 
         #endregion
+
+        public bool AllowCreateNewChannel { get; set; } = true;
 
         public void Load()
         {
