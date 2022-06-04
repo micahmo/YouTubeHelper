@@ -52,7 +52,7 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <Expander Grid.Row="0" Margin="15">
+                                <Expander Grid.Row="0" Margin="15,15,30,15">
                                     <Expander.Header>
                                         <!-- Need to use this width hack in order for the header content to stretch horizontally -->
                                         <!-- https://stackoverflow.com/a/680512/4206279 -->
@@ -67,28 +67,28 @@
                                         </Grid>
                                     </Expander.Header>
 
-
-                                    <Grid Margin="5">
+                                    <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="50"/>
                                         </Grid.ColumnDefinitions>
 
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="5"/>
                                             <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="5"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="{x:Static properties:Resources.ChannelName}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                                        <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,21,0,0" Command="{Binding LookupChannelCommand}">
+                                        <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Command="{Binding LookupChannelCommand}">
                                             <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
                                         </Button>
-                                        <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
+                                        <Button Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
                                     </Grid>
                                 </Expander>
 
-                                <Grid Grid.Row="1">
+                                <Grid Grid.Row="1" Margin="0,0,30,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -113,7 +113,7 @@
                                     <Button Grid.Column="2" Command="{Binding MoveLeftCommand}" Margin="15,0,0,15">
                                         <ui:FontIcon Glyph="&#xE760;"/>
                                     </Button>
-                                    <Button Grid.Column="4" Command="{Binding MoveRightCommand}" Margin="0,0,20,15">
+                                    <Button Grid.Column="4" Command="{Binding MoveRightCommand}" Margin="0,0,0,15">
                                         <ui:FontIcon Glyph="&#xE761;"/>
                                     </Button>
                                 </Grid>
@@ -123,7 +123,7 @@
                                     <ItemsControl ItemsSource="{Binding Videos}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Margin="15,0,0,0">
+                                                <Grid Margin="15,0,30,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
@@ -154,7 +154,7 @@
                                                         </Expander>
                                                     </Grid>
 
-                                                    <Grid Grid.Column="2" Margin="0,0,20,0">
+                                                    <Grid Grid.Column="2">
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="*"/>
                                                             <RowDefinition/>
@@ -166,7 +166,7 @@
                                                         </Button>
                                                     </Grid>
 
-                                                    <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" CornerRadius="2" Height="6" Margin="0,0,15,10" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                                    <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" CornerRadius="2" Height="6" Margin="0,0,0,10" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

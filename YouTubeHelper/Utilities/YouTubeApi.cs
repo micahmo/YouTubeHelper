@@ -33,13 +33,14 @@ namespace YouTubeHelper.Utilities
             SearchResource.ListRequest channelSearchRequest = _youTubeService.Search.List("snippet");
             channelSearchRequest.Q = channel.Identifier;
             SearchListResponse channelSearchResult = await channelSearchRequest.ExecuteAsync();
+            List<SearchResult> items = channelSearchResult.Items.Where(r => r.Id.Kind == "youtube#channel").ToList();
 
-            if (channel.ResultIndex >= channelSearchResult.Items.Count)
+            if (channel.ResultIndex >= items.Count)
             {
                 channel.ResultIndex = -1;
             }
 
-            if (channelSearchResult.Items.Skip(channel.ResultIndex++).FirstOrDefault(r => r.Id.Kind == "youtube#channel") is { } r)
+            if (channelSearchResult.Items.Skip(channel.ResultIndex++).FirstOrDefault() is { } r)
             {
                 channel.VanityName = r.Snippet.Title;
                 channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
