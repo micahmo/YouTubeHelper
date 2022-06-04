@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Threading;
+using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper
 {
@@ -13,5 +9,18 @@ namespace YouTubeHelper
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+        }
+
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Dispatcher.Invoke(async () => await MessageBoxHelper.ShowCopyableText(YouTubeHelper.Properties.Resources.UnexpectedError, YouTubeHelper.Properties.Resources.Error, e.Exception.ToString()));
+
+            e.Handled = true;
+        }
     }
 }

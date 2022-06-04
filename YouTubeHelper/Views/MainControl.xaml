@@ -15,7 +15,7 @@
         <TabControl ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Channel.Name}"/>
+                    <TextBlock Text="{Binding Channel.VanityName}"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
@@ -45,6 +45,7 @@
                             <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="50"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
@@ -54,8 +55,11 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Name, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="Channel name" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                                <Button Grid.Column="0" Grid.Row="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
+                                <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="{x:Static properties:Resources.ChannelName}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,21,0,0" Command="{Binding SearchCommand}">
+                                    <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
+                                </Button>
+                                <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
                             </Grid>
                         </Expander>
                     </Grid>

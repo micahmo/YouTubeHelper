@@ -23,11 +23,23 @@ namespace YouTubeHelper.Models
         }
         private int _objectId;
 
-        public string Name
+        public string Identifier
         {
-            get => _name;
-            set => SetProperty(ref _name, value);
+            get => _identifier;
+            set
+            {
+                SetProperty(ref _identifier, value);
+                VanityName = value;
+            }
         }
-        private string _name;
+
+        private string _identifier;
+
+        public string VanityName
+        {
+            get => _vanityName;
+            set => SetProperty(ref _vanityName, value);
+        }
+        private string _vanityName;
     }
 }

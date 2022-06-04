@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
+using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels
 {
-    public class ChannelViewModel
+    public class ChannelViewModel : ObservableObject
     {
         public ChannelViewModel(Channel channel, MainControlViewModel mainControlViewModel)
         {
@@ -23,8 +26,34 @@ namespace YouTubeHelper.ViewModels
             DatabaseEngine.ChannelCollection.Delete(Channel.ObjectId);
         }
 
+        public ICommand SearchCommand => _searchCommand ??= new RelayCommand(Search);
+        private ICommand _searchCommand;
+
+        private async void Search()
+        {
+            if (await YouTubeApi.Instance.PopulateChannel(Channel))
+            {
+                SearchGlyph = Icons.Check;
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                SearchGlyph = Icons.Search;
+            }
+            else
+            {
+                SearchGlyph = Icons.X;
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                SearchGlyph = Icons.Search;
+            }
+        }
+
+        public string SearchGlyph
+        {
+            get => _searchGlyph;
+            set => SetProperty(ref _searchGlyph, value);
+        }
+        private string _searchGlyph = Icons.Search;
+
         public Channel Channel { get; }
 
-        private MainControlViewModel _mainControlViewModel;
+        private readonly MainControlViewModel _mainControlViewModel;
     }
 }

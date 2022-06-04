@@ -19,14 +19,14 @@ namespace YouTubeHelper.ViewModels
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        ChannelViewModel channelViewModel = new(new Channel { Name = Resources.NewChannel }, this);
+                        ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel }, this);
                         Channels.Insert(Channels.Count - 1, channelViewModel);
                         SelectedChannel = channelViewModel;
                     });
                 }
             };
 
-            _newChannelTab = new(new Channel(nonPersistent: true) { Name = "+" }, this);
+            _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
         }
 
         public MainControlMode Mode
