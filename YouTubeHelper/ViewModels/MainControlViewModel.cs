@@ -27,6 +27,26 @@ namespace YouTubeHelper.ViewModels
                         });
                     }
                 }
+
+                if (args.PropertyName == nameof(Mode))
+                {
+                    switch (Mode)
+                    {
+                        case MainControlMode.Search:
+                            Channels.ToList().ForEach(c =>
+                            {
+                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.SortMode == Utilities.SortMode.AgeDesc);
+                            });
+                            break;
+                        case MainControlMode.Watch:
+                        default:
+                            Channels.ToList().ForEach(c =>
+                            {
+                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.SortMode == Utilities.SortMode.DurationPlusRecency);
+                            });
+                            break;
+                    }
+                }
             };
 
             _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);

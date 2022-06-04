@@ -149,4 +149,10 @@
   <data name="Searching" xml:space="preserve">
     <value>Searching...</value>
   </data>
+  <data name="ExactSearch" xml:space="preserve">
+    <value>Exact search</value>
+  </data>
+  <data name="Lookup" xml:space="preserve">
+    <value>Lookup</value>
+  </data>
 </root>

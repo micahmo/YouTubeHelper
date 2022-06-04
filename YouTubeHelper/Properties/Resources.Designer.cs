@@ -124,6 +124,24 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exact search.
+        /// </summary>
+        public static string ExactSearch {
+            get {
+                return ResourceManager.GetString("ExactSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lookup.
+        /// </summary>
+        public static string Lookup {
+            get {
+                return ResourceManager.GetString("Lookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Channel.
         /// </summary>
         public static string NewChannel {

@@ -17,6 +17,15 @@ namespace YouTubeHelper.ViewModels
         {
             Channel = channel;
             _mainControlViewModel = mainControlViewModel;
+
+            _mainControlViewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(_mainControlViewModel.Mode))
+                {
+                    OnPropertyChanged(nameof(SearchMode));
+                    OnPropertyChanged(nameof(WatchMode));
+                }
+            };
         }
 
         public ICommand DeleteCommand => _deleteChannelCommand ??= new RelayCommand(Delete);
@@ -110,7 +119,7 @@ namespace YouTubeHelper.ViewModels
 
         #region Sorting
 
-        public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m));
+        public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
 
         public SortModeExtended SelectedSortMode
         {
@@ -127,6 +136,10 @@ namespace YouTubeHelper.ViewModels
         private int _selectedSortModeIndex;
 
         #endregion
+
+        public bool WatchMode => _mainControlViewModel.Mode == MainControlMode.Watch;
+
+        public bool SearchMode => _mainControlViewModel.Mode == MainControlMode.Search;
 
         public Channel Channel { get; }
 

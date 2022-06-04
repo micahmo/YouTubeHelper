@@ -89,10 +89,14 @@
                                     </Grid>
                                 </Expander>
 
-                                <Grid Grid.Row="1" Margin="0,0,30,0">
+                                <Grid Grid.Row="1" Margin="0,0,30,15">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -100,7 +104,11 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Button Command="{Binding FindVideosCommand}" Margin="15,0,0,15">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="33"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindVideosCommand}" Margin="15,0,0,0">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
@@ -113,12 +121,18 @@
                                         </Grid>
                                     </Button>
 
-                                    <ComboBox Grid.Column="2" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
+                                    <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
 
-                                    <Button Grid.Column="4" Command="{Binding MoveLeftCommand}" Margin="15,0,0,15">
+                                    <TextBox Grid.Column="4" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
+                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
+
+                                    <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
+                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
+
+                                    <Button Grid.Column="8" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
                                         <ui:FontIcon Glyph="&#xE760;"/>
                                     </Button>
-                                    <Button Grid.Column="6" Command="{Binding MoveRightCommand}" Margin="0,0,0,15">
+                                    <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveRightCommand}" Margin="0,0,0,0">
                                         <ui:FontIcon Glyph="&#xE761;"/>
                                     </Button>
                                 </Grid>
