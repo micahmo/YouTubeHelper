@@ -18,7 +18,10 @@ namespace YouTubeHelper
                         Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName));
                     }
 
-                    return new LiteDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName, DbName));
+                    return new LiteDatabase(new ConnectionString(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName, DbName))
+                    {
+                        Connection = ConnectionType.Shared
+                    });
                 })();
             }
         }
@@ -34,6 +37,9 @@ namespace YouTubeHelper
 
         public static ILiteCollection<Channel> ChannelCollection => _channelCollection ??= DatabaseInstance.GetCollection<Channel>("channel");
         private static ILiteCollection<Channel> _channelCollection;
+
+        public static ILiteCollection<Settings> SettingsCollection => _settingsCollection ??= DatabaseInstance.GetCollection<Settings>("settings");
+        private static ILiteCollection<Settings> _settingsCollection;
 
         private const string DbName = "YTH.db";
         private const string AppDataFolderName = "YTH";

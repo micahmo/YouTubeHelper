@@ -35,7 +35,7 @@ namespace YouTubeHelper
                 MainControlViewModel.Mode = MainControlMode.Search;
             }
 
-            NavigationView.Content = args.IsSettingsInvoked ? null : MainControl;
+            NavigationView.Content = args.IsSettingsInvoked ? SettingsControl : MainControl;
             NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;
         }
 
@@ -47,11 +47,13 @@ namespace YouTubeHelper
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MainControlViewModel.Save();
             DatabaseEngine.Shutdown();
         }
 
         private static readonly MainControlViewModel MainControlViewModel = new();
         private static readonly MainControl MainControl = new() {DataContext = MainControlViewModel};
+
+        private static readonly SettingsViewModel SettingsViewModel = new();
+        private static readonly SettingsControl SettingsControl = new() { DataContext = SettingsViewModel };
     }
 }

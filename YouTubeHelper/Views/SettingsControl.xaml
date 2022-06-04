@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="YouTubeHelper.Views.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
+             d:DataContext="{d:DesignInstance Type=viewModels:SettingsViewModel, IsDesignTimeCreatable=True}"
+             mc:Ignorable="d">
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Settings.YouTubeApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="YouTube API Key" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Grid.Column="0" Grid.Row="2" Text="{Binding Settings.YtDlpPath, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="yt-dlp Path" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Grid.Column="0" Grid.Row="4" Text="{Binding Settings.TelegramBotId, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="Telegram Bot ID" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Grid.Column="0" Grid.Row="6" Text="{Binding Settings.TelegramApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="Telegram API Key" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+    </Grid>
+</UserControl>

@@ -26,7 +26,7 @@ namespace YouTubeHelper.ViewModels
                 }
             };
 
-            _newChannelTab = new(new Channel { Name = "+" }, this);
+            _newChannelTab = new(new Channel(nonPersistent: true) { Name = "+" }, this);
         }
 
         public MainControlMode Mode
@@ -55,14 +55,6 @@ namespace YouTubeHelper.ViewModels
         private ChannelViewModel _selectedChannel;
 
         private readonly ChannelViewModel _newChannelTab;
-
-        public void Save()
-        {
-            Channels.Where(c => c != _newChannelTab).ToList().ForEach(c =>
-            {
-                DatabaseEngine.ChannelCollection.Upsert(c.Channel);
-            });
-        }
 
         public void Load()
         {

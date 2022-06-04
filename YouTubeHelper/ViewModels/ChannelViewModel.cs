@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
 
@@ -17,6 +18,7 @@ namespace YouTubeHelper.ViewModels
 
         private void Delete()
         {
+            _mainControlViewModel.SelectedChannel = _mainControlViewModel.Channels[Math.Max(0, _mainControlViewModel.Channels.IndexOf(this) - 1)];
             _mainControlViewModel.Channels.Remove(this);
             DatabaseEngine.ChannelCollection.Delete(Channel.ObjectId);
         }

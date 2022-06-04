@@ -6,6 +6,7 @@
       xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
       xmlns:properties="clr-namespace:YouTubeHelper.Properties"
+      xmlns:ui="http://schemas.modernwpf.com/2019"
       d:DataContext="{d:DesignInstance Type=viewModels:MainControlViewModel, IsDesignTimeCreatable=True}"
       mc:Ignorable="d">
     <Grid>
@@ -43,20 +44,18 @@
 
                             <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="10"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <Label Grid.Column="0" Grid.Row="0" Content="Channel" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Channel.Name, UpdateSourceTrigger=PropertyChanged, Delay=1000}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-
-                                <Button Grid.Column="0" Grid.Row="1" Content="Delete" Command="{Binding DeleteCommand}"/>
+                                <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Name, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="Channel name" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                <Button Grid.Column="0" Grid.Row="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
                             </Grid>
                         </Expander>
                     </Grid>
