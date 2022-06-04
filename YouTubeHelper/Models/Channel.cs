@@ -64,9 +64,9 @@ namespace YouTubeHelper.Models
                 OnPropertyChanged(nameof(ExtendedDescription));
             }
         }
-
         private string _description;
 
+        [BsonIgnore]
         public string ExtendedDescription => $"{Description} ({ChannelPlaylist})";
 
         [BsonIgnore]

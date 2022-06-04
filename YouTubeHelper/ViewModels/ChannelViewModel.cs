@@ -110,11 +110,11 @@ namespace YouTubeHelper.ViewModels
 
         #region Sorting
 
-        public IEnumerable<SortModeExtended> SortModeValues => Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m));
+        public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m));
 
         public SortModeExtended SelectedSortMode
         {
-            get => _selectedSortMode;
+            get => _selectedSortMode ?? SortModeValues.FirstOrDefault();
             set => SetProperty(ref _selectedSortMode, value);
         }
         private SortModeExtended _selectedSortMode;
@@ -124,7 +124,7 @@ namespace YouTubeHelper.ViewModels
             get => _selectedSortModeIndex;
             set => SetProperty(ref _selectedSortModeIndex, value);
         }
-        private int _selectedSortModeIndex = 0;
+        private int _selectedSortModeIndex;
 
         #endregion
 

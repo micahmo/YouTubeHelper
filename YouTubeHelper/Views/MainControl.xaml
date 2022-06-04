@@ -113,9 +113,7 @@
                                         </Grid>
                                     </Button>
 
-                                    <ComboBox Grid.Column="2" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}">
-
-                                    </ComboBox>
+                                    <ComboBox Grid.Column="2" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
 
                                     <Button Grid.Column="4" Command="{Binding MoveLeftCommand}" Margin="15,0,0,15">
                                         <ui:FontIcon Glyph="&#xE760;"/>
