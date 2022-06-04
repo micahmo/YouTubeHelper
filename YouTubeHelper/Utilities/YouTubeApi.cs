@@ -43,7 +43,7 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel)
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, SortMode sortMode = SortMode.DurationPlusRecency)
         {
             List<Models.Video> results = new();
 
@@ -84,7 +84,7 @@ namespace YouTubeHelper.Utilities
             // Then sort by age
             var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAt).ToList();
 
-            var rankedVideos = videos.OrderBy(v => videosSortedByDuration.IndexOf(v) + videosSortedByAge.IndexOf(v)).ToList();
+            var rankedVideos = videos.OrderBy(v => SortFunction(sortMode, v, videosSortedByDuration, videosSortedByAge)).ToList();
 
             foreach (Video v in rankedVideos.Take(10))
             {
@@ -102,6 +102,24 @@ namespace YouTubeHelper.Utilities
             return results;
         }
 
+        private int SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
+        {
+            switch (sortMode)
+            {
+                case SortMode.DurationDesc:
+                    return -(int)XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
+                case SortMode.DurationAsc:
+                    return (int)XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
+                case SortMode.AgeDesc:
+                    return -(int)new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                case SortMode.AgeAsc:
+                    return (int)new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                case SortMode.DurationPlusRecency:
+                default:
+                    return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
+            }
+        }
+
         public async Task<string> GetRawUrl(string videoId)
         {
             // Get URL with yt-dlp
@@ -111,5 +129,14 @@ namespace YouTubeHelper.Utilities
         }
 
         private readonly YouTubeService _youTubeService;
+    }
+
+    public enum SortMode
+    {
+        DurationPlusRecency,
+        DurationDesc,
+        DurationAsc,
+        AgeDesc,
+        AgeAsc,
     }
 }
