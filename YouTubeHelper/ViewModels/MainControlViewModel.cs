@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using YouTubeHelper.Models;
@@ -60,6 +62,59 @@ namespace YouTubeHelper.ViewModels
         private ChannelViewModel _selectedChannel;
 
         private readonly ChannelViewModel _newChannelTab;
+
+        #region Active video
+
+        public bool IsPlayerExpanded
+        {
+            get => _isPlayerExpanded;
+            set => SetProperty(ref _isPlayerExpanded, value);
+        }
+        private bool _isPlayerExpanded;
+
+        public GridLength ExpandedGridLength { get; } = new(1, GridUnitType.Star);
+
+        public GridLength CollapsedGridLength { get; } = new(15, GridUnitType.Pixel);
+
+
+        public string ActiveVideo
+        {
+            get => _activeVideo;
+            set => SetProperty(ref _activeVideo, value);
+        }
+        private string _activeVideo;
+
+        public TimeSpan ActiveVideoElapsedTimeSpan
+        {
+            get => _activeVideoElapsedTimeSpan;
+            set
+            {
+                SetProperty(ref _activeVideoElapsedTimeSpan, value);
+                OnPropertyChanged(nameof(ActiveVideoRemainingTimeSpan));
+                OnPropertyChanged(nameof(ActiveVideoTimeString));
+            }
+        }
+        private TimeSpan _activeVideoElapsedTimeSpan;
+
+        public TimeSpan ActiveVideoDuration
+        {
+            get => _activeVideoDuration;
+            set
+            {
+                SetProperty(ref _activeVideoDuration, value);
+                OnPropertyChanged(nameof(ActiveVideoRemainingTimeSpan));
+                OnPropertyChanged(nameof(ActiveVideoTimeString));
+            }
+        }
+        private TimeSpan _activeVideoDuration;
+
+        public TimeSpan ActiveVideoRemainingTimeSpan => ActiveVideoDuration - ActiveVideoElapsedTimeSpan;
+
+        public string ActiveVideoTimeString => $"{(int)ActiveVideoElapsedTimeSpan.TotalHours:D2}:{ActiveVideoElapsedTimeSpan.Minutes:D2}:{ActiveVideoElapsedTimeSpan.Seconds:D2}  /  " +
+                                               $"{(int)ActiveVideoDuration.TotalHours:D2}:{ActiveVideoDuration.Minutes:D2}:{ActiveVideoDuration.Seconds:D2}  /  " +
+                                               $"{(int)ActiveVideoRemainingTimeSpan.TotalHours:D2}:{ActiveVideoRemainingTimeSpan.Minutes:D2}:{ActiveVideoRemainingTimeSpan.Seconds:D2}";
+
+        #endregion
 
         public void Load()
         {

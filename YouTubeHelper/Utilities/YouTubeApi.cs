@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using CliWrap;
+using CliWrap.Buffered;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
@@ -84,16 +86,28 @@ namespace YouTubeHelper.Utilities
 
             var rankedVideos = videos.OrderBy(v => videosSortedByDuration.IndexOf(v) + videosSortedByAge.IndexOf(v)).ToList();
 
-            rankedVideos.Take(10).ToList().ForEach(v => results.Add(new Models.Video
+            foreach (Video v in rankedVideos.Take(10))
             {
-                Title = v.Snippet.Title,
-                Description = v.Snippet.Description,
-                Duration = XmlConvert.ToTimeSpan(v.ContentDetails.Duration),
-                ReleaseDate = new DateTimeOffset(v.Snippet.PublishedAt ?? DateTime.MinValue),
-                ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */v.Snippet.Thumbnails.Medium?.Url ?? v.Snippet.Thumbnails.Standard?.Url ?? v.Snippet.Thumbnails.High?.Url ?? v.Snippet.Thumbnails.Default__?.Url ?? string.Empty
-            }));
+                results.Add(new Models.Video
+                {
+                    Title = v.Snippet.Title,
+                    Id = v.Id,
+                    Description = v.Snippet.Description,
+                    Duration = XmlConvert.ToTimeSpan(v.ContentDetails.Duration),
+                    ReleaseDate = new DateTimeOffset(v.Snippet.PublishedAt ?? DateTime.MinValue),
+                    ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */v.Snippet.Thumbnails.Medium?.Url ?? v.Snippet.Thumbnails.Standard?.Url ?? v.Snippet.Thumbnails.High?.Url ?? v.Snippet.Thumbnails.Default__?.Url ?? string.Empty
+                });
+            }
 
             return results;
+        }
+
+        public async Task<string> GetRawUrl(string videoId)
+        {
+            // Get URL with yt-dlp
+            return (await Cli.Wrap(Settings.Instance.YtDlpPath)
+                .WithArguments($"-f b --get-url {videoId}")
+                .ExecuteBufferedAsync()).StandardOutput;
         }
 
         private readonly YouTubeService _youTubeService;
