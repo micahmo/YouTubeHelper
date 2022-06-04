@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -110,18 +111,18 @@ namespace YouTubeHelper.Utilities
             return results;
         }
 
-        private int SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
+        private double SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
         {
             switch (sortMode)
             {
                 case SortMode.DurationDesc:
-                    return -(int)XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
+                    return -XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
                 case SortMode.DurationAsc:
-                    return (int)XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
+                    return XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
                 case SortMode.AgeDesc:
-                    return -(int)new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                    return -new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
                 case SortMode.AgeAsc:
-                    return (int)new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                    return new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
                 case SortMode.DurationPlusRecency:
                 default:
                     return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
@@ -141,10 +142,31 @@ namespace YouTubeHelper.Utilities
 
     public enum SortMode
     {
+        [Description("Duration + Recency")]
         DurationPlusRecency,
+
+        [Description("Duration Descending (Longest First)")]
         DurationDesc,
+
+        [Description("Duration Ascending (Shortest First)")]
         DurationAsc,
+
+        [Description("Age Descending (Newest First)")]
         AgeDesc,
-        AgeAsc,
+
+        [Description("Age Ascending (Oldest First)")]
+        AgeAsc
+    }
+
+    public class SortModeExtended
+    {
+        public SortModeExtended(SortMode sortMode)
+        {
+            SortMode = sortMode;
+        }
+
+        public SortMode SortMode { get; }
+
+        public string Description => SortMode.GetType().GetMember(SortMode.ToString()).FirstOrDefault().GetCustomAttributes(typeof(DescriptionAttribute), true).OfType<DescriptionAttribute>().FirstOrDefault()?.Description;
     }
 }

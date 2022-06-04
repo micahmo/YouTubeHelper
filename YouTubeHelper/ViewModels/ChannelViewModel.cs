@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
-                (await YouTubeApi.Instance.FindVideos(Channel)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel)));
+                (await YouTubeApi.Instance.FindVideos(Channel, SelectedSortMode.SortMode)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel)));
             }
             finally
             {
@@ -106,6 +107,26 @@ namespace YouTubeHelper.ViewModels
         private string _searchGlyph = Icons.Search;
 
         public ObservableCollection<VideoViewModel> Videos { get; } = new();
+
+        #region Sorting
+
+        public IEnumerable<SortModeExtended> SortModeValues => Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m));
+
+        public SortModeExtended SelectedSortMode
+        {
+            get => _selectedSortMode;
+            set => SetProperty(ref _selectedSortMode, value);
+        }
+        private SortModeExtended _selectedSortMode;
+
+        public int SelectedSortModeIndex
+        {
+            get => _selectedSortModeIndex;
+            set => SetProperty(ref _selectedSortModeIndex, value);
+        }
+        private int _selectedSortModeIndex = 0;
+
+        #endregion
 
         public Channel Channel { get; }
 
