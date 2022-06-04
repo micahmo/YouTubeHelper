@@ -40,7 +40,7 @@
                 <TabControl Grid.Column="0" ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Channel.VanityName}"/>
+                            <TextBlock Text="{Binding Channel.VanityName}" ToolTip="{Binding Channel.ExtendedDescription}"/>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>

@@ -54,5 +54,22 @@ namespace YouTubeHelper.Models
             set => SetProperty(ref _vanityName, value);
         }
         private string _vanityName;
+
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                SetProperty(ref _description, value);
+                OnPropertyChanged(nameof(ExtendedDescription));
+            }
+        }
+
+        private string _description;
+
+        public string ExtendedDescription => $"{Description} ({ChannelPlaylist})";
+
+        [BsonIgnore]
+        public int ResultIndex { get; set; } = -1;
     }
 }

@@ -33,10 +33,17 @@ namespace YouTubeHelper.Utilities
             SearchResource.ListRequest channelSearchRequest = _youTubeService.Search.List("snippet");
             channelSearchRequest.Q = channel.Identifier;
             SearchListResponse channelSearchResult = await channelSearchRequest.ExecuteAsync();
-            if (channelSearchResult.Items.FirstOrDefault(r => r.Id.Kind == "youtube#channel") is { } r)
+
+            if (channel.ResultIndex >= channelSearchResult.Items.Count)
+            {
+                channel.ResultIndex = -1;
+            }
+
+            if (channelSearchResult.Items.Skip(channel.ResultIndex++).FirstOrDefault(r => r.Id.Kind == "youtube#channel") is { } r)
             {
                 channel.VanityName = r.Snippet.Title;
                 channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
+                channel.Description = r.Snippet.Description;
                 return true;
             }
 
