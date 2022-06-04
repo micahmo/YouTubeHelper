@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using ModernWpf.Controls;
 using YouTubeHelper.ViewModels;
@@ -93,5 +95,13 @@ namespace YouTubeHelper.Views
             }
         }
         public static List<Flyout> OpenFlyouts = new();
+
+        private void Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                (DataContext as MainControlViewModel)?.SelectedChannel?.FindVideosCommand.Execute(null);
+            }
+        }
     }
 }

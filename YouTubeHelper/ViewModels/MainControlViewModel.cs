@@ -43,12 +43,14 @@ namespace YouTubeHelper.ViewModels
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
+                                c.ExactSearchTerm = c.LookupSearchTerm = null;
                                 c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.Value == Utilities.SortMode.DurationPlusRecency);
                             });
                             break;
                         case MainControlMode.Exclusions:
                             Channels.ToList().ForEach(c =>
                             {
+                                c.ExactSearchTerm = c.LookupSearchTerm = null;
                                 c.Videos.Clear();
                             });
                             break;

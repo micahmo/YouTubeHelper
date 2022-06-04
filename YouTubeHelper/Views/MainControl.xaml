@@ -144,10 +144,14 @@
                                               Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}"/>
                                     
                                     <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
-                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
+                                             Text="{Binding ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
+                                             KeyDown="Search_KeyDown"/>
 
                                     <TextBox Grid.Column="8" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
-                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
+                                             Text="{Binding LookupSearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                                             Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
+                                             KeyDown="Search_KeyDown"/>
 
                                     <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
                                         <ui:FontIcon Glyph="&#xE760;"/>

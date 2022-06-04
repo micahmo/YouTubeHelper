@@ -44,6 +44,7 @@ namespace YouTubeHelper.Utilities
             if (channelSearchResult.Items.Skip(channel.ResultIndex++).FirstOrDefault() is { } r)
             {
                 channel.VanityName = r.Snippet.Title;
+                channel.ChannelId = r.Snippet.ChannelId;
                 channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
                 channel.Description = r.Snippet.Description;
                 return true;
@@ -52,7 +53,7 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions = false, SortMode sortMode = SortMode.DurationPlusRecency)
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken";
@@ -75,10 +76,21 @@ namespace YouTubeHelper.Utilities
                 videoIds = videoIds.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode);
+            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms);
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode = SortMode.AgeDesc)
+        public async Task<IEnumerable<Models.Video>> SearchVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup)
+        {
+            SearchResource.ListRequest videoSearchRequest = _youTubeService.Search.List("snippet");
+            videoSearchRequest.Q = lookup;
+            SearchListResponse channelSearchResult = await videoSearchRequest.ExecuteAsync();
+            
+            List<string> items = channelSearchResult.Items.Where(r => r.Id.Kind == "youtube#video").Select(r => r.Id.VideoId).ToList();
+
+            return await FindVideoDetails(items, excludedVideos, channel, sortMode);
+        }
+
+        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null)
         {
             List<Models.Video> results = new();
             List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
@@ -96,6 +108,46 @@ namespace YouTubeHelper.Utilities
                 videoIds = videoIds.Skip(50).ToList();
             }
 
+            // Do optional filtering
+            if (searchTerms?.Any() == true)
+            {
+                // Filter by search terms
+                HashSet<Video> filteredVideos = new HashSet<Video>();
+                foreach (Video video in videos)
+                {
+                    bool result = true;
+                    foreach (string searchTerm in searchTerms)
+                    {
+                        if (!video.Snippet.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = false;
+                        }
+                    }
+                    if (result)
+                    {
+                        filteredVideos.Add(video);
+                    }
+
+                    result = true;
+                    foreach (string searchTerm in searchTerms)
+                    {
+                        if (!video.Snippet.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = false;
+                        }
+                    }
+                    if (result)
+                    {
+                        filteredVideos.Add(video);
+                    }
+                }
+
+                videos = filteredVideos.ToList();
+            }
+
+            // Remove videos that are not from this channel
+            videos = videos.Except(videos.Where(v => v.Snippet.ChannelId != channel.ChannelId)).ToList();
+
             // First sort by duration
             var videosSortedByDuration = videos.OrderByDescending(v => XmlConvert.ToTimeSpan(v.ContentDetails.Duration)).ToList();
 
@@ -104,7 +156,7 @@ namespace YouTubeHelper.Utilities
 
             var rankedVideos = videos.OrderBy(v => SortFunction(sortMode, v, videosSortedByDuration, videosSortedByAge)).ToList();
 
-            foreach (Video video in rankedVideos.Take(10))
+            foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : 10))
             {
                 results.Add(new Models.Video
                 {

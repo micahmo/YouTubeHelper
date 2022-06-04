@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -70,7 +71,24 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
-                (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                List<string> searchTerms = null;
+
+                if (_mainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(LookupSearchTerm))
+                {
+                    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value, LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                }
+                else
+                {
+                    if (_mainControlViewModel.Mode == MainControlMode.Search)
+                    {
+                        if (!string.IsNullOrEmpty(ExactSearchTerm))
+                        {
+                            searchTerms = ExactSearchTerm.Split().ToList();
+                        }
+                    }
+
+                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value, searchTerms)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                }
             }
             finally
             {
@@ -171,6 +189,36 @@ namespace YouTubeHelper.ViewModels
         public bool SearchMode => _mainControlViewModel.Mode == MainControlMode.Search;
 
         public bool ExclusionsMode => _mainControlViewModel.Mode == MainControlMode.Exclusions;
+
+        public string ExactSearchTerm
+        {
+            get => _exactSearchTerm;
+            set => SetProperty(ref _exactSearchTerm, value);
+        }
+        private string _exactSearchTerm;
+
+        public string LookupSearchTerm
+        {
+            get => _lookupSearchTerm;
+            set
+            {
+                // See if this is a URL and try to parse it
+                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri uri))
+                {
+                    var queryString = HttpUtility.ParseQueryString(uri.Query);
+                    string videoId = queryString["v"];
+                    if (!string.IsNullOrEmpty(videoId))
+                    {
+                        SetProperty(ref _lookupSearchTerm, videoId);
+                        return;
+                    }
+                }
+
+                SetProperty(ref _lookupSearchTerm, value);
+            }
+        }
+
+        private string _lookupSearchTerm;
 
         public Channel Channel { get; }
 

@@ -41,6 +41,13 @@ namespace YouTubeHelper.Models
         }
         private string _identifier;
 
+        public string ChannelId
+        {
+            get => _channelId;
+            set => SetProperty(ref _channelId, value);
+        }
+        private string _channelId;
+
         public string ChannelPlaylist
         {
             get => _channelPlaylist;
