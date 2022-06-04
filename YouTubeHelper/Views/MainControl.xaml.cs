@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using ModernWpf.Controls;
 using YouTubeHelper.ViewModels;
 
 namespace YouTubeHelper.Views
@@ -82,5 +84,14 @@ namespace YouTubeHelper.Views
         private object _helperObject;
         private FieldInfo StateField => _stateField ??= HelperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
         private FieldInfo _stateField;
+
+        private void Flyout_Opened(object sender, object e)
+        {
+            if (sender is Flyout flyout)
+            {
+                OpenFlyouts.Add(flyout);
+            }
+        }
+        public static List<Flyout> OpenFlyouts = new();
     }
 }

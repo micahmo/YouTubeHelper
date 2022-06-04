@@ -155,4 +155,22 @@
   <data name="Lookup" xml:space="preserve">
     <value>Lookup</value>
   </data>
+  <data name="ShowExcludedVideos" xml:space="preserve">
+    <value>Show excluded videos</value>
+  </data>
+  <data name="Exclusions" xml:space="preserve">
+    <value>Exclusions</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="Excluded" xml:space="preserve">
+    <value>EXCLUDED</value>
+  </data>
+  <data name="WontWatch" xml:space="preserve">
+    <value>Won't watch</value>
+  </data>
+  <data name="MightWatch" xml:space="preserve">
+    <value>Might watch</value>
+  </data>
 </root>

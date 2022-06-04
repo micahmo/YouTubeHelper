@@ -52,10 +52,8 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, SortMode sortMode = SortMode.DurationPlusRecency)
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions = false, SortMode sortMode = SortMode.DurationPlusRecency)
         {
-            List<Models.Video> results = new();
-
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken";
             playlistRequest.PlaylistId = channel.ChannelPlaylist;
@@ -72,7 +70,18 @@ namespace YouTubeHelper.Utilities
                 nextPageToken = response.NextPageToken;
             }
 
-            //videoIds = videoIds.Except(excludedVideoIds).ToList();
+            if (!showExclusions)
+            {
+                videoIds = videoIds.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
+            }
+
+            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode);
+        }
+
+        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode = SortMode.AgeDesc)
+        {
+            List<Models.Video> results = new();
+            List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
 
             // Use the videoIds to look up real info
             List<Video> videos = new List<Video>();
@@ -95,16 +104,19 @@ namespace YouTubeHelper.Utilities
 
             var rankedVideos = videos.OrderBy(v => SortFunction(sortMode, v, videosSortedByDuration, videosSortedByAge)).ToList();
 
-            foreach (Video v in rankedVideos.Take(10))
+            foreach (Video video in rankedVideos.Take(10))
             {
                 results.Add(new Models.Video
                 {
-                    Title = v.Snippet.Title,
-                    Id = v.Id,
-                    Description = v.Snippet.Description,
-                    Duration = XmlConvert.ToTimeSpan(v.ContentDetails.Duration),
-                    ReleaseDate = new DateTimeOffset(v.Snippet.PublishedAt ?? DateTime.MinValue),
-                    ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */v.Snippet.Thumbnails.Medium?.Url ?? v.Snippet.Thumbnails.Standard?.Url ?? v.Snippet.Thumbnails.High?.Url ?? v.Snippet.Thumbnails.Default__?.Url ?? string.Empty
+                    Excluded = (excludedVideoIds ?? new List<string>()).Contains(video.Id),
+                    ExclusionReason = excludedVideos?.FirstOrDefault(v => v.Id == video.Id)?.ExclusionReason ?? ExclusionReason.None,
+                    Title = video.Snippet.Title,
+                    Id = video.Id,
+                    ChannelPlaylist = channel.ChannelPlaylist,
+                    Description = video.Snippet.Description,
+                    Duration = XmlConvert.ToTimeSpan(video.ContentDetails.Duration),
+                    ReleaseDate = new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue),
+                    ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */video.Snippet.Thumbnails.Medium?.Url ?? video.Snippet.Thumbnails.Standard?.Url ?? video.Snippet.Thumbnails.High?.Url ?? video.Snippet.Thumbnails.Default__?.Url ?? string.Empty
                 });
             }
 
@@ -158,15 +170,8 @@ namespace YouTubeHelper.Utilities
         AgeAsc
     }
 
-    public class SortModeExtended
+    public class SortModeExtended : EnumExtended<SortMode>
     {
-        public SortModeExtended(SortMode sortMode)
-        {
-            SortMode = sortMode;
-        }
-
-        public SortMode SortMode { get; }
-
-        public string Description => SortMode.GetType().GetMember(SortMode.ToString()).FirstOrDefault().GetCustomAttributes(typeof(DescriptionAttribute), true).OfType<DescriptionAttribute>().FirstOrDefault()?.Description;
+        public SortModeExtended(SortMode sortMode) : base(sortMode) { }
     }
 }

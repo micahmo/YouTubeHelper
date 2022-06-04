@@ -34,6 +34,10 @@ namespace YouTubeHelper
             {
                 MainControlViewModel.Mode = MainControlMode.Search;
             }
+            else if (args.InvokedItem?.ToString() == Properties.Resources.Exclusions)
+            {
+                MainControlViewModel.Mode = MainControlMode.Exclusions;
+            }
 
             NavigationView.Content = args.IsSettingsInvoked ? SettingsControl : MainControl;
             NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;

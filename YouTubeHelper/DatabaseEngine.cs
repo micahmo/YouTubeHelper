@@ -41,6 +41,9 @@ namespace YouTubeHelper
         public static ILiteCollection<Settings> SettingsCollection => _settingsCollection ??= DatabaseInstance.GetCollection<Settings>("settings");
         private static ILiteCollection<Settings> _settingsCollection;
 
+        public static ILiteCollection<Video> ExcludedVideosCollection => _excludedVideosCollection ??= DatabaseInstance.GetCollection<Video>("excludedVideos");
+        private static ILiteCollection<Video> _excludedVideosCollection;
+
         private const string DbName = "YTH.db";
         private const string AppDataFolderName = "YTH";
     }

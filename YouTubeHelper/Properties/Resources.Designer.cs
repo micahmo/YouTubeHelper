@@ -133,11 +133,38 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EXCLUDED.
+        /// </summary>
+        public static string Excluded {
+            get {
+                return ResourceManager.GetString("Excluded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exclusions.
+        /// </summary>
+        public static string Exclusions {
+            get {
+                return ResourceManager.GetString("Exclusions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lookup.
         /// </summary>
         public static string Lookup {
             get {
                 return ResourceManager.GetString("Lookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Might watch.
+        /// </summary>
+        public static string MightWatch {
+            get {
+                return ResourceManager.GetString("MightWatch", resourceCulture);
             }
         }
         
@@ -196,6 +223,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show excluded videos.
+        /// </summary>
+        public static string ShowExcludedVideos {
+            get {
+                return ResourceManager.GetString("ShowExcludedVideos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:MMMM d, yyyy}  •  {1} day(s) ago  •  {2}.
         /// </summary>
         public static string TimeStringFormat {
@@ -214,11 +250,29 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View.
+        /// </summary>
+        public static string View {
+            get {
+                return ResourceManager.GetString("View", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Watch.
         /// </summary>
         public static string Watch {
             get {
                 return ResourceManager.GetString("Watch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Won&apos;t watch.
+        /// </summary>
+        public static string WontWatch {
+            get {
+                return ResourceManager.GetString("WontWatch", resourceCulture);
             }
         }
         

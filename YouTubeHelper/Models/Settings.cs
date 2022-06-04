@@ -35,6 +35,13 @@ namespace YouTubeHelper.Models
         }
         private string _ytDlpPath;
 
+        public string ChromePath
+        {
+            get => _chromePath;
+            set => SetProperty(ref _chromePath, value);
+        }
+        private string _chromePath;
+
         public string TelegramBotId
         {
             get => _telegramBotId;

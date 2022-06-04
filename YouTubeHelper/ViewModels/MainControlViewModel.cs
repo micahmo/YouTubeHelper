@@ -35,15 +35,24 @@ namespace YouTubeHelper.ViewModels
                         case MainControlMode.Search:
                             Channels.ToList().ForEach(c =>
                             {
-                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.SortMode == Utilities.SortMode.AgeDesc);
+                                c.Videos.Clear();
+                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.Value == Utilities.SortMode.AgeDesc);
                             });
                             break;
                         case MainControlMode.Watch:
-                        default:
                             Channels.ToList().ForEach(c =>
                             {
-                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.SortMode == Utilities.SortMode.DurationPlusRecency);
+                                c.Videos.Clear();
+                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.Value == Utilities.SortMode.DurationPlusRecency);
                             });
+                            break;
+                        case MainControlMode.Exclusions:
+                            Channels.ToList().ForEach(c =>
+                            {
+                                c.Videos.Clear();
+                            });
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -60,6 +69,7 @@ namespace YouTubeHelper.ViewModels
                 SetProperty(ref _mode, value);
                 OnPropertyChanged(nameof(WatchMode));
                 OnPropertyChanged(nameof(SearchMode));
+                OnPropertyChanged(nameof(ExclusionsMode));
             }
         }
         private MainControlMode _mode;
@@ -67,6 +77,8 @@ namespace YouTubeHelper.ViewModels
         public bool WatchMode => Mode == MainControlMode.Watch;
 
         public bool SearchMode => Mode == MainControlMode.Search;
+
+        public bool ExclusionsMode => Mode == MainControlMode.Exclusions;
 
         public ObservableCollection<ChannelViewModel> Channels { get; } = new();
 
@@ -155,6 +167,7 @@ namespace YouTubeHelper.ViewModels
     public enum MainControlMode
     {
         Watch,
-        Search
+        Search,
+        Exclusions
     }
 }

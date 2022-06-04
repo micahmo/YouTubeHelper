@@ -24,6 +24,7 @@ namespace YouTubeHelper.ViewModels
                 {
                     OnPropertyChanged(nameof(SearchMode));
                     OnPropertyChanged(nameof(WatchMode));
+                    OnPropertyChanged(nameof(ExclusionsMode));
                 }
             };
         }
@@ -68,7 +69,28 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
-                (await YouTubeApi.Instance.FindVideos(Channel, SelectedSortMode.SortMode)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel)));
+                List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+            }
+            finally
+            {
+                _mainControlViewModel.IsBusy = false;
+            }
+        }
+
+        public ICommand FindExclusionsCommand => _findExclusionsCommand ??= new RelayCommand(FindExclusions);
+        private ICommand _findExclusionsCommand;
+
+        private async void FindExclusions()
+        {
+            _mainControlViewModel.IsBusy = true;
+
+            Videos.Clear();
+
+            try
+            {
+                List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode.Value)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
             }
             finally
             {
@@ -135,11 +157,20 @@ namespace YouTubeHelper.ViewModels
         }
         private int _selectedSortModeIndex;
 
+        public bool ShowExcludedVideos
+        {
+            get => _showExcludedVideos;
+            set => SetProperty(ref _showExcludedVideos, value);
+        }
+        private bool _showExcludedVideos;
+
         #endregion
 
         public bool WatchMode => _mainControlViewModel.Mode == MainControlMode.Watch;
 
         public bool SearchMode => _mainControlViewModel.Mode == MainControlMode.Search;
+
+        public bool ExclusionsMode => _mainControlViewModel.Mode == MainControlMode.Exclusions;
 
         public Channel Channel { get; }
 

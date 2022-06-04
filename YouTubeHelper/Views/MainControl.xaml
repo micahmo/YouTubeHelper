@@ -64,7 +64,7 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock Grid.Column="0" Text="Channel Settings"/>
-                                            <Border Grid.Column="1" CornerRadius="2" Margin="10,8,24,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                            <Border Grid.Column="1" CornerRadius="2" Margin="10,8,22,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
                                         </Grid>
                                     </Expander.Header>
 
@@ -98,6 +98,8 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="5"/>
@@ -108,7 +110,8 @@
                                         <RowDefinition Height="33"/>
                                     </Grid.RowDefinitions>
 
-                                    <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindVideosCommand}" Margin="15,0,0,0">
+                                    <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindVideosCommand}" Margin="15,0,0,0"
+                                            Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}" >
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
@@ -121,18 +124,35 @@
                                         </Grid>
                                     </Button>
 
+                                    <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindExclusionsCommand}" Margin="15,0,0,0"
+                                            Visibility="{c:Binding 'ExclusionsMode', FalseToVisibility=Collapsed}" >
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="5"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
+                                            <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.View}"/>
+                                        </Grid>
+                                    </Button>
+
                                     <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
 
-                                    <TextBox Grid.Column="4" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
+                                    <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding ShowExcludedVideos}"
+                                              Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}"/>
+                                    
+                                    <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
 
-                                    <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
+                                    <TextBox Grid.Column="8" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"/>
 
-                                    <Button Grid.Column="8" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
+                                    <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
                                         <ui:FontIcon Glyph="&#xE760;"/>
                                     </Button>
-                                    <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveRightCommand}" Margin="0,0,0,0">
+                                    <Button Grid.Column="12" VerticalAlignment="Stretch" Command="{Binding MoveRightCommand}" Margin="0,0,0,0">
                                         <ui:FontIcon Glyph="&#xE761;"/>
                                     </Button>
                                 </Grid>
@@ -160,13 +180,15 @@
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto"/>
                                                             <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
                                                             <RowDefinition Height="*"/>
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
 
                                                         <TextBlock Grid.Row="0" Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
                                                         <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
-                                                        <Expander Grid.Row="2" Header="Description">
+                                                        <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
+                                                        <Expander Grid.Row="3" Header="Description">
                                                             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
                                                                 <TextBlock Text="{Binding Video.Description}" FontSize="13"/>
                                                             </ScrollViewer>
@@ -174,14 +196,60 @@
                                                     </Grid>
 
                                                     <Grid Grid.Column="2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="5"/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="*"/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition Height="5"/>
                                                             <RowDefinition/>
                                                             <RowDefinition Height="*"/>
                                                         </Grid.RowDefinitions>
 
-                                                        <Button Grid.Row="1" Command="{Binding PlayVideoCommand}" CommandParameter="{Binding ElementName=MediaElement}">
-                                                            <ui:FontIcon Glyph="&#xF5B0;"/>
+                                                        <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}"
+                                                                Visibility="{c:Binding '!Video.Excluded', FalseToVisibility=Collapsed}">
+                                                            <ui:FontIcon Glyph="&#xE896;"/>
+                                                        </Button>
+
+                                                        <Button Grid.Column="0" Grid.Row="3"
+                                                                Visibility="{c:Binding '!Video.Excluded', FalseToVisibility=Collapsed}">
+                                                            <ui:FontIcon Glyph="&#xEA39;"/>
+                                                            <ui:FlyoutService.Flyout>
+                                                                <ui:Flyout Opened="Flyout_Opened">
+                                                                    <ui:Flyout.FlyoutPresenterStyle>
+                                                                        <Style TargetType="ui:FlyoutPresenter">
+                                                                            <Setter Property="Padding" Value="0"/>
+                                                                        </Style>
+                                                                    </ui:Flyout.FlyoutPresenterStyle>
+
+                                                                    <Grid>
+                                                                        <Grid.RowDefinitions>
+                                                                            <RowDefinition/>
+                                                                            <RowDefinition/>
+                                                                        </Grid.RowDefinitions>
+
+                                                                        <Button Grid.Row="0" Content="{x:Static properties:Resources.WontWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"/>
+                                                                        <Button Grid.Row="1" Content="{x:Static properties:Resources.MightWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"/>
+                                                                    </Grid>
+                                                                </ui:Flyout>
+                                                            </ui:FlyoutService.Flyout>
+                                                        </Button>
+
+                                                        <Button Grid.Column="0" Grid.Row="3" Command="{Binding UnexcludeVideoCommand}"
+                                                                Visibility="{c:Binding 'Video.Excluded', FalseToVisibility=Collapsed}">
+                                                            <ui:FontIcon Glyph="&#xECC8;"/>
+                                                        </Button>
+
+                                                        <Button Grid.Column="2" Grid.Row="1" Command="{Binding PlayVideoCommand}">
+                                                            <ui:FontIcon Glyph="&#xE768;"/>
+                                                        </Button>
+
+                                                        <Button Grid.Column="2" Grid.Row="3" Command="{Binding PlayVideoInBrowserCommand}">
+                                                            <ui:FontIcon Glyph="&#xE774;"/>
                                                         </Button>
                                                     </Grid>
 

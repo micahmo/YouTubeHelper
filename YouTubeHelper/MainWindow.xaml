@@ -6,7 +6,7 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:properties="clr-namespace:YouTubeHelper.Properties"
         mc:Ignorable="d"
-        Title="{x:Static properties:Resources.ApplicationName}" Height="700" Width="1250"
+        Title="{x:Static properties:Resources.ApplicationName}" Height="700" Width="1450"
         Closing="Window_Closing"
         MouseDown="Window_MouseDown">
     <Grid>
@@ -22,6 +22,11 @@
                 <ui:NavigationViewItem Content="{x:Static properties:Resources.Search}">
                     <ui:NavigationViewItem.Icon>
                         <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;"/>
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="{x:Static properties:Resources.Exclusions}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA39;"/>
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
