@@ -32,8 +32,14 @@ namespace YouTubeHelper.Models
                 VanityName = value;
             }
         }
-
         private string _identifier;
+
+        public string ChannelPlaylist
+        {
+            get => _channelPlaylist;
+            set => SetProperty(ref _channelPlaylist, value);
+        }
+        private string _channelPlaylist;
 
         public string VanityName
         {

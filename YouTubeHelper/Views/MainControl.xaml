@@ -3,68 +3,129 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
-      xmlns:properties="clr-namespace:YouTubeHelper.Properties"
       xmlns:ui="http://schemas.modernwpf.com/2019"
+      xmlns:properties="clr-namespace:YouTubeHelper.Properties"
+      xmlns:busyIndicator="https://github.com/Peoky/BusyIndicator"
       d:DataContext="{d:DesignInstance Type=viewModels:MainControlViewModel, IsDesignTimeCreatable=True}"
       mc:Ignorable="d">
     <Grid>
-        <!--<TextBlock Text="Watch" Visibility="{c:Binding WatchMode, FalseToVisibility=Collapsed}"/>
-        <TextBlock Text="Search" Visibility="{c:Binding SearchMode, FalseToVisibility=Collapsed}"/>-->
-        <TabControl ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Channel.VanityName}"/>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <Grid Margin="15">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+        <busyIndicator:BusyMask x:Name="BusyIndicator" IsBusy="{Binding IsBusy}" IndicatorType="ThreeDots" BusyContent="{x:Static properties:Resources.Searching}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <!--<ColumnDefinition Width="*"/>-->
+                </Grid.ColumnDefinitions>
 
-                        <Expander Grid.Row="0">
-                            <Expander.Header>
-                                <!-- Need to use this width hack in order for the header content to stretch horizontally -->
-                                <!-- https://stackoverflow.com/a/680512/4206279 -->
-                                <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Grid.Column="0" Text="Channel Settings"/>
-                                    <Border Grid.Column="1" CornerRadius="2" Margin="10,8,24,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
-                                </Grid>
-                            </Expander.Header>
-
-
-                            <Grid Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                <TabControl Grid.Column="0" ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Channel.VanityName}"/>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="10"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="{x:Static properties:Resources.ChannelName}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                                <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,21,0,0" Command="{Binding SearchCommand}">
-                                    <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
+                                <Expander Grid.Row="0" Margin="15">
+                                    <Expander.Header>
+                                        <!-- Need to use this width hack in order for the header content to stretch horizontally -->
+                                        <!-- https://stackoverflow.com/a/680512/4206279 -->
+                                        <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="Channel Settings"/>
+                                            <Border Grid.Column="1" CornerRadius="2" Margin="10,8,24,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                        </Grid>
+                                    </Expander.Header>
+
+
+                                    <Grid Margin="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="50"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="10"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" ui:ControlHelper.Header="{x:Static properties:Resources.ChannelName}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                        <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Right" Margin="0,21,0,0" Command="{Binding LookupChannelCommand}">
+                                            <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
+                                        </Button>
+                                        <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
+                                    </Grid>
+                                </Expander>
+
+                                <Button Grid.Row="1" Command="{Binding FindVideosCommand}" Margin="15,0,0,15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="5"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
+                                        <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Search}"/>
+                                    </Grid>
                                 </Button>
-                                <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
+
+                                <ScrollViewer Grid.Row="2" ui:ScrollViewerHelper.AutoHideScrollBars="False">
+                                    <ItemsControl ItemsSource="{Binding Videos}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="15,0,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <Image Grid.Column="0" Source="{Binding Video.ThumbnailUrl}" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,10,10"/>
+
+                                                    <Grid Grid.Column="1" Grid.Row="0" Margin="0,0,15,0">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock Grid.Row="0" Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                        <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
+                                                        <Expander Grid.Row="2" Header="Description">
+                                                            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
+                                                                <TextBlock Text="{Binding Video.Description}" FontSize="13"/>
+                                                            </ScrollViewer>
+                                                        </Expander>
+                                                    </Grid>
+
+                                                    <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" CornerRadius="2" Height="6" Margin="0,0,15,10" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
                             </Grid>
-                        </Expander>
-                    </Grid>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Grid>
+        </busyIndicator:BusyMask>
     </Grid>
 </UserControl>

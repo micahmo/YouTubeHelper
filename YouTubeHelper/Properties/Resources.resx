@@ -140,4 +140,13 @@
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="TimeStringFormat" xml:space="preserve">
+    <value>{0:MMMM d, yyyy}  •  {1} day(s) ago  •  {2}</value>
+  </data>
+  <data name="Searching" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
 </root>

@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 
@@ -46,6 +44,13 @@ namespace YouTubeHelper.ViewModels
         public bool SearchMode => Mode == MainControlMode.Search;
 
         public ObservableCollection<ChannelViewModel> Channels { get; } = new();
+
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set => SetProperty(ref _isBusy, value);
+        }
+        private bool _isBusy;
 
         public ChannelViewModel SelectedChannel
         {

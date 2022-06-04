@@ -1,10 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using YouTubeHelper.Models;
 using Channel = YouTubeHelper.Models.Channel;
+using Video = Google.Apis.YouTube.v3.Data.Video;
 
 namespace YouTubeHelper.Utilities
 {
@@ -30,10 +34,66 @@ namespace YouTubeHelper.Utilities
             if (channelSearchResult.Items.FirstOrDefault(r => r.Id.Kind == "youtube#channel") is { } r)
             {
                 channel.VanityName = r.Snippet.Title;
+                channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
                 return true;
             }
 
             return false;
+        }
+
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel)
+        {
+            List<Models.Video> results = new();
+
+            PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
+            playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken";
+            playlistRequest.PlaylistId = channel.ChannelPlaylist;
+            playlistRequest.MaxResults = 50;
+
+            List<string> videoIds = new List<string>();
+
+            string nextPageToken = string.Empty;
+            while (nextPageToken != null)
+            {
+                playlistRequest.PageToken = nextPageToken;
+                PlaylistItemListResponse response = await playlistRequest.ExecuteAsync();
+                videoIds.AddRange(response.Items.Select(i => i.ContentDetails.VideoId));
+                nextPageToken = response.NextPageToken;
+            }
+
+            //videoIds = videoIds.Except(excludedVideoIds).ToList();
+
+            // Use the videoIds to look up real info
+            List<Video> videos = new List<Video>();
+
+            while (videoIds.Any())
+            {
+                VideosResource.ListRequest videoRequest = _youTubeService.Videos.List(new List<string> { "snippet", "contentDetails" });
+                videoRequest.Id = string.Join(",", videoIds.Take(50));
+                var videoResponse = await videoRequest.ExecuteAsync();
+                videos.AddRange(videoResponse.Items);
+
+                videoIds = videoIds.Skip(50).ToList();
+            }
+
+            // First sort by duration
+            var videosSortedByDuration = videos.OrderByDescending(v => XmlConvert.ToTimeSpan(v.ContentDetails.Duration)).ToList();
+
+            // Then sort by age
+            var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAt).ToList();
+
+            var rankedVideos = videos.OrderBy(v => videosSortedByDuration.IndexOf(v) + videosSortedByAge.IndexOf(v)).ToList();
+
+            rankedVideos.Take(10).ToList().ForEach(v => results.Add(new Models.Video
+            {
+                Title = v.Snippet.Title,
+                Description = v.Snippet.Description,
+                Duration = XmlConvert.ToTimeSpan(v.ContentDetails.Duration),
+                ReleaseDate = new DateTimeOffset(v.Snippet.PublishedAt ?? DateTime.MinValue),
+                ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */v.Snippet.Thumbnails.Medium?.Url ?? v.Snippet.Thumbnails.Standard?.Url ?? v.Snippet.Thumbnails.High?.Url ?? v.Snippet.Thumbnails.Default__?.Url ?? string.Empty
+            }));
+
+            return results;
         }
 
         private readonly YouTubeService _youTubeService;
