@@ -133,6 +133,12 @@ namespace YouTubeHelper.ViewModels
             _mainControlViewModel.Channels.Insert(Math.Min(_mainControlViewModel.Channels.Count - 1, previousIndex + 1), this);
             _mainControlViewModel.SelectedChannel = this;
             _mainControlViewModel.AllowCreateNewChannel = true;
+
+            _mainControlViewModel.Channels.ToList().ForEach(c =>
+            {
+                c.Channel.Index = _mainControlViewModel.Channels.IndexOf(c);
+                DatabaseEngine.ChannelCollection.Update(c.Channel);
+            });
         }
 
         public ICommand MoveLeftCommand => _moveLeftCommand ??= new RelayCommand(MoveLeft);
