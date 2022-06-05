@@ -95,7 +95,7 @@ namespace YouTubeHelper.Utilities
             return await FindVideoDetails(items, excludedVideos, channel, sortMode);
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null)
+        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10)
         {
             List<Models.Video> results = new();
             List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
@@ -161,7 +161,7 @@ namespace YouTubeHelper.Utilities
 
             var rankedVideos = videos.OrderBy(v => SortFunction(sortMode, v, videosSortedByDuration, videosSortedByAge)).ToList();
 
-            foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : 10))
+            foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : count))
             {
                 results.Add(new Models.Video
                 {

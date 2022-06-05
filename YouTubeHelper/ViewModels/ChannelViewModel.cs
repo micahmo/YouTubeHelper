@@ -114,7 +114,7 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
-                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode.Value)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
             }
             finally
             {
