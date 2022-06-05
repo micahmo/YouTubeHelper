@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using CliWrap;
 using CliWrap.Buffered;
@@ -58,8 +59,15 @@ namespace YouTubeHelper.ViewModels
         public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(DownloadVideo);
         private ICommand _downloadVideoCommand;
 
-        private async void DownloadVideo()
+        private void DownloadVideo()
         {
+            // Initiate the download
+            Clipboard.SetText($"https://www.youtube.com/watch?v={Video.Id}");
+            Cli.Wrap(Settings.Instance.TelegramPath)
+                .WithArguments($@"-- ""tg://resolve/?domain={Settings.Instance.TelegramBotId}""")
+                .ExecuteBufferedAsync();
+
+            // Mark as downloaded
             Video.Excluded = true;
             Video.ExclusionReason = ExclusionReason.Watched;
             DatabaseEngine.ExcludedVideosCollection.Upsert(Video);

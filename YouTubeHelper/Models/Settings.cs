@@ -49,12 +49,12 @@ namespace YouTubeHelper.Models
         }
         private string _telegramBotId;
 
-        public string TelegramApiKey
+        public string TelegramPath
         {
-            get => _telegramApiKey;
-            set => SetProperty(ref _telegramApiKey, value);
+            get => _telegramPath;
+            set => SetProperty(ref _telegramPath, value);
         }
-        private string _telegramApiKey;
+        private string _telegramPath;
 
         public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {
