@@ -103,5 +103,13 @@ namespace YouTubeHelper.Views
                 (DataContext as MainControlViewModel)?.SelectedChannel?.FindVideosCommand.Execute(null);
             }
         }
+
+        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBlock textBlock)
+            {
+                Clipboard.SetText(textBlock.Text);
+            }
+        }
     }
 }

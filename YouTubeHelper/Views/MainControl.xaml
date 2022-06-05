@@ -204,7 +204,10 @@
                                                                 <RowDefinition Height="Auto"/>
                                                             </Grid.RowDefinitions>
 
-                                                            <TextBlock Grid.Row="0" Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                                                <TextBlock Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                                <TextBlock Text="{Binding Video.Id}" FontWeight="Light" TextWrapping="Wrap" Padding="15,0,15,0" Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
+                                                            </StackPanel>
                                                             <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
                                                             <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
                                                             <Expander Grid.Row="3" Header="Description">
