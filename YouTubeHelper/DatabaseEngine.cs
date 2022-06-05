@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using LiteDB;
 using YouTubeHelper.Models;
@@ -13,12 +14,12 @@ namespace YouTubeHelper
             {
                 return _databaseInstance ??= new Func<LiteDatabase>(() =>
                 {
-                    if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName)))
+                    if (!Directory.Exists(DatabaseDirectory))
                     {
-                        Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName));
+                        Directory.CreateDirectory(DatabaseDirectory);
                     }
 
-                    return new LiteDatabase(new ConnectionString(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppDataFolderName, DbName))
+                    return new LiteDatabase(new ConnectionString(Path.Combine(DatabaseDirectory, DbName))
                     {
                         Connection = ConnectionType.Shared
                     });
@@ -45,6 +46,15 @@ namespace YouTubeHelper
         private static ILiteCollection<Video> _excludedVideosCollection;
 
         private const string DbName = "YTH.db";
-        private const string AppDataFolderName = "YTH";
+        private static string DatabaseDirectory
+        {
+            get
+            {
+                string overrideDirectory = ConfigurationManager.AppSettings["DatabaseDirectory"];
+                return string.IsNullOrEmpty(overrideDirectory)
+                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YTH")
+                    : overrideDirectory;
+            }
+        }
     }
 }
