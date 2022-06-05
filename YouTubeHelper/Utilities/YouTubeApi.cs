@@ -87,6 +87,11 @@ namespace YouTubeHelper.Utilities
             
             List<string> items = channelSearchResult.Items.Where(r => r.Id.Kind == "youtube#video").Select(r => r.Id.VideoId).ToList();
 
+            if (!showExclusions)
+            {
+                items = items.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
+            }
+
             return await FindVideoDetails(items, excludedVideos, channel, sortMode);
         }
 
