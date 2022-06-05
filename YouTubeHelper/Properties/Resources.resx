@@ -176,4 +176,7 @@
   <data name="CountLabel" xml:space="preserve">
     <value>Count: {0}</value>
   </data>
+  <data name="Watched" xml:space="preserve">
+    <value>Watched</value>
+  </data>
 </root>

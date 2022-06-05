@@ -88,7 +88,11 @@ namespace YouTubeHelper.ViewModels
 
             if (sender is Button button)
             {
-                if (button.Content?.ToString() == Properties.Resources.WontWatch)
+                if (button.Content?.ToString() == Properties.Resources.Watched)
+                {
+                    Video.ExclusionReason = ExclusionReason.Watched;
+                }
+                else if (button.Content?.ToString() == Properties.Resources.WontWatch)
                 {
                     Video.ExclusionReason = ExclusionReason.WontWatch;
                 }

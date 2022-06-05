@@ -277,6 +277,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Watched.
+        /// </summary>
+        public static string Watched {
+            get {
+                return ResourceManager.GetString("Watched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Won&apos;t watch.
         /// </summary>
         public static string WontWatch {
