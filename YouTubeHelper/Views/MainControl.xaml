@@ -158,6 +158,9 @@
                                         <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding ShowExcludedVideos}"
                                               Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}"/>
 
+                                        <ComboBox Grid.Column="4" ItemsSource="{Binding ExclusionReasonValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}"
+                                                  Visibility="{c:Binding ExclusionsMode, FalseToVisibility=Collapsed}"/>
+
                                         <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
                                              Text="{Binding ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"

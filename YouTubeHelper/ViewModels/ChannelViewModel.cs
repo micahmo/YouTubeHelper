@@ -114,6 +114,12 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+
+                if (SelectedExclusionFilter.Value != ExclusionReason.None)
+                {
+                    exclusions = exclusions.Where(v => v.ExclusionReason == SelectedExclusionFilter.Value).ToList();
+                }
+
                 (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
             }
             finally
@@ -193,6 +199,22 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _showExcludedVideos, value);
         }
         private bool _showExcludedVideos;
+
+        public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
+
+        public ExclusionReasonExtended SelectedExclusionFilter
+        {
+            get => _exclusionFilter ?? ExclusionReasonValues.FirstOrDefault();
+            set => SetProperty(ref _exclusionFilter, value);
+        }
+        private ExclusionReasonExtended _exclusionFilter;
+
+        public int SelectedExclusionFilterIndex
+        {
+            get => _selectedExclusionFilterIndex;
+            set => SetProperty(ref _selectedExclusionFilterIndex, value);
+        }
+        private int _selectedExclusionFilterIndex;
 
         #endregion
 

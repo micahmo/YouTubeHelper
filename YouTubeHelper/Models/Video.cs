@@ -53,7 +53,7 @@ namespace YouTubeHelper.Models
 
     public enum ExclusionReason
     {
-        [Description("None")]
+        [Description("No exclusion reason filter")]
         None,
 
         [Description("Won't Watch")]
