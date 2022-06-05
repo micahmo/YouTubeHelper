@@ -19,7 +19,7 @@ namespace YouTubeHelper.Views
         {
             InitializeComponent();
 
-            new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, (_, __) =>
+            new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, (_, _) =>
             {
                 if (DataContext is MainControlViewModel mainControlViewModel && MediaElement.NaturalDuration.HasTimeSpan)
                 {

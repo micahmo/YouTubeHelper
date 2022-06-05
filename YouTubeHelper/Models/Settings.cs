@@ -8,7 +8,7 @@ namespace YouTubeHelper.Models
     {
         public Settings()
         {
-            PropertyChanged += (_, __) =>
+            PropertyChanged += (_, _) =>
             {
                 DatabaseEngine.SettingsCollection.Upsert(this);
             };

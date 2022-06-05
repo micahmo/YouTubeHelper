@@ -173,4 +173,7 @@
   <data name="MightWatch" xml:space="preserve">
     <value>Might watch</value>
   </data>
+  <data name="CountLabel" xml:space="preserve">
+    <value>Count: {0}</value>
+  </data>
 </root>

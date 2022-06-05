@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
+using YouTubeHelper.Properties;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels
@@ -27,6 +28,11 @@ namespace YouTubeHelper.ViewModels
                     OnPropertyChanged(nameof(WatchMode));
                     OnPropertyChanged(nameof(ExclusionsMode));
                 }
+            };
+
+            Videos.CollectionChanged += (_, _) =>
+            {
+                OnPropertyChanged(nameof(CountLabel));
             };
         }
 
@@ -219,6 +225,8 @@ namespace YouTubeHelper.ViewModels
         }
 
         private string _lookupSearchTerm;
+
+        public string CountLabel => string.Format(Resources.CountLabel, Videos.Count);
 
         public Channel Channel { get; }
 

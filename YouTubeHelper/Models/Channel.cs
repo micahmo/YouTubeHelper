@@ -11,7 +11,7 @@ namespace YouTubeHelper.Models
         {
             if (!nonPersistent)
             {
-                PropertyChanged += (_, __) => DatabaseEngine.ChannelCollection.Upsert(this);
+                PropertyChanged += (_, _) => DatabaseEngine.ChannelCollection.Upsert(this);
             }
         }
 

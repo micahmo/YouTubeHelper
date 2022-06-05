@@ -106,6 +106,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count: {0}.
+        /// </summary>
+        public static string CountLabel {
+            get {
+                return ResourceManager.GetString("CountLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string Description {
