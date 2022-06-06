@@ -37,6 +37,10 @@ namespace YouTubeHelper.Views
                     }
                 }
             }, Dispatcher.CurrentDispatcher).Start();
+
+            // Manually hook up the slider mouse events, and say we want them even when they're handled
+            MediaScrub.AddHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(MediaScrub_PreviewMouseDown), true);
+            MediaScrub.AddHandler(PreviewMouseUpEvent, new MouseButtonEventHandler(MediaScrub_PreviewMouseUp), true);
         }
 
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -53,12 +57,12 @@ namespace YouTubeHelper.Views
             }
         }
 
-        private void MediaScrub_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MediaScrub_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             _mediaScrubBeingDragged = true;
         }
 
-        private void MediaScrub_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MediaScrub_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             _manualScrubPosition = MediaScrub.Value;
             _mediaScrubHandled = false;
@@ -68,7 +72,7 @@ namespace YouTubeHelper.Views
         private bool _mediaScrubHandled = true;
         private double _manualScrubPosition;
 
-        private void MediaElement_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MediaElement_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             MediaState state = (MediaState)StateField.GetValue(HelperObject);
 

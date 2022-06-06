@@ -48,8 +48,7 @@
                             <MediaElement x:Name="MediaElement" Grid.Row="1" Source="{Binding ActiveVideo}" LoadedBehavior="Manual" 
                                   PreviewMouseDown="MediaElement_PreviewMouseDown"/>
                             <Label Grid.Row="2" Content="{Binding ActiveVideoTimeString}" HorizontalAlignment="Right"/>
-                            <Slider x:Name="MediaScrub" Grid.Row="3" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"
-                            PreviewMouseDown="MediaScrub_PreviewMouseDown" PreviewMouseUp="MediaScrub_PreviewMouseUp"/>
+                            <Slider x:Name="MediaScrub" Grid.Row="3" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"/>
                         </Grid>
                     </Expander>
 
