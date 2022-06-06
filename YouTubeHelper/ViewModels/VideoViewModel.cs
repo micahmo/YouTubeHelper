@@ -72,7 +72,7 @@ namespace YouTubeHelper.ViewModels
             Video.ExclusionReason = ExclusionReason.Watched;
             DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
 
-            if (!_channelViewModel.ShowExcludedVideos)
+            if (!_mainControlViewModel.ShowExcludedVideos)
             {
                 _channelViewModel.Videos.Remove(this);
             }
@@ -105,7 +105,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = true;
             DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
 
-            if (!_channelViewModel.ShowExcludedVideos)
+            if (!_mainControlViewModel.ShowExcludedVideos)
             {
                 _channelViewModel.Videos.Remove(this);
             }

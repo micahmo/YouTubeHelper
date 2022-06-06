@@ -159,21 +159,21 @@
                                                 </Grid>
                                             </Button>
 
-                                            <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
+                                            <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding MainControlViewModel.SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding MainControlViewModel.SelectedSortMode}" SelectedIndex="{Binding MainControlViewModel.SelectedSortModeIndex}"/>
 
-                                            <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding ShowExcludedVideos}"
+                                            <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding MainControlViewModel.ShowExcludedVideos}"
                                               Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}"/>
 
-                                            <ComboBox Grid.Column="4" ItemsSource="{Binding ExclusionReasonValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}"
+                                            <ComboBox Grid.Column="4" ItemsSource="{Binding MainControlViewModel.ExclusionReasonValues}" DisplayMemberPath="Description" SelectedItem="{Binding MainControlViewModel.SelectedExclusionFilter}" SelectedIndex="{Binding MainControlViewModel.SelectedExclusionFilterIndex}"
                                                   Visibility="{c:Binding ExclusionsMode, FalseToVisibility=Collapsed}"/>
 
                                             <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
-                                             Text="{Binding ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding MainControlViewModel.ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
                                              KeyDown="Search_KeyDown"/>
 
                                             <TextBox Grid.Column="8" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
-                                             Text="{Binding LookupSearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding MainControlViewModel.LookupSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
                                              KeyDown="Search_KeyDown"/>
 

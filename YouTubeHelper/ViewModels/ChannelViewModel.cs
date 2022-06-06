@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -18,11 +17,11 @@ namespace YouTubeHelper.ViewModels
         public ChannelViewModel(Channel channel, MainControlViewModel mainControlViewModel)
         {
             Channel = channel;
-            _mainControlViewModel = mainControlViewModel;
+            MainControlViewModel = mainControlViewModel;
 
-            _mainControlViewModel.PropertyChanged += (_, args) =>
+            MainControlViewModel.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(_mainControlViewModel.Mode))
+                if (args.PropertyName == nameof(MainControlViewModel.Mode))
                 {
                     OnPropertyChanged(nameof(SearchMode));
                     OnPropertyChanged(nameof(WatchMode));
@@ -41,8 +40,8 @@ namespace YouTubeHelper.ViewModels
 
         private void Delete()
         {
-            _mainControlViewModel.SelectedChannel = _mainControlViewModel.Channels[Math.Max(0, _mainControlViewModel.Channels.IndexOf(this) - 1)];
-            _mainControlViewModel.Channels.Remove(this);
+            MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
+            MainControlViewModel.Channels.Remove(this);
             DatabaseEngine.ChannelCollection.Delete(Channel.ObjectId);
         }
 
@@ -70,7 +69,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindVideos()
         {
-            _mainControlViewModel.IsBusy = true;
+            MainControlViewModel.IsBusy = true;
 
             Videos.Clear();
 
@@ -79,26 +78,26 @@ namespace YouTubeHelper.ViewModels
                 List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
                 List<string> searchTerms = null;
 
-                if (_mainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(LookupSearchTerm))
+                if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                 {
-                    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value, LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
                 }
                 else
                 {
-                    if (_mainControlViewModel.Mode == MainControlMode.Search)
+                    if (MainControlViewModel.Mode == MainControlMode.Search)
                     {
-                        if (!string.IsNullOrEmpty(ExactSearchTerm))
+                        if (!string.IsNullOrEmpty(MainControlViewModel.ExactSearchTerm))
                         {
-                            searchTerms = ExactSearchTerm.Split().ToList();
+                            searchTerms = MainControlViewModel.ExactSearchTerm.Split().ToList();
                         }
                     }
 
-                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode.Value, searchTerms)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
                 }
             }
             finally
             {
-                _mainControlViewModel.IsBusy = false;
+                MainControlViewModel.IsBusy = false;
             }
         }
 
@@ -107,7 +106,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindExclusions()
         {
-            _mainControlViewModel.IsBusy = true;
+            MainControlViewModel.IsBusy = true;
 
             Videos.Clear();
 
@@ -115,16 +114,16 @@ namespace YouTubeHelper.ViewModels
             {
                 List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
 
-                if (SelectedExclusionFilter.Value != ExclusionReason.None)
+                if (MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None)
                 {
-                    exclusions = exclusions.Where(v => v.ExclusionReason == SelectedExclusionFilter.Value).ToList();
+                    exclusions = exclusions.Where(v => v.ExclusionReason == MainControlViewModel.SelectedExclusionFilter.Value).ToList();
                 }
 
-                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, _mainControlViewModel, this)));
+                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
             }
             finally
             {
-                _mainControlViewModel.IsBusy = false;
+                MainControlViewModel.IsBusy = false;
             }
         }
 
@@ -133,16 +132,16 @@ namespace YouTubeHelper.ViewModels
 
         private void MoveRight()
         {
-            _mainControlViewModel.AllowCreateNewChannel = false;
-            int previousIndex = _mainControlViewModel.Channels.IndexOf(this);
-            _mainControlViewModel.Channels.Remove(this);
-            _mainControlViewModel.Channels.Insert(Math.Min(_mainControlViewModel.Channels.Count - 1, previousIndex + 1), this);
-            _mainControlViewModel.SelectedChannel = this;
-            _mainControlViewModel.AllowCreateNewChannel = true;
+            MainControlViewModel.AllowCreateNewChannel = false;
+            int previousIndex = MainControlViewModel.Channels.IndexOf(this);
+            MainControlViewModel.Channels.Remove(this);
+            MainControlViewModel.Channels.Insert(Math.Min(MainControlViewModel.Channels.Count - 1, previousIndex + 1), this);
+            MainControlViewModel.SelectedChannel = this;
+            MainControlViewModel.AllowCreateNewChannel = true;
 
-            _mainControlViewModel.Channels.ToList().ForEach(c =>
+            MainControlViewModel.Channels.ToList().ForEach(c =>
             {
-                c.Channel.Index = _mainControlViewModel.Channels.IndexOf(c);
+                c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
                 DatabaseEngine.ChannelCollection.Update(c.Channel);
             });
         }
@@ -152,16 +151,16 @@ namespace YouTubeHelper.ViewModels
 
         private void MoveLeft()
         {
-            _mainControlViewModel.AllowCreateNewChannel = false;
-            int previousIndex = _mainControlViewModel.Channels.IndexOf(this);
-            _mainControlViewModel.Channels.Remove(this);
-            _mainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
-            _mainControlViewModel.SelectedChannel = this;
-            _mainControlViewModel.AllowCreateNewChannel = true;
+            MainControlViewModel.AllowCreateNewChannel = false;
+            int previousIndex = MainControlViewModel.Channels.IndexOf(this);
+            MainControlViewModel.Channels.Remove(this);
+            MainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
+            MainControlViewModel.SelectedChannel = this;
+            MainControlViewModel.AllowCreateNewChannel = true;
 
-            _mainControlViewModel.Channels.ToList().ForEach(c =>
+            MainControlViewModel.Channels.ToList().ForEach(c =>
             {
-                c.Channel.Index = _mainControlViewModel.Channels.IndexOf(c);
+                c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
                 DatabaseEngine.ChannelCollection.Update(c.Channel);
             });
         }
@@ -175,89 +174,16 @@ namespace YouTubeHelper.ViewModels
 
         public ObservableCollection<VideoViewModel> Videos { get; } = new();
 
-        #region Sorting
+        public bool WatchMode => MainControlViewModel.Mode == MainControlMode.Watch;
 
-        public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
+        public bool SearchMode => MainControlViewModel.Mode == MainControlMode.Search;
 
-        public SortModeExtended SelectedSortMode
-        {
-            get => _selectedSortMode ?? SortModeValues.FirstOrDefault();
-            set => SetProperty(ref _selectedSortMode, value);
-        }
-        private SortModeExtended _selectedSortMode;
-
-        public int SelectedSortModeIndex
-        {
-            get => _selectedSortModeIndex;
-            set => SetProperty(ref _selectedSortModeIndex, value);
-        }
-        private int _selectedSortModeIndex;
-
-        public bool ShowExcludedVideos
-        {
-            get => _showExcludedVideos;
-            set => SetProperty(ref _showExcludedVideos, value);
-        }
-        private bool _showExcludedVideos;
-
-        public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
-
-        public ExclusionReasonExtended SelectedExclusionFilter
-        {
-            get => _exclusionFilter ?? ExclusionReasonValues.FirstOrDefault();
-            set => SetProperty(ref _exclusionFilter, value);
-        }
-        private ExclusionReasonExtended _exclusionFilter;
-
-        public int SelectedExclusionFilterIndex
-        {
-            get => _selectedExclusionFilterIndex;
-            set => SetProperty(ref _selectedExclusionFilterIndex, value);
-        }
-        private int _selectedExclusionFilterIndex;
-
-        #endregion
-
-        public bool WatchMode => _mainControlViewModel.Mode == MainControlMode.Watch;
-
-        public bool SearchMode => _mainControlViewModel.Mode == MainControlMode.Search;
-
-        public bool ExclusionsMode => _mainControlViewModel.Mode == MainControlMode.Exclusions;
-
-        public string ExactSearchTerm
-        {
-            get => _exactSearchTerm;
-            set => SetProperty(ref _exactSearchTerm, value);
-        }
-        private string _exactSearchTerm;
-
-        public string LookupSearchTerm
-        {
-            get => _lookupSearchTerm;
-            set
-            {
-                // See if this is a URL and try to parse it
-                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri uri))
-                {
-                    var queryString = HttpUtility.ParseQueryString(uri.Query);
-                    string videoId = queryString["v"];
-                    if (!string.IsNullOrEmpty(videoId))
-                    {
-                        SetProperty(ref _lookupSearchTerm, videoId);
-                        return;
-                    }
-                }
-
-                SetProperty(ref _lookupSearchTerm, value);
-            }
-        }
-
-        private string _lookupSearchTerm;
+        public bool ExclusionsMode => MainControlViewModel.Mode == MainControlMode.Exclusions;
 
         public string CountLabel => string.Format(Resources.CountLabel, Videos.Count);
 
         public Channel Channel { get; }
 
-        private readonly MainControlViewModel _mainControlViewModel;
+        public MainControlViewModel MainControlViewModel { get; }
     }
 }

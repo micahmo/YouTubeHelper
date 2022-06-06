@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Web;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels
 {
@@ -33,24 +36,24 @@ namespace YouTubeHelper.ViewModels
                     switch (Mode)
                     {
                         case MainControlMode.Search:
+                            SelectedSortMode = SortModeValues.FirstOrDefault(s => s.Value == SortMode.AgeDesc);
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
-                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.Value == Utilities.SortMode.AgeDesc);
                             });
                             break;
                         case MainControlMode.Watch:
+                            ExactSearchTerm = LookupSearchTerm = null;
+                            SelectedSortMode = SortModeValues.FirstOrDefault(s => s.Value == SortMode.DurationPlusRecency);
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
-                                c.ExactSearchTerm = c.LookupSearchTerm = null;
-                                c.SelectedSortMode = c.SortModeValues.FirstOrDefault(s => s.Value == Utilities.SortMode.DurationPlusRecency);
                             });
                             break;
                         case MainControlMode.Exclusions:
+                            ExactSearchTerm = LookupSearchTerm = null;
                             Channels.ToList().ForEach(c =>
                             {
-                                c.ExactSearchTerm = c.LookupSearchTerm = null;
                                 c.Videos.Clear();
                             });
                             break;
@@ -161,6 +164,79 @@ namespace YouTubeHelper.ViewModels
         public string ActiveVideoTimeString => $"{(int)ActiveVideoElapsedTimeSpan.TotalHours:D2}:{ActiveVideoElapsedTimeSpan.Minutes:D2}:{ActiveVideoElapsedTimeSpan.Seconds:D2}  /  " +
                                                $"{(int)ActiveVideoDuration.TotalHours:D2}:{ActiveVideoDuration.Minutes:D2}:{ActiveVideoDuration.Seconds:D2}  /  " +
                                                $"{(int)ActiveVideoRemainingTimeSpan.TotalHours:D2}:{ActiveVideoRemainingTimeSpan.Minutes:D2}:{ActiveVideoRemainingTimeSpan.Seconds:D2}";
+
+        #endregion
+
+        #region Sorting and filtering
+
+        public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
+
+        public SortModeExtended SelectedSortMode
+        {
+            get => _selectedSortMode ?? SortModeValues.FirstOrDefault();
+            set => SetProperty(ref _selectedSortMode, value);
+        }
+        private SortModeExtended _selectedSortMode;
+
+        public int SelectedSortModeIndex
+        {
+            get => _selectedSortModeIndex;
+            set => SetProperty(ref _selectedSortModeIndex, value);
+        }
+        private int _selectedSortModeIndex;
+
+        public bool ShowExcludedVideos
+        {
+            get => _showExcludedVideos;
+            set => SetProperty(ref _showExcludedVideos, value);
+        }
+        private bool _showExcludedVideos;
+
+        public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
+
+        public ExclusionReasonExtended SelectedExclusionFilter
+        {
+            get => _exclusionFilter ?? ExclusionReasonValues.FirstOrDefault();
+            set => SetProperty(ref _exclusionFilter, value);
+        }
+        private ExclusionReasonExtended _exclusionFilter;
+
+        public int SelectedExclusionFilterIndex
+        {
+            get => _selectedExclusionFilterIndex;
+            set => SetProperty(ref _selectedExclusionFilterIndex, value);
+        }
+        private int _selectedExclusionFilterIndex;
+
+        public string ExactSearchTerm
+        {
+            get => _exactSearchTerm;
+            set => SetProperty(ref _exactSearchTerm, value);
+        }
+        private string _exactSearchTerm;
+
+        public string LookupSearchTerm
+        {
+            get => _lookupSearchTerm;
+            set
+            {
+                // See if this is a URL and try to parse it
+                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri uri))
+                {
+                    var queryString = HttpUtility.ParseQueryString(uri.Query);
+                    string videoId = queryString["v"];
+                    if (!string.IsNullOrEmpty(videoId))
+                    {
+                        SetProperty(ref _lookupSearchTerm, videoId);
+                        return;
+                    }
+                }
+
+                SetProperty(ref _lookupSearchTerm, value);
+            }
+        }
+
+        private string _lookupSearchTerm;
 
         #endregion
 
