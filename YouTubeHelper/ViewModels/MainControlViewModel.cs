@@ -250,6 +250,15 @@ namespace YouTubeHelper.ViewModels
             });
 
             Channels.Add(_newChannelTab);
+
+            try
+            {
+                SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 

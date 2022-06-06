@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using ModernWpf.Controls;
+using YouTubeHelper.Models;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
 
@@ -14,7 +16,16 @@ namespace YouTubeHelper
     {
         public MainWindow()
         {
+            ApplicationSettings.Instance.Load();
+
             InitializeComponent();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            ApplicationSettings.Instance.Tracker.Track(this);
         }
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
@@ -51,6 +62,7 @@ namespace YouTubeHelper
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
             DatabaseEngine.Shutdown();
         }
 
