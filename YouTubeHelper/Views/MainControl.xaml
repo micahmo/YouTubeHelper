@@ -31,12 +31,13 @@
 
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="{c:Binding 'IsPlayerExpanded ? ExpandedGridLength : CollapsedGridLength'}"/>
+                        <ColumnDefinition Width="{c:Binding 'IsMainControlExpanded ? TwoStarGridLength : FifteenPixelGridLength'}"/>
+                        <ColumnDefinition Width="{c:Binding '!IsMainControlExpanded and !IsPlayerExpanded ? OneStarGridLength : ZeroGridLength'}"/>
+                        <ColumnDefinition Width="{c:Binding 'IsPlayerExpanded ? OneStarGridLength : FifteenPixelGridLength'}"/>
                     </Grid.ColumnDefinitions>
 
-                    <Expander Grid.Column="1" ExpandDirection="Left" IsExpanded="{Binding IsPlayerExpanded}" Background="{DynamicResource SystemControlBackgroundListLowBrush}" Padding="0,10,0,0">
-                        <Grid Margin="15,0,0,0" >
+                    <Expander Grid.Column="2" ExpandDirection="Left" IsExpanded="{Binding IsPlayerExpanded}" Background="{DynamicResource SystemControlBackgroundListLowBrush}" Padding="0,10,0,0">
+                        <Grid Margin="15,0,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
@@ -46,252 +47,259 @@
                             </Grid.RowDefinitions>
 
                             <MediaElement x:Name="MediaElement" Grid.Row="1" Source="{Binding ActiveVideo}" LoadedBehavior="Manual" 
-                                  PreviewMouseDown="MediaElement_PreviewMouseDown"/>
-                            <Label Grid.Row="2" Content="{Binding ActiveVideoTimeString}" HorizontalAlignment="Right"/>
-                            <Slider x:Name="MediaScrub" Grid.Row="3" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"/>
+                                  PreviewMouseDown="MediaElement_PreviewMouseDown"
+                                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  MaxHeight="{c:Binding 'ActualHeight - 150', RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Label Grid.Row="2" Content="{Binding ActiveVideoTimeString}"
+                                   HorizontalContentAlignment="Right" Padding="0,5,1,0"
+                                   Width="{Binding ActualWidth, ElementName=MediaElement}"/>
+                            <Slider x:Name="MediaScrub" Grid.Row="3" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"
+                                    Width="{Binding ActualWidth, ElementName=MediaElement}"/>
                         </Grid>
                     </Expander>
 
-                    <TabControl Grid.Column="0" ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}">
-                        <TabControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Channel.VanityName}" ToolTip="{Binding Channel.ExtendedDescription}"/>
-                            </DataTemplate>
-                        </TabControl.ItemTemplate>
-                        <TabControl.ContentTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                    <Expander Grid.Column="0" ExpandDirection="Right" IsExpanded="{Binding IsMainControlExpanded}" Background="{DynamicResource SystemControlBackgroundListLowBrush}" Padding="0,10,0,0">
+                        <TabControl ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}" Background="#e6e6e6" Margin="0,-15,0,0">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Channel.VanityName}" ToolTip="{Binding Channel.ExtendedDescription}"/>
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid Background="White">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <Expander Grid.Row="0" Margin="15,15,30,15">
-                                        <Expander.Header>
-                                            <!-- Need to use this width hack in order for the header content to stretch horizontally -->
-                                            <!-- https://stackoverflow.com/a/680512/4206279 -->
-                                            <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}">
+                                        <Expander Grid.Row="0" Margin="15,15,30,15">
+                                            <Expander.Header>
+                                                <!-- Need to use this width hack in order for the header content to stretch horizontally -->
+                                                <!-- https://stackoverflow.com/a/680512/4206279 -->
+                                                <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Expander}}, Path=ActualWidth}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0" Text="Channel Settings"/>
+                                                    <Border Grid.Column="1" CornerRadius="2" Margin="10,8,22,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+                                                </Grid>
+                                            </Expander.Header>
+
+                                            <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="50"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Column="0" Text="Channel Settings"/>
-                                                <Border Grid.Column="1" CornerRadius="2" Margin="10,8,22,5" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
-                                            </Grid>
-                                        </Expander.Header>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                                        <Grid>
+                                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                                <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Command="{Binding LookupChannelCommand}">
+                                                    <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
+                                                </Button>
+                                                <Button Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
+                                            </Grid>
+                                        </Expander>
+
+                                        <Grid Grid.Row="1" Margin="0,0,30,15">
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="5"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="5"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="5"/>
-                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="33"/>
                                             </Grid.RowDefinitions>
 
-                                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                                            <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Command="{Binding LookupChannelCommand}">
-                                                <ui:FontIcon Glyph="{Binding SearchGlyph}"/>
-                                            </Button>
-                                            <Button Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Content="Delete" Command="{Binding DeleteCommand}" HorizontalAlignment="Stretch"/>
-                                        </Grid>
-                                    </Expander>
-
-                                    <Grid Grid.Row="1" Margin="0,0,30,15">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="10"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="10"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="10"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="10"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="5"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="33"/>
-                                        </Grid.RowDefinitions>
-
-                                        <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindVideosCommand}" Margin="15,0,0,0"
+                                            <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindVideosCommand}" Margin="15,0,0,0"
                                             Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}" >
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="5"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="5"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
-                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Search}"/>
-                                            </Grid>
-                                        </Button>
+                                                    <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
+                                                    <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Search}"/>
+                                                </Grid>
+                                            </Button>
 
-                                        <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindExclusionsCommand}" Margin="15,0,0,0"
+                                            <Button Grid.Column="0" VerticalAlignment="Stretch" Command="{Binding FindExclusionsCommand}" Margin="15,0,0,0"
                                             Visibility="{c:Binding 'ExclusionsMode', FalseToVisibility=Collapsed}" >
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="5"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="5"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
-                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.View}"/>
-                                            </Grid>
-                                        </Button>
+                                                    <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;"/>
+                                                    <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.View}"/>
+                                                </Grid>
+                                            </Button>
 
-                                        <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
+                                            <ComboBox Grid.Column="2" VerticalAlignment="Stretch" ItemsSource="{Binding SortModeValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
 
-                                        <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding ShowExcludedVideos}"
+                                            <CheckBox Grid.Column="4" Content="{x:Static properties:Resources.ShowExcludedVideos}" IsChecked="{Binding ShowExcludedVideos}"
                                               Visibility="{c:Binding '!ExclusionsMode', FalseToVisibility=Collapsed}"/>
 
-                                        <ComboBox Grid.Column="4" ItemsSource="{Binding ExclusionReasonValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}"
+                                            <ComboBox Grid.Column="4" ItemsSource="{Binding ExclusionReasonValues}" DisplayMemberPath="Description" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}"
                                                   Visibility="{c:Binding ExclusionsMode, FalseToVisibility=Collapsed}"/>
 
-                                        <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
+                                            <TextBox Grid.Column="6" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}" Padding="10,5,10,5" MinWidth="250"
                                              Text="{Binding ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
                                              KeyDown="Search_KeyDown"/>
 
-                                        <TextBox Grid.Column="8" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
+                                            <TextBox Grid.Column="8" VerticalAlignment="Stretch" VerticalContentAlignment="Center" ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}" Padding="10,5,10,5" MinWidth="400"
                                              Text="{Binding LookupSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                              Visibility="{c:Binding 'SearchMode', FalseToVisibility=Collapsed}"
                                              KeyDown="Search_KeyDown"/>
 
-                                        <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
-                                            <ui:FontIcon Glyph="&#xE760;"/>
-                                        </Button>
-                                        <Button Grid.Column="12" VerticalAlignment="Stretch" Command="{Binding MoveRightCommand}" Margin="0,0,0,0">
-                                            <ui:FontIcon Glyph="&#xE761;"/>
-                                        </Button>
-                                    </Grid>
+                                            <Button Grid.Column="10" VerticalAlignment="Stretch" Command="{Binding MoveLeftCommand}" Margin="15,0,0,0">
+                                                <ui:FontIcon Glyph="&#xE760;"/>
+                                            </Button>
+                                            <Button Grid.Column="12" VerticalAlignment="Stretch" Command="{Binding MoveRightCommand}" Margin="0,0,0,0">
+                                                <ui:FontIcon Glyph="&#xE761;"/>
+                                            </Button>
+                                        </Grid>
 
 
-                                    <ScrollViewer Grid.Row="2" ui:ScrollViewerHelper.AutoHideScrollBars="False">
-                                        <ItemsControl ItemsSource="{Binding Videos}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Margin="15,0,30,0">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto"/>
-                                                            <RowDefinition Height="Auto"/>
-                                                        </Grid.RowDefinitions>
-
-                                                        <Image Grid.Column="0" Source="{Binding Video.ThumbnailUrl}" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,10,10"/>
-
-                                                        <Grid Grid.Column="1" Grid.Row="0" Margin="0,0,15,0">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition Height="Auto"/>
-                                                                <RowDefinition Height="Auto"/>
-                                                                <RowDefinition Height="Auto"/>
-                                                                <RowDefinition Height="*"/>
-                                                                <RowDefinition Height="Auto"/>
-                                                            </Grid.RowDefinitions>
-
-                                                            <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                                                <TextBlock Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
-                                                                <TextBlock Text="{Binding Video.Id}" FontWeight="Light" TextWrapping="Wrap" Padding="15,0,15,0" Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
-                                                            </StackPanel>
-                                                            <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
-                                                            <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
-                                                            <Expander Grid.Row="3" Header="Description">
-                                                                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
-                                                                    <TextBlock Text="{Binding Video.Description}" FontSize="13"/>
-                                                                </ScrollViewer>
-                                                            </Expander>
-                                                        </Grid>
-
-                                                        <Grid Grid.Column="2">
+                                        <ScrollViewer Grid.Row="2" ui:ScrollViewerHelper.AutoHideScrollBars="False">
+                                            <ItemsControl ItemsSource="{Binding Videos}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="15,0,30,0">
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition/>
-                                                                <ColumnDefinition Width="5"/>
-                                                                <ColumnDefinition/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
                                                             </Grid.ColumnDefinitions>
 
                                                             <Grid.RowDefinitions>
-                                                                <RowDefinition Height="*"/>
-                                                                <RowDefinition/>
-                                                                <RowDefinition Height="5"/>
-                                                                <RowDefinition/>
-                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="Auto"/>
                                                             </Grid.RowDefinitions>
 
-                                                            <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}"
+                                                            <Image Grid.Column="0" Source="{Binding Video.ThumbnailUrl}" Width="150" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,10,10"/>
+
+                                                            <Grid Grid.Column="1" Grid.Row="0" Margin="0,0,15,0">
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="*"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                                                    <TextBlock Text="{Binding Video.Title}" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                                    <TextBlock Text="{Binding Video.Id}" FontWeight="Light" TextWrapping="Wrap" Padding="15,0,15,0" Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
+                                                                </StackPanel>
+                                                                <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
+                                                                <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
+                                                                <Expander Grid.Row="3" Header="Description">
+                                                                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
+                                                                        <TextBlock Text="{Binding Video.Description}" FontSize="13"/>
+                                                                    </ScrollViewer>
+                                                                </Expander>
+                                                            </Grid>
+
+                                                            <Grid Grid.Column="2">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition/>
+                                                                    <ColumnDefinition Width="5"/>
+                                                                    <ColumnDefinition/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="*"/>
+                                                                    <RowDefinition/>
+                                                                    <RowDefinition Height="5"/>
+                                                                    <RowDefinition/>
+                                                                    <RowDefinition Height="*"/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}"
                                                                 Visibility="{c:Binding '!Video.Excluded', FalseToVisibility=Collapsed}">
-                                                                <ui:FontIcon Glyph="&#xE896;"/>
-                                                            </Button>
+                                                                    <ui:FontIcon Glyph="&#xE896;"/>
+                                                                </Button>
 
-                                                            <Button Grid.Column="0" Grid.Row="3"
+                                                                <Button Grid.Column="0" Grid.Row="3"
                                                                 Visibility="{c:Binding '!Video.Excluded', FalseToVisibility=Collapsed}">
-                                                                <ui:FontIcon Glyph="&#xEA39;"/>
-                                                                <ui:FlyoutService.Flyout>
-                                                                    <ui:Flyout Opened="Flyout_Opened">
-                                                                        <ui:Flyout.FlyoutPresenterStyle>
-                                                                            <Style TargetType="ui:FlyoutPresenter">
-                                                                                <Setter Property="Padding" Value="0"/>
-                                                                            </Style>
-                                                                        </ui:Flyout.FlyoutPresenterStyle>
+                                                                    <ui:FontIcon Glyph="&#xEA39;"/>
+                                                                    <ui:FlyoutService.Flyout>
+                                                                        <ui:Flyout Opened="Flyout_Opened">
+                                                                            <ui:Flyout.FlyoutPresenterStyle>
+                                                                                <Style TargetType="ui:FlyoutPresenter">
+                                                                                    <Setter Property="Padding" Value="0"/>
+                                                                                </Style>
+                                                                            </ui:Flyout.FlyoutPresenterStyle>
 
-                                                                        <Grid>
-                                                                            <Grid.RowDefinitions>
-                                                                                <RowDefinition/>
-                                                                                <RowDefinition/>
-                                                                                <RowDefinition/>
-                                                                            </Grid.RowDefinitions>
+                                                                            <Grid>
+                                                                                <Grid.RowDefinitions>
+                                                                                    <RowDefinition/>
+                                                                                    <RowDefinition/>
+                                                                                    <RowDefinition/>
+                                                                                </Grid.RowDefinitions>
 
-                                                                            <Button Grid.Row="0" Content="{x:Static properties:Resources.Watched}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
+                                                                                <Button Grid.Row="0" Content="{x:Static properties:Resources.Watched}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
                                                                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
-                                                                            <Button Grid.Row="1" Content="{x:Static properties:Resources.WontWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
+                                                                                <Button Grid.Row="1" Content="{x:Static properties:Resources.WontWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
                                                                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
-                                                                            <Button Grid.Row="2" Content="{x:Static properties:Resources.MightWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
+                                                                                <Button Grid.Row="2" Content="{x:Static properties:Resources.MightWatch}" Command="{Binding ExcludeVideoCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Background="Transparent"
                                                                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
-                                                                        </Grid>
-                                                                    </ui:Flyout>
-                                                                </ui:FlyoutService.Flyout>
-                                                            </Button>
+                                                                            </Grid>
+                                                                        </ui:Flyout>
+                                                                    </ui:FlyoutService.Flyout>
+                                                                </Button>
 
-                                                            <Button Grid.Column="0" Grid.Row="3" Command="{Binding UnexcludeVideoCommand}"
+                                                                <Button Grid.Column="0" Grid.Row="3" Command="{Binding UnexcludeVideoCommand}"
                                                                 Visibility="{c:Binding 'Video.Excluded', FalseToVisibility=Collapsed}">
-                                                                <ui:FontIcon Glyph="&#xECC8;"/>
-                                                            </Button>
+                                                                    <ui:FontIcon Glyph="&#xECC8;"/>
+                                                                </Button>
 
-                                                            <Button Grid.Column="2" Grid.Row="1" Command="{Binding PlayVideoCommand}">
-                                                                <ui:FontIcon Glyph="&#xE768;"/>
-                                                            </Button>
+                                                                <Button Grid.Column="2" Grid.Row="1" Command="{Binding PlayVideoCommand}">
+                                                                    <ui:FontIcon Glyph="&#xE768;"/>
+                                                                </Button>
 
-                                                            <Button Grid.Column="2" Grid.Row="3" Command="{Binding PlayVideoInBrowserCommand}">
-                                                                <ui:FontIcon Glyph="&#xE774;"/>
-                                                            </Button>
+                                                                <Button Grid.Column="2" Grid.Row="3" Command="{Binding PlayVideoInBrowserCommand}">
+                                                                    <ui:FontIcon Glyph="&#xE774;"/>
+                                                                </Button>
+                                                            </Grid>
+
+                                                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" CornerRadius="2" Height="6" Margin="0,0,0,10" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
                                                         </Grid>
-
-                                                        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" CornerRadius="2" Height="6" Margin="0,0,0,10" HorizontalAlignment="Stretch" Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Grid>
-                            </DataTemplate>
-                        </TabControl.ContentTemplate>
-                    </TabControl>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+                    </Expander>
                 </Grid>
             </Grid>
         </busyIndicator:BusyMask>

@@ -102,6 +102,13 @@ namespace YouTubeHelper.ViewModels
 
         #region Active video
 
+        public bool IsMainControlExpanded
+        {
+            get => _isMainControlExpanded;
+            set => SetProperty(ref _isMainControlExpanded, value);
+        }
+        private bool _isMainControlExpanded = true;
+
         public bool IsPlayerExpanded
         {
             get => _isPlayerExpanded;
@@ -109,9 +116,13 @@ namespace YouTubeHelper.ViewModels
         }
         private bool _isPlayerExpanded;
 
-        public GridLength ExpandedGridLength { get; } = new(1, GridUnitType.Star);
+        public GridLength TwoStarGridLength { get; } = new(2, GridUnitType.Star);
 
-        public GridLength CollapsedGridLength { get; } = new(15, GridUnitType.Pixel);
+        public GridLength OneStarGridLength { get; } = new(1, GridUnitType.Star);
+
+        public GridLength FifteenPixelGridLength { get; } = new(15, GridUnitType.Pixel);
+
+        public GridLength ZeroGridLength { get; } = new(0, GridUnitType.Pixel);
 
 
         public string ActiveVideo
