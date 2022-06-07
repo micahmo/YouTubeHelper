@@ -114,7 +114,7 @@ namespace YouTubeHelper.ViewModels
         public ICommand UnexcludeVideoCommand => _enexcludeVideoCommand ??= new RelayCommand(UnexcludeVideo);
         private ICommand _enexcludeVideoCommand;
 
-        private async void UnexcludeVideo()
+        private void UnexcludeVideo()
         {
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
