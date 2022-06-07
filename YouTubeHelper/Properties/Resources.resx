@@ -179,4 +179,37 @@
   <data name="Watched" xml:space="preserve">
     <value>Watched</value>
   </data>
+  <data name="AddWatchedIdsMessage" xml:space="preserve">
+    <value>Enter video IDs (one per line) to mark as Watched for channel '{0}' ({1})</value>
+  </data>
+  <data name="AddMightWatchIdsMessage" xml:space="preserve">
+    <value>Enter video IDs (one per line) to mark as Might Watch for channel '{0}' ({1})</value>
+  </data>
+  <data name="AddWontWatchIdsMessage" xml:space="preserve">
+    <value>Enter video IDs (one per line) to mark as Won't Watch for channel '{0}' ({1})</value>
+  </data>
+  <data name="MarkAsWatched" xml:space="preserve">
+    <value>Mark as Watched</value>
+  </data>
+  <data name="MarkAsWontWatch" xml:space="preserve">
+    <value>Mark as Won't Watch</value>
+  </data>
+  <data name="MarkAsMightWatch" xml:space="preserve">
+    <value>Mark as Might Watch</value>
+  </data>
+  <data name="MarkedAsWontWatch" xml:space="preserve">
+    <value>Marked {0} new video(s) as Won't Watch.
+Updated the status of {1} video(s).</value>
+  </data>
+  <data name="MarkedAsWatched" xml:space="preserve">
+    <value>Marked {0} new video(s) as Watched.
+Updated the status of {1} video(s).</value>
+  </data>
+  <data name="MarkedAsMightWatch" xml:space="preserve">
+    <value>Marked {0} new video(s) as Might Watch.
+Updated the status of {1} video(s).</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
 </root>

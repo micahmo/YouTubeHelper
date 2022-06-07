@@ -79,6 +79,36 @@ namespace YouTubeHelper.Utilities
             }
         }
 
+        /// <summary>
+        /// Show a message box into which the user can paste text and save
+        /// </summary>
+        public static async Task<string> ShowPastableText(string message, string title, bool monospace = false, bool standalone = false)
+        {
+            var stackPanel = GetTextBlockContent(message, string.Empty, monospace, readOnly: false, out var flowDocument);
+
+            ContentDialog contentDialog = new ContentDialog
+            {
+                Title = title,
+                Content = stackPanel,
+                DefaultButton = ContentDialogButton.Primary,
+                PrimaryButtonText = Properties.Resources.OK,
+                CloseButtonText = Resources.Cancel
+            };
+
+            if (standalone)
+            {
+                contentDialog.BorderThickness = new Thickness(0);
+                contentDialog.IsShadowEnabled = false;
+            }
+
+            if (await contentDialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                return new TextRange(flowDocument.ContentStart, flowDocument.ContentEnd).Text;
+            }
+
+            return default;
+        }
+
         private static FrameworkElement GetTextBlockContent(string message, string textBlock, bool monospace, bool readOnly, out FlowDocument document)
         {
             StackPanel stackPanel = new StackPanel();

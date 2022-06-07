@@ -61,6 +61,33 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter video IDs (one per line) to mark as Might Watch for channel &apos;{0}&apos; ({1}).
+        /// </summary>
+        public static string AddMightWatchIdsMessage {
+            get {
+                return ResourceManager.GetString("AddMightWatchIdsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter video IDs (one per line) to mark as Watched for channel &apos;{0}&apos; ({1}).
+        /// </summary>
+        public static string AddWatchedIdsMessage {
+            get {
+                return ResourceManager.GetString("AddWatchedIdsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter video IDs (one per line) to mark as Won&apos;t Watch for channel &apos;{0}&apos; ({1}).
+        /// </summary>
+        public static string AddWontWatchIdsMessage {
+            get {
+                return ResourceManager.GetString("AddWontWatchIdsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to YouTubeHelper.
         /// </summary>
         public static string ApplicationName {
@@ -169,6 +196,63 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mark as Might Watch.
+        /// </summary>
+        public static string MarkAsMightWatch {
+            get {
+                return ResourceManager.GetString("MarkAsMightWatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark as Watched.
+        /// </summary>
+        public static string MarkAsWatched {
+            get {
+                return ResourceManager.GetString("MarkAsWatched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark as Won&apos;t Watch.
+        /// </summary>
+        public static string MarkAsWontWatch {
+            get {
+                return ResourceManager.GetString("MarkAsWontWatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marked {0} new video(s) as Might Watch.
+        ///Updated the status of {1} video(s)..
+        /// </summary>
+        public static string MarkedAsMightWatch {
+            get {
+                return ResourceManager.GetString("MarkedAsMightWatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marked {0} new video(s) as Watched.
+        ///Updated the status of {1} video(s)..
+        /// </summary>
+        public static string MarkedAsWatched {
+            get {
+                return ResourceManager.GetString("MarkedAsWatched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Marked {0} new video(s) as Won&apos;t Watch.
+        ///Updated the status of {1} video(s)..
+        /// </summary>
+        public static string MarkedAsWontWatch {
+            get {
+                return ResourceManager.GetString("MarkedAsWontWatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Might watch.
         /// </summary>
         public static string MightWatch {
@@ -237,6 +321,15 @@ namespace YouTubeHelper.Properties {
         public static string ShowExcludedVideos {
             get {
                 return ResourceManager.GetString("ShowExcludedVideos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
             }
         }
         

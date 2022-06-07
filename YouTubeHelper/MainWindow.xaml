@@ -5,10 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:properties="clr-namespace:YouTubeHelper.Properties"
+        xmlns:local="clr-namespace:YouTubeHelper.Utilities"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.ApplicationName}" Height="700" Width="1450"
         Closing="Window_Closing"
         MouseDown="Window_MouseDown">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWatchedIds}" Executed="AddWatchedIds_Executed"/>
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWontWatchIds}" Executed="AddWontWatchIds_Executed"/>
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed"/>
+    </Window.CommandBindings>
+
     <Grid>
         <ui:NavigationView x:Name="NavigationView" IsBackButtonVisible="Collapsed" CompactModeThresholdWidth="0" ExpandedModeThresholdWidth="99999"
                            Loaded="NavigationView_Loaded"

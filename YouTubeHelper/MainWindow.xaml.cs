@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using ModernWpf.Controls;
 using YouTubeHelper.Models;
+using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
 
@@ -71,5 +72,124 @@ namespace YouTubeHelper
 
         private static readonly SettingsViewModel SettingsViewModel = new();
         private static readonly SettingsControl SettingsControl = new() { DataContext = SettingsViewModel };
+
+        private async void AddWatchedIds_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!_dialogOpen)
+            {
+                _dialogOpen = true;
+                
+                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                        Properties.Resources.AddWatchedIdsMessage,
+                        MainControlViewModel.SelectedChannel.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                    Properties.Resources.MarkAsWatched);
+
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    string[] videoIds = input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    int updatedCount = 0;
+                    foreach (string videoId in videoIds)
+                    {
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        {
+                            Id = videoId,
+                            ExclusionReason = ExclusionReason.Watched,
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                        });
+
+                        if (res)
+                        {
+                            ++updatedCount;
+                        }
+                    }
+
+                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWatched, updatedCount, videoIds.Length - updatedCount), 
+                        Properties.Resources.Success, MessageBoxButton.OK);
+                }
+
+                _dialogOpen = false;
+            }
+        }
+
+        private async void AddWontWatchIds_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!_dialogOpen)
+            {
+                _dialogOpen = true;
+                
+                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                        Properties.Resources.AddWontWatchIdsMessage,
+                        MainControlViewModel.SelectedChannel.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                    Properties.Resources.MarkAsWontWatch);
+
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    string[] videoIds = input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    int updatedCount = 0;
+                    foreach (string videoId in videoIds)
+                    {
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        {
+                            Id = videoId,
+                            ExclusionReason = ExclusionReason.WontWatch,
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                        });
+
+                        if (res)
+                        {
+                            ++updatedCount;
+                        }
+                    }
+
+                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWontWatch, updatedCount, videoIds.Length - updatedCount),
+                        Properties.Resources.Success, MessageBoxButton.OK);
+                }
+
+                _dialogOpen = false;
+            }
+        }
+
+        private async void AddMightWatchIds_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!_dialogOpen)
+            {
+                _dialogOpen = true;
+                
+                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                        Properties.Resources.AddMightWatchIdsMessage,
+                        MainControlViewModel.SelectedChannel.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                    Properties.Resources.MarkAsMightWatch);
+
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    string[] videoIds = input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    int updatedCount = 0;
+                    foreach (string videoId in videoIds)
+                    {
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        {
+                            Id = videoId,
+                            ExclusionReason = ExclusionReason.MightWatch,
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                        });
+
+                        if (res)
+                        {
+                            ++updatedCount;
+                        }
+                    }
+
+                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsMightWatch, updatedCount, videoIds.Length - updatedCount),
+                        Properties.Resources.Success, MessageBoxButton.OK);
+                }
+
+                _dialogOpen = false;
+            }
+        }
+
+        private bool _dialogOpen;
     }
 }
