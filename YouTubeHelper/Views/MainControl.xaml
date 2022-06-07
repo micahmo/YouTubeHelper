@@ -241,8 +241,7 @@
                                                                     <RowDefinition Height="*"/>
                                                                 </Grid.RowDefinitions>
 
-                                                                <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}"
-                                                                Visibility="{c:Binding '!Video.Excluded', FalseToVisibility=Collapsed}">
+                                                                <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}">
                                                                     <ui:FontIcon Glyph="&#xE896;"/>
                                                                 </Button>
 
