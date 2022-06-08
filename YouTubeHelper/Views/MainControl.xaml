@@ -186,7 +186,7 @@
                                         </Grid>
 
 
-                                        <ScrollViewer Grid.Row="2" ui:ScrollViewerHelper.AutoHideScrollBars="False">
+                                        <ScrollViewer Grid.Row="2" ui:ScrollViewerHelper.AutoHideScrollBars="False" ScrollChanged="ScrollViewer_ScrollChanged">
                                             <ItemsControl ItemsSource="{Binding Videos}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>

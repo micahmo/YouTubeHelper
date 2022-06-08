@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -113,6 +114,15 @@ namespace YouTubeHelper.Views
             if (sender is TextBlock textBlock)
             {
                 Clipboard.SetText(textBlock.Text);
+            }
+        }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (sender is ScrollViewer scrollViewer &&
+                (DataContext as MainControlViewModel)?.SelectedChannel.Videos.Any() == false)
+            {
+                scrollViewer.ScrollToVerticalOffset(0);
             }
         }
     }
