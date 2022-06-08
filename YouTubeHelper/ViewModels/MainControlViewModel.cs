@@ -61,6 +61,13 @@ namespace YouTubeHelper.ViewModels
                             break;
                     }
                 }
+
+                if (args.PropertyName == nameof(SelectedChannel) 
+                    && SelectedChannel.Channel.VanityName != Resources.NewChannel && SelectedChannel.Channel.VanityName != "+"
+                    && !string.IsNullOrEmpty(SelectedChannel.Channel.ChannelPlaylist))
+                {
+                    Clipboard.SetText(SelectedChannel.Channel.ChannelPlaylist);
+                }
             };
 
             _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
