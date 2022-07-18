@@ -202,7 +202,7 @@ namespace YouTubeHelper.Utilities
         {
             // Get URL with yt-dlp
             return (await Cli.Wrap(Settings.Instance.YtDlpPath)
-                .WithArguments($"-f b --get-url {videoId}")
+                .WithArguments($"-f b --get-url https://youtube.com/watch?v={videoId}")
                 .ExecuteBufferedAsync()).StandardOutput;
         }
 
