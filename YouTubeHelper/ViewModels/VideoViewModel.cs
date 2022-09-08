@@ -71,6 +71,7 @@ namespace YouTubeHelper.ViewModels
             var resultTask = Settings.Instance.TelegramApiAddress
                 .AppendPathSegment(url, fullyEncode: true)
                 .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                .WithTimeout(TimeSpan.FromMinutes(10))
                 .GetAsync();
 
             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
