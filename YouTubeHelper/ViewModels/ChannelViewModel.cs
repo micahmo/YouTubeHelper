@@ -116,7 +116,7 @@ namespace YouTubeHelper.ViewModels
 
                 if (MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None)
                 {
-                    exclusions = exclusions.Where(v => v.ExclusionReason == MainControlViewModel.SelectedExclusionFilter.Value).ToList();
+                    exclusions = exclusions.Where(v => MainControlViewModel.SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                 }
 
                 (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));

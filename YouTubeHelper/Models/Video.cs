@@ -51,19 +51,23 @@ namespace YouTubeHelper.Models
         private bool _excluded;
     }
 
+    [Flags]
     public enum ExclusionReason
     {
         [Description("No exclusion reason filter")]
-        None,
+        None = 0,
 
         [Description("Won't Watch")]
-        WontWatch,
+        WontWatch = 1,
 
         [Description("Might Watch")]
-        MightWatch,
+        MightWatch = 2,
 
         [Description("Watched")]
-        Watched
+        Watched = 4,
+
+        [Description("Not Watched")]
+        NotWatched = WontWatch | MightWatch
     }
 
     public class ExclusionReasonExtended : EnumExtended<ExclusionReason>
