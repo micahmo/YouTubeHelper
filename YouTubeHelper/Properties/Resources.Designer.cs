@@ -352,6 +352,35 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to download &apos;{0}&apos;.
+        ///
+        ///{1}.
+        /// </summary>
+        public static string VideoDownloadFailed {
+            get {
+                return ResourceManager.GetString("VideoDownloadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sent request to download &apos;{0}&apos;..
+        /// </summary>
+        public static string VideoDownloadRequested {
+            get {
+                return ResourceManager.GetString("VideoDownloadRequested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully downloaded &apos;{0}&apos;..
+        /// </summary>
+        public static string VideoDownloadSucceeded {
+            get {
+                return ResourceManager.GetString("VideoDownloadSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View.
         /// </summary>
         public static string View {

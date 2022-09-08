@@ -1,11 +1,15 @@
-﻿using System.Windows;
+﻿using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CliWrap;
 using CliWrap.Buffered;
+using Flurl;
+using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Notification.Wpf;
 using YouTubeHelper.Models;
+using YouTubeHelper.Properties;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.Views;
 
@@ -59,22 +63,31 @@ namespace YouTubeHelper.ViewModels
         public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(DownloadVideo);
         private ICommand _downloadVideoCommand;
 
-        private void DownloadVideo()
+        private async void DownloadVideo()
         {
             // Initiate the download
-            Clipboard.SetText($"https://www.youtube.com/watch?v={Video.Id}");
-            Cli.Wrap(Settings.Instance.TelegramPath)
-                .WithArguments($@"-- ""tg://resolve/?domain={Settings.Instance.TelegramBotId}""")
-                .ExecuteBufferedAsync();
+            string url = $"https://www.youtube.com/watch?v={Video.Id}";
 
-            // Mark as downloaded
-            Video.Excluded = true;
-            Video.ExclusionReason = ExclusionReason.Watched;
-            DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
+            var resultTask = Settings.Instance.TelegramApiAddress
+                .AppendPathSegment(url, fullyEncode: true)
+                .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                .GetAsync();
 
-            if (!_mainControlViewModel.ShowExcludedVideos)
+            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
+
+            try
             {
-                _channelViewModel.Videos.Remove(this);
+                await resultTask;
+                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
+
+                // Mark as downloaded (only if succeeded)
+                Video.Excluded = true;
+                Video.ExclusionReason = ExclusionReason.Watched;
+                DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
+            }
+            catch (Exception ex)
+            {
+                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
             }
         }
 

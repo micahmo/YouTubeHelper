@@ -42,19 +42,19 @@ namespace YouTubeHelper.Models
         }
         private string _chromePath;
 
-        public string TelegramBotId
+        public string TelegramApiKey
         {
-            get => _telegramBotId;
-            set => SetProperty(ref _telegramBotId, value);
+            get => _telegramApiKey;
+            set => SetProperty(ref _telegramApiKey, value);
         }
-        private string _telegramBotId;
+        private string _telegramApiKey;
 
-        public string TelegramPath
+        public string TelegramApiAddress
         {
-            get => _telegramPath;
-            set => SetProperty(ref _telegramPath, value);
+            get => _telegramApiAddress;
+            set => SetProperty(ref _telegramApiAddress, value);
         }
-        private string _telegramPath;
+        private string _telegramApiAddress;
 
         public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {

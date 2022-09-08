@@ -28,7 +28,7 @@
         <TextBox Grid.Column="0" Grid.Row="0" Text="{Binding Settings.YouTubeApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.YouTubeApiKey}" ui:ControlHelper.Header="YouTube API Key" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
         <TextBox Grid.Column="0" Grid.Row="2" Text="{Binding Settings.YtDlpPath, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.YtDlpPath}" ui:ControlHelper.Header="yt-dlp.exe Path" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
         <TextBox Grid.Column="0" Grid.Row="4" Text="{Binding Settings.ChromePath, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.ChromePath}" ui:ControlHelper.Header="chrome.exe Path" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-        <TextBox Grid.Column="0" Grid.Row="6" Text="{Binding Settings.TelegramPath, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.TelegramPath}" ui:ControlHelper.Header="telegram.exe Path" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-        <TextBox Grid.Column="0" Grid.Row="8" Text="{Binding Settings.TelegramBotId, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.TelegramBotId}" ui:ControlHelper.Header="Telegram Bot ID" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Grid.Column="0" Grid.Row="6" Text="{Binding Settings.TelegramApiAddress, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.TelegramApiAddress}" ui:ControlHelper.Header="Telegram API Address" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+        <TextBox Grid.Column="0" Grid.Row="8" Text="{Binding Settings.TelegramApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}" ToolTip="{Binding Settings.TelegramApiKey}" ui:ControlHelper.Header="Telegram API Key" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>

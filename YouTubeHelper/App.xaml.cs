@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Threading;
+using Notification.Wpf;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper
@@ -22,5 +23,7 @@ namespace YouTubeHelper
 
             e.Handled = true;
         }
+
+        public static NotificationManager NotificationManager = new();
     }
 }

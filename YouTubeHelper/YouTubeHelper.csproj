@@ -15,12 +15,14 @@
     <PackageReference Include="BusyIndicator" Version="2.0.0.1" />
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="CliWrap" Version="3.4.4" />
+    <PackageReference Include="Flurl.Http" Version="3.2.4" />
     <PackageReference Include="Google.Apis" Version="1.57.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2693" />
     <PackageReference Include="Jot" Version="2.1.13" />
     <PackageReference Include="LiteDB" Version="5.0.11" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />
+    <PackageReference Include="Notification.WPF" Version="6.1.0.4" />
   </ItemGroup>
 
   <ItemGroup>
