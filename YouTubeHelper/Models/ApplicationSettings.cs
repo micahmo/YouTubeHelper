@@ -4,6 +4,7 @@ using System.Windows;
 using Jot;
 using Jot.Storage;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.Models
 {
@@ -36,6 +37,7 @@ namespace YouTubeHelper.Models
         {
             Tracker.Configure<ApplicationSettings>()
                 .Property(a => a.SelectedTabIndex)
+                .Property(a => a.SelectedSortMode)
                 .Track(this);
         }
 
@@ -50,6 +52,13 @@ namespace YouTubeHelper.Models
             set => SetProperty(ref _selectedTabIndex, value);
         }
         private int _selectedTabIndex;
+
+        public SortMode SelectedSortMode
+        {
+            get => _selectedSortMode;
+            set => SetProperty(ref _selectedSortMode, value);
+        }
+        private SortMode _selectedSortMode;
 
         #region Private fields
 

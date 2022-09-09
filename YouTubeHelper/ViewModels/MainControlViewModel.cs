@@ -36,7 +36,6 @@ namespace YouTubeHelper.ViewModels
                     switch (Mode)
                     {
                         case MainControlMode.Search:
-                            SelectedSortMode = SortModeValues.FirstOrDefault(s => s.Value == SortMode.AgeDesc);
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
@@ -44,7 +43,6 @@ namespace YouTubeHelper.ViewModels
                             break;
                         case MainControlMode.Watch:
                             ExactSearchTerm = LookupSearchTerm = null;
-                            SelectedSortMode = SortModeValues.FirstOrDefault(s => s.Value == SortMode.DurationPlusRecency);
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
@@ -260,6 +258,7 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
+                SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
                 SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
             }
             catch

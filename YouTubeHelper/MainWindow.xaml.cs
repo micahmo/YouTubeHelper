@@ -64,6 +64,7 @@ namespace YouTubeHelper
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
+            ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
             DatabaseEngine.Shutdown();
         }
 
