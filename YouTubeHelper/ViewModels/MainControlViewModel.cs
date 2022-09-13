@@ -249,23 +249,28 @@ namespace YouTubeHelper.ViewModels
 
         public void Load()
         {
-            DatabaseEngine.ChannelCollection.FindAll().OrderBy(c => c.Index).ToList().ForEach(c =>
+            if (!_loaded)
             {
-                Channels.Add(new ChannelViewModel(c, this));
-            });
+                DatabaseEngine.ChannelCollection.FindAll().OrderBy(c => c.Index).ToList().ForEach(c => { Channels.Add(new ChannelViewModel(c, this)); });
 
-            Channels.Add(_newChannelTab);
+                Channels.Add(_newChannelTab);
 
-            try
-            {
-                SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
-                SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
-            }
-            catch
-            {
-                // ignored
+                try
+                {
+                    SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
+                    SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                _loaded = true;
             }
         }
+
+        // Helps to prevent double-loading when using the app through RDP sessions.
+        private bool _loaded;
     }
 
     public enum MainControlMode
