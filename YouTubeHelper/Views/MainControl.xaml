@@ -221,6 +221,7 @@
                                                                     </StackPanel>
                                                                     <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
                                                                     <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
+                                                                    <TextBlock Grid.Row="2" Text="{Binding Video.Status}" TextWrapping="Wrap" Foreground="Green" FontWeight="Medium" Visibility="{c:Binding !Video.Excluded, FalseToVisibility=Collapsed}"/>
                                                                     <Expander Grid.Row="3" Header="Description">
                                                                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
                                                                             <TextBlock Text="{Binding Video.Description}" FontSize="13"/>

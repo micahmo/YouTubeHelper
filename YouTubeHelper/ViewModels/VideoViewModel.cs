@@ -76,6 +76,11 @@ namespace YouTubeHelper.ViewModels
 
             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
 
+            // Mark as downloading
+            Video.Excluded = false;
+            Video.Status = Resources.Downloading;
+            Video.ExclusionReason = ExclusionReason.None;
+
             try
             {
                 await resultTask;
@@ -83,6 +88,7 @@ namespace YouTubeHelper.ViewModels
 
                 // Mark as downloaded (only if succeeded)
                 Video.Excluded = true;
+                Video.Status = null;
                 Video.ExclusionReason = ExclusionReason.Watched;
                 DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
             }
@@ -102,15 +108,15 @@ namespace YouTubeHelper.ViewModels
 
             if (sender is Button button)
             {
-                if (button.Content?.ToString() == Properties.Resources.Watched)
+                if (button.Content?.ToString() == Resources.Watched)
                 {
                     Video.ExclusionReason = ExclusionReason.Watched;
                 }
-                else if (button.Content?.ToString() == Properties.Resources.WontWatch)
+                else if (button.Content?.ToString() == Resources.WontWatch)
                 {
                     Video.ExclusionReason = ExclusionReason.WontWatch;
                 }
-                else if (button.Content?.ToString() == Properties.Resources.MightWatch)
+                else if (button.Content?.ToString() == Resources.MightWatch)
                 {
                     Video.ExclusionReason = ExclusionReason.MightWatch;
                 }
@@ -140,7 +146,7 @@ namespace YouTubeHelper.ViewModels
             }
         }
 
-        public string ExcludedString => $"{Properties.Resources.Excluded} - {new ExclusionReasonExtended(Video.ExclusionReason).Description}";
+        public string ExcludedString => $"{Resources.Excluded} - {new ExclusionReasonExtended(Video.ExclusionReason).Description}";
 
         public Video Video { get; }
 
