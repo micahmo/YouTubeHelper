@@ -220,8 +220,13 @@
                                                                         <TextBlock Text="{Binding Video.Id}" FontWeight="Light" TextWrapping="Wrap" Padding="15,0,15,0" Cursor="Hand" MouseDown="TextBlock_MouseDown"/>
                                                                     </StackPanel>
                                                                     <TextBlock Grid.Row="1" Text="{Binding Video.TimeString}" TextWrapping="Wrap"/>
-                                                                    <TextBlock Grid.Row="2" Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
-                                                                    <TextBlock Grid.Row="2" Text="{Binding Video.Status}" TextWrapping="Wrap" Foreground="Green" FontWeight="Medium" Visibility="{c:Binding !Video.Excluded, FalseToVisibility=Collapsed}"/>
+
+                                                                    <StackPanel Orientation="Horizontal" Grid.Row="2">
+                                                                        <TextBlock Text="{Binding ExcludedString}" TextWrapping="Wrap" Foreground="Red" FontWeight="Medium" Padding="0,0,15,0" Visibility="{c:Binding Video.Excluded, FalseToVisibility=Collapsed}"/>
+                                                                        <TextBlock Text="{Binding Video.Status}" TextWrapping="Wrap" Foreground="Green" FontWeight="Medium" Padding="0,0,15,0" Visibility="{c:Binding 'Video.Status != null and !Video.Excluded', FalseToVisibility=Collapsed}"/>
+                                                                        <TextBlock Text="{x:Static properties:Resources.Playing}" TextWrapping="Wrap" Foreground="Black" FontWeight="Medium" Visibility="{c:Binding 'Video.RawUrl != null and Video.RawUrl == MainControlViewModel.ActiveVideo', FalseToVisibility=Collapsed}"/>
+                                                                    </StackPanel>
+                                                                    
                                                                     <Expander Grid.Row="3" Header="Description">
                                                                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
                                                                             <TextBlock Text="{Binding Video.Description}" FontSize="13"/>

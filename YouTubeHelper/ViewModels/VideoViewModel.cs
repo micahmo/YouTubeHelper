@@ -20,7 +20,7 @@ namespace YouTubeHelper.ViewModels
         public VideoViewModel(Video video, MainControlViewModel mainControlViewModel, ChannelViewModel channelViewModel)
         {
             Video = video;
-            _mainControlViewModel = mainControlViewModel;
+            MainControlViewModel = mainControlViewModel;
             _channelViewModel = channelViewModel;
 
             Video.PropertyChanged += (_, args) =>
@@ -40,14 +40,14 @@ namespace YouTubeHelper.ViewModels
             Mouse.OverrideCursor = Cursors.Wait;
             try
             {
-                _mainControlViewModel.ActiveVideo = Video.RawUrl ??= await YouTubeApi.Instance.GetRawUrl(Video.Id);
+                MainControlViewModel.ActiveVideo = Video.RawUrl ??= await YouTubeApi.Instance.GetRawUrl(Video.Id);
             }
             finally
             {
                 Mouse.OverrideCursor = null;
             }
 
-            _mainControlViewModel.IsPlayerExpanded = true;
+            MainControlViewModel.IsPlayerExpanded = true;
         }
 
         public ICommand PlayVideoInBrowserCommand => _playVideoInBrowserCommand ??= new RelayCommand(PlayVideoInBrowser);
@@ -125,7 +125,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = true;
             DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
 
-            if (!_mainControlViewModel.ShowExcludedVideos)
+            if (!MainControlViewModel.ShowExcludedVideos)
             {
                 _channelViewModel.Videos.Remove(this);
             }
@@ -150,7 +150,8 @@ namespace YouTubeHelper.ViewModels
 
         public Video Video { get; }
 
-        private readonly MainControlViewModel _mainControlViewModel;
+        public MainControlViewModel MainControlViewModel { get; }
+        
         private readonly ChannelViewModel _channelViewModel;
     }
 }

@@ -31,7 +31,12 @@ namespace YouTubeHelper.Models
         public TimeSpan Duration { get; set; }
 
         [BsonIgnore]
-        public string RawUrl { get; set; }
+        public string RawUrl
+        {
+            get => _rawUrl;
+            set => SetProperty(ref _rawUrl, value);
+        }
+        private string _rawUrl;
 
         public ExclusionReason ExclusionReason
         {
