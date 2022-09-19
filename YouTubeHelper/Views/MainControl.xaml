@@ -249,7 +249,7 @@
                                                                         <RowDefinition Height="*"/>
                                                                     </Grid.RowDefinitions>
 
-                                                                    <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}">
+                                                                    <Button Grid.Column="0" Grid.Row="1" Command="{Binding DownloadVideoCommand}" ToolTip="{x:Static properties:Resources.DownloadButtonToolTip}">
                                                                         <ui:FontIcon Glyph="&#xE896;"/>
                                                                     </Button>
 

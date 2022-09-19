@@ -229,4 +229,7 @@ Updated the status of {1} video(s).</value>
   <data name="Playing" xml:space="preserve">
     <value>▶</value>
   </data>
+  <data name="DownloadButtonToolTip" xml:space="preserve">
+    <value>Download (hold Shift to download silently)</value>
+  </data>
 </root>

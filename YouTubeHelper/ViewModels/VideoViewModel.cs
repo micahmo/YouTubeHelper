@@ -65,12 +65,16 @@ namespace YouTubeHelper.ViewModels
 
         private async void DownloadVideo()
         {
+            // Use silent mode when shift key is down. Grab this value is as soon as possible.
+            bool silent = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+
             // Initiate the download
             string url = $"https://www.youtube.com/watch?v={Video.Id}";
 
             var resultTask = Settings.Instance.TelegramApiAddress
                 .AppendPathSegment(url, fullyEncode: true)
                 .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                .SetQueryParam("silent", silent)
                 .WithTimeout(TimeSpan.FromMinutes(10))
                 .GetAsync();
 

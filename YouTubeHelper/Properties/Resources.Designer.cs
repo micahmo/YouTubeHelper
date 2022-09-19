@@ -151,6 +151,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download (hold Shift to download silently).
+        /// </summary>
+        public static string DownloadButtonToolTip {
+            get {
+                return ResourceManager.GetString("DownloadButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Downloading....
         /// </summary>
         public static string Downloading {
