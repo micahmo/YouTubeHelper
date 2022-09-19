@@ -226,6 +226,9 @@ Updated the status of {1} video(s).</value>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading...</value>
   </data>
+  <data name="DownloadingProgress" xml:space="preserve">
+    <value>Downloading...  {0}</value>
+  </data>
   <data name="Playing" xml:space="preserve">
     <value>▶</value>
   </data>

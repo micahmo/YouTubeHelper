@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CliWrap;
@@ -71,12 +74,39 @@ namespace YouTubeHelper.ViewModels
             // Initiate the download
             string url = $"https://www.youtube.com/watch?v={Video.Id}";
 
+            // Generate request ID
+            string requestId = Guid.NewGuid().ToString();
+
             var resultTask = Settings.Instance.TelegramApiAddress
+                .AppendPathSegment("youtube")
                 .AppendPathSegment(url, fullyEncode: true)
                 .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
                 .SetQueryParam("silent", silent)
+                .SetQueryParam("requestId", requestId)
                 .WithTimeout(TimeSpan.FromMinutes(10))
                 .GetAsync();
+
+            // Spin up a task to check for progress
+            CancellationTokenSource progressCancellationToken = new();
+            var _ = Task.Run(async () =>
+            {
+                while (!progressCancellationToken.IsCancellationRequested)
+                {
+                    var progressResponse = await Settings.Instance.TelegramApiAddress
+                        .AppendPathSegment("progress")
+                        .AppendPathSegment(requestId)
+                        .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
+                        .GetAsync();
+
+                    if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
+                    {
+                        double progress = await progressResponse.GetJsonAsync<double>();
+                        Video.Status = string.Format(Resources.DownloadingProgress, $"{progress}%");
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(.5));
+                }
+            }, progressCancellationToken.Token);
 
             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
 
@@ -99,6 +129,10 @@ namespace YouTubeHelper.ViewModels
             catch (Exception ex)
             {
                 App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+            }
+            finally
+            {
+                progressCancellationToken.Cancel();
             }
         }
 

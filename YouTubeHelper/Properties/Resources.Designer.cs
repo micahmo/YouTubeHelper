@@ -169,6 +169,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Downloading...  {0}.
+        /// </summary>
+        public static string DownloadingProgress {
+            get {
+                return ResourceManager.GetString("DownloadingProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
