@@ -192,5 +192,24 @@ namespace YouTubeHelper
         }
 
         private bool _dialogOpen;
+
+        private void ChangeView_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D1)
+            {
+                MainControlViewModel.IsMainControlExpanded = true;
+                MainControlViewModel.IsPlayerExpanded = false;
+            }
+            else if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D2)
+            {
+                MainControlViewModel.IsMainControlExpanded = true;
+                MainControlViewModel.IsPlayerExpanded = true;
+            }
+            else if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D3)
+            {
+                MainControlViewModel.IsMainControlExpanded = false;
+                MainControlViewModel.IsPlayerExpanded = true;
+            }
+        }
     }
 }

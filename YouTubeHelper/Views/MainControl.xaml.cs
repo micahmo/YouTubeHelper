@@ -85,6 +85,9 @@ namespace YouTubeHelper.Views
             {
                 MediaElement.Play();
             }
+
+            // MediaElement steals keyboard focus for future shortcuts
+            Dispatcher.CurrentDispatcher.BeginInvoke(() => MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
         }
 
         private object HelperObject => _helperObject ??= typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MediaElement);
