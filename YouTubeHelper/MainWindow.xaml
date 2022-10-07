@@ -14,9 +14,7 @@
         <CommandBinding Command="{x:Static local:ShortcutCommands.AddWatchedIds}" Executed="AddWatchedIds_Executed"/>
         <CommandBinding Command="{x:Static local:ShortcutCommands.AddWontWatchIds}" Executed="AddWontWatchIds_Executed"/>
         <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.DefaultView}" Executed="ChangeView_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.SplitView}" Executed="ChangeView_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.VideoView}" Executed="ChangeView_Executed"/>
+        <CommandBinding Command="{x:Static local:ShortcutCommands.ChangeView}" Executed="ChangeView_Executed"/>
     </Window.CommandBindings>
 
     <Grid>

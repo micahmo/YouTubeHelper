@@ -50,7 +50,8 @@ namespace YouTubeHelper.Views
             {
                 mainControlViewModel.PropertyChanged += (_, args) =>
                 {
-                    if (args.PropertyName == nameof(MainControlViewModel.ActiveVideo))
+                    if (args.PropertyName == nameof(MainControlViewModel.ActiveVideo) ||
+                        args.PropertyName == nameof(MainControlViewModel.SignalPlayVideo))
                     {
                         MediaElement.Play();
                     }

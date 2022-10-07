@@ -71,6 +71,11 @@ namespace YouTubeHelper.ViewModels
             _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
         }
 
+        public void RaisePropertyChanged(string propertyName)
+        {
+            OnPropertyChanged(propertyName);
+        }
+
         public MainControlMode Mode
         {
             get => _mode;
@@ -139,6 +144,9 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _activeVideo, value);
         }
         private string _activeVideo;
+
+        // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
+        public object SignalPlayVideo { get; set; }
 
         public TimeSpan ActiveVideoElapsedTimeSpan
         {

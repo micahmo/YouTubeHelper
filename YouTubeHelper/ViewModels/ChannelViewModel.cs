@@ -70,6 +70,7 @@ namespace YouTubeHelper.ViewModels
         private async void FindVideos()
         {
             MainControlViewModel.IsBusy = true;
+            MainControlViewModel.IsPlayerExpanded = false;
 
             Videos.Clear();
 

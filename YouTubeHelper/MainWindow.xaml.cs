@@ -195,20 +195,31 @@ namespace YouTubeHelper
 
         private void ChangeView_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D1)
+            if (Keyboard.IsKeyDown(Key.D1))
             {
                 MainControlViewModel.IsMainControlExpanded = true;
                 MainControlViewModel.IsPlayerExpanded = false;
             }
-            else if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D2)
+            else if (Keyboard.IsKeyDown(Key.D2))
             {
                 MainControlViewModel.IsMainControlExpanded = true;
                 MainControlViewModel.IsPlayerExpanded = true;
             }
-            else if ((e.Command as RoutedCommand)?.InputGestures.OfType<KeyGesture>().FirstOrDefault()?.Key == Key.D3)
+            else if (Keyboard.IsKeyDown(Key.D3))
             {
                 MainControlViewModel.IsMainControlExpanded = false;
                 MainControlViewModel.IsPlayerExpanded = true;
+            }
+            else if (Keyboard.IsKeyDown(Key.Escape))
+            {
+                if (!MainControlViewModel.IsMainControlExpanded)
+                {
+                    MainControlViewModel.IsMainControlExpanded = true;
+                }
+                else if (MainControlViewModel.IsPlayerExpanded)
+                {
+                    MainControlViewModel.IsPlayerExpanded = false;
+                }
             }
         }
     }

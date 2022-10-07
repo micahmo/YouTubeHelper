@@ -44,12 +44,16 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 MainControlViewModel.ActiveVideo = Video.RawUrl ??= await YouTubeApi.Instance.GetRawUrl(Video.Id);
+
+                // In case the video didn't change, we want to start playing anyway, so always raise the property changed.
+                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPlayVideo));
             }
             finally
             {
                 Mouse.OverrideCursor = null;
             }
 
+            MainControlViewModel.IsMainControlExpanded = false;
             MainControlViewModel.IsPlayerExpanded = true;
         }
 
