@@ -93,7 +93,12 @@ namespace YouTubeHelper.ViewModels
                         }
                     }
 
-                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, progress =>
+                    {
+                        MainControlViewModel.Progress = progress;
+                    })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+
+                    MainControlViewModel.Progress = 0;
                 }
             }
             finally

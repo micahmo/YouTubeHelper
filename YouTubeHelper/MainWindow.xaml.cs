@@ -19,6 +19,8 @@ namespace YouTubeHelper
         {
             ApplicationSettings.Instance.Load();
 
+            DataContext = MainControlViewModel;
+
             InitializeComponent();
         }
 

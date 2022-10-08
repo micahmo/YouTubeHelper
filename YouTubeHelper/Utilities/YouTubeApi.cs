@@ -55,10 +55,10 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms)
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float> progressCallback = null)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
-            playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken";
+            playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
             playlistRequest.PlaylistId = channel.ChannelPlaylist;
             playlistRequest.MaxResults = 50;
 
@@ -70,12 +70,16 @@ namespace YouTubeHelper.Utilities
 #endif
 
             string nextPageToken = string.Empty;
-            while (nextPageToken != null)
+            for (float i = 1; nextPageToken != null; ++i)
             {
                 playlistRequest.PageToken = nextPageToken;
                 PlaylistItemListResponse response = await playlistRequest.ExecuteAsync();
                 videoIds.AddRange(response.Items.Select(i => i.ContentDetails.VideoId));
                 nextPageToken = response.NextPageToken;
+
+                float progress = Math.Min(i * 50 / response.PageInfo.TotalResults ?? 1, 1);
+                progressCallback?.Invoke(progress);
+                Debug.WriteLine($"Progress is {i*50} / {response.PageInfo.TotalResults} : {progress}");
             }
 
 #if DEBUG

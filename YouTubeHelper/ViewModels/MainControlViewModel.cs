@@ -178,6 +178,13 @@ namespace YouTubeHelper.ViewModels
                                                $"{(int)ActiveVideoDuration.TotalHours:D2}:{ActiveVideoDuration.Minutes:D2}:{ActiveVideoDuration.Seconds:D2}  /  " +
                                                $"{(int)ActiveVideoRemainingTimeSpan.TotalHours:D2}:{ActiveVideoRemainingTimeSpan.Minutes:D2}:{ActiveVideoRemainingTimeSpan.Seconds:D2}";
 
+        public float Progress
+        {
+            get => _progress;
+            set => SetProperty(ref _progress, value);
+        }
+        private float _progress;
+
         #endregion
 
         #region Sorting and filtering

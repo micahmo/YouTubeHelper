@@ -6,6 +6,7 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:properties="clr-namespace:YouTubeHelper.Properties"
         xmlns:local="clr-namespace:YouTubeHelper.Utilities"
+        xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
         mc:Ignorable="d"
         Title="{x:Static properties:Resources.ApplicationName}" Height="700" Width="1450"
         Closing="Window_Closing"
@@ -16,6 +17,10 @@
         <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed"/>
         <CommandBinding Command="{x:Static local:ShortcutCommands.ChangeView}" Executed="ChangeView_Executed"/>
     </Window.CommandBindings>
+
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressValue="{c:Binding 'Progress'}" ProgressState="Normal"/>
+    </Window.TaskbarItemInfo>
 
     <Grid>
         <ui:NavigationView x:Name="NavigationView" IsBackButtonVisible="Collapsed" CompactModeThresholdWidth="0" ExpandedModeThresholdWidth="99999"
