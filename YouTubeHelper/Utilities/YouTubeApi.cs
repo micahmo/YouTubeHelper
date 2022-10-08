@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -62,6 +64,11 @@ namespace YouTubeHelper.Utilities
 
             List<string> videoIds = new List<string>();
 
+#if DEBUG
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+#endif
+
             string nextPageToken = string.Empty;
             while (nextPageToken != null)
             {
@@ -70,6 +77,11 @@ namespace YouTubeHelper.Utilities
                 videoIds.AddRange(response.Items.Select(i => i.ContentDetails.VideoId));
                 nextPageToken = response.NextPageToken;
             }
+
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine($"Took {stopwatch.Elapsed} for first retrieve.");
+#endif
 
             if (!showExclusions)
             {
@@ -101,17 +113,27 @@ namespace YouTubeHelper.Utilities
             List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
 
             // Use the videoIds to look up real info
-            List<Video> videos = new List<Video>();
+            ConcurrentBag<IList<Video>> videoResults = new();
 
-            while (videoIds.Any())
+#if DEBUG
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+#endif
+
+            await Parallel.ForEachAsync(videoIds.Chunk(50), async (chunkedVideoIds, _) =>
             {
                 VideosResource.ListRequest videoRequest = _youTubeService.Videos.List(new List<string> { "snippet", "contentDetails" });
-                videoRequest.Id = string.Join(",", videoIds.Take(50));
+                videoRequest.Id = string.Join(",", chunkedVideoIds.Take(50));
                 var videoResponse = await videoRequest.ExecuteAsync();
-                videos.AddRange(videoResponse.Items);
+                videoResults.Add(videoResponse.Items);
+            });
 
-                videoIds = videoIds.Skip(50).ToList();
-            }
+            List<Video> videos = videoResults.SelectMany(v => v).ToList();
+
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine($"Took {stopwatch.Elapsed} for second retrieve.");
+#endif
 
             // Do optional filtering
             if (searchTerms?.Any() == true)
