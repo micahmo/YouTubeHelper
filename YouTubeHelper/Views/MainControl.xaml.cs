@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -55,6 +57,10 @@ namespace YouTubeHelper.Views
                     {
                         MediaElement.Play();
                     }
+                    else if (args.PropertyName == nameof(MainControlViewModel.SignalPauseVideo))
+                    {
+                        MediaElement.Pause();
+                    }
                 };
             }
         }
@@ -76,6 +82,34 @@ namespace YouTubeHelper.Views
 
         private void MediaElement_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1/4f));
+                if (!_doubleClickCancellationToken.IsCancellationRequested)
+                {
+                    _doubleClickCancellationToken.Cancel();
+                    Dispatcher.Invoke(TogglePlayState);
+                }
+            }, (_doubleClickCancellationToken = new CancellationTokenSource()).Token);
+
+            if (e.ClickCount == 2 && !_doubleClickCancellationToken.IsCancellationRequested)
+            {
+                _doubleClickCancellationToken?.Cancel();
+
+                if (DataContext is MainControlViewModel mainControlViewModel)
+                {
+                    mainControlViewModel.IsMainControlExpanded = !mainControlViewModel.IsMainControlExpanded;
+                }
+            }
+
+            // MediaElement steals keyboard focus for future shortcuts
+            Dispatcher.BeginInvoke(() => MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
+        }
+
+        private CancellationTokenSource _doubleClickCancellationToken;
+
+        private void TogglePlayState()
+        {
             MediaState state = (MediaState)StateField.GetValue(HelperObject);
 
             if (state == MediaState.Play)
@@ -86,9 +120,6 @@ namespace YouTubeHelper.Views
             {
                 MediaElement.Play();
             }
-
-            // MediaElement steals keyboard focus for future shortcuts
-            Dispatcher.CurrentDispatcher.BeginInvoke(() => MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
         }
 
         private object HelperObject => _helperObject ??= typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MediaElement);

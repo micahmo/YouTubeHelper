@@ -148,6 +148,9 @@ namespace YouTubeHelper.ViewModels
         // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
         public object SignalPlayVideo { get; set; }
 
+        // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
+        public object SignalPauseVideo { get; set; }
+
         public TimeSpan ActiveVideoElapsedTimeSpan
         {
             get => _activeVideoElapsedTimeSpan;

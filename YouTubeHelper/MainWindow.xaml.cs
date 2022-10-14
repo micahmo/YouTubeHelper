@@ -214,6 +214,8 @@ namespace YouTubeHelper
             }
             else if (Keyboard.IsKeyDown(Key.Escape))
             {
+                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPauseVideo));
+
                 if (!MainControlViewModel.IsMainControlExpanded)
                 {
                     MainControlViewModel.IsMainControlExpanded = true;
