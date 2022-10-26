@@ -151,14 +151,5 @@ namespace YouTubeHelper.Views
                 Clipboard.SetText(textBlock.Text);
             }
         }
-
-        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (sender is ScrollViewer scrollViewer &&
-                (DataContext as MainControlViewModel)?.SelectedChannel.Videos.Any() == false)
-            {
-                scrollViewer.ScrollToVerticalOffset(0);
-            }
-        }
     }
 }
