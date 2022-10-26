@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
 using System.Windows;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using YouTubeHelper.Models;
@@ -187,6 +188,13 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _progress, value);
         }
         private float _progress;
+
+        public TaskbarItemProgressState ProgressState
+        {
+            get => _progressState;
+            set => SetProperty(ref _progressState, value);
+        }
+        private TaskbarItemProgressState _progressState;
 
         #endregion
 

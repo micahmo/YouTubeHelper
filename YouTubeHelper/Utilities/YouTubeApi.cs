@@ -55,7 +55,7 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float> progressCallback = null)
+        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
@@ -63,6 +63,10 @@ namespace YouTubeHelper.Utilities
             playlistRequest.MaxResults = 50;
 
             List<string> videoIds = new List<string>();
+
+            // Load known videos
+            List<string> knownVideos = DatabaseEngine.KnownVideosCollection.Find(v => v.ChannelPlaylist == channel.ChannelPlaylist).Select(v => v.Id).ToList();
+            videoIds.AddRange(knownVideos);
 
 #if DEBUG
             Stopwatch stopwatch = new();
@@ -74,18 +78,39 @@ namespace YouTubeHelper.Utilities
             {
                 playlistRequest.PageToken = nextPageToken;
                 PlaylistItemListResponse response = await playlistRequest.ExecuteAsync();
+
+                // If any ID from the API is already in the list, we can stop after this
+                bool toBreak = videoIds.Contains(response.Items.LastOrDefault()?.ContentDetails.VideoId);
+
                 videoIds.AddRange(response.Items.Select(i => i.ContentDetails.VideoId));
                 nextPageToken = response.NextPageToken;
 
                 float progress = Math.Min(i * 50 / response.PageInfo.TotalResults ?? 1, 1);
-                progressCallback?.Invoke(progress);
+                progressCallback?.Invoke(progress, false);
                 Debug.WriteLine($"Progress is {i*50} / {response.PageInfo.TotalResults} : {progress}");
+
+                if (toBreak)
+                {
+                    break;
+                }
             }
+
+            progressCallback?.Invoke(0, true);
 
 #if DEBUG
             stopwatch.Stop();
             Debug.WriteLine($"Took {stopwatch.Elapsed} for first retrieve.");
 #endif
+
+            // De-dup, in case we loaded from known and API
+            videoIds = videoIds.Distinct().ToList();
+
+            // Save the newly loaded known videos
+            DatabaseEngine.KnownVideosCollection.InsertBulk(videoIds.Except(knownVideos).Select(v => new Models.Video
+            {
+                Id = v,
+                ChannelPlaylist = channel.ChannelPlaylist
+            }));
 
             if (!showExclusions)
             {

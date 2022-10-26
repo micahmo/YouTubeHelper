@@ -19,7 +19,7 @@
     </Window.CommandBindings>
 
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo ProgressValue="{c:Binding 'Progress'}" ProgressState="Normal"/>
+        <TaskbarItemInfo ProgressValue="{c:Binding 'Progress'}" ProgressState="{c:Binding ProgressState}"/>
     </Window.TaskbarItemInfo>
 
     <Grid>

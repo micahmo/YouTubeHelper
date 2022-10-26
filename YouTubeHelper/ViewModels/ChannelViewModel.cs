@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Shell;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using YouTubeHelper.Models;
@@ -93,12 +94,14 @@ namespace YouTubeHelper.ViewModels
                         }
                     }
 
-                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, progress =>
+                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, (progress, indeterminate) =>
                     {
                         MainControlViewModel.Progress = progress;
+                        MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
                     })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
 
                     MainControlViewModel.Progress = 0;
+                    MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
                 }
             }
             finally

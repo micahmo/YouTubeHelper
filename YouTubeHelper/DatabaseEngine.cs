@@ -45,6 +45,9 @@ namespace YouTubeHelper
         public static ILiteCollection<Video> ExcludedVideosCollection => _excludedVideosCollection ??= DatabaseInstance.GetCollection<Video>("excludedVideos");
         private static ILiteCollection<Video> _excludedVideosCollection;
 
+        public static ILiteCollection<Video> KnownVideosCollection => _knownVideosCollection ??= DatabaseInstance.GetCollection<Video>("knownVideos");
+        private static ILiteCollection<Video> _knownVideosCollection;
+
         private const string DbName = "YTH.db";
         private static string DatabaseDirectory
         {
