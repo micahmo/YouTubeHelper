@@ -72,6 +72,15 @@ namespace YouTubeHelper.ViewModels
 
         private async void DownloadVideo()
         {
+            if (_progressCancellationToken is not null)
+            {
+                // There is a download in progress and we've been told to cancel it.
+                _progressCancellationToken.Cancel();
+                return;
+            }
+
+            _progressCancellationToken = new();
+
             // Use silent mode when shift key is down. Grab this value is as soon as possible.
             bool silent = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 
@@ -81,36 +90,74 @@ namespace YouTubeHelper.ViewModels
             // Generate request ID
             string requestId = Guid.NewGuid().ToString();
 
-            var resultTask = Settings.Instance.TelegramApiAddress
-                .AppendPathSegment("youtube")
-                .AppendPathSegment(url, fullyEncode: true)
-                .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
-                .SetQueryParam("silent", silent)
-                .SetQueryParam("requestId", requestId)
-                .WithTimeout(TimeSpan.FromMinutes(10))
-                .GetAsync();
+            try
+            {
+                await Settings.Instance.TelegramApiAddress
+                    .AppendPathSegment("youtube")
+                    .AppendPathSegment(url, fullyEncode: true)
+                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .SetQueryParam("silent", silent)
+                    .SetQueryParam("requestId", requestId)
+                    .GetAsync();
+            }
+            catch (Exception ex)
+            {
+                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                _progressCancellationToken = null;
+                return;
+            }
 
             // Spin up a task to check for progress
-            CancellationTokenSource progressCancellationToken = new();
-            var _ = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
-                while (!progressCancellationToken.IsCancellationRequested)
+                while (!_progressCancellationToken.IsCancellationRequested)
                 {
-                    var progressResponse = await Settings.Instance.TelegramApiAddress
-                        .AppendPathSegment("progress")
-                        .AppendPathSegment(requestId)
-                        .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
-                        .GetAsync();
+                    IFlurlResponse progressResponse;
+                    try
+                    {
+                        progressResponse = await Settings.Instance.TelegramApiAddress
+                            .AppendPathSegment("v2")
+                            .AppendPathSegment("progress")
+                            .AppendPathSegment(requestId)
+                            .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
+                            .GetAsync(_progressCancellationToken.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                        return;
+                    }
 
                     if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
                     {
-                        double progress = await progressResponse.GetJsonAsync<double>();
-                        Video.Status = string.Format(Resources.DownloadingProgress, $"{progress}%");
+                        dynamic result = await progressResponse.GetJsonAsync();
+                        Video.Status = string.Format(Resources.DownloadingProgress, $"{result.progress}%");
+
+                        if (result.status == 1)
+                        {
+                            // Mark as downloaded (only if succeeded)
+                            Video.Excluded = true;
+                            Video.Status = null;
+                            Video.ExclusionReason = ExclusionReason.Watched;
+                            DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
+
+                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
+                            return;
+                        }
+
+                        if (result.status == 2)
+                        {
+                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.status), NotificationType.Error, "NotificationArea");
+                            return;
+                        }
                     }
 
                     await Task.Delay(TimeSpan.FromSeconds(.5));
                 }
-            }, progressCancellationToken.Token);
+            }).ContinueWith(_ =>
+            {
+                _progressCancellationToken = null;
+            });
 
             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
 
@@ -118,27 +165,9 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.Status = Resources.Downloading;
             Video.ExclusionReason = ExclusionReason.None;
-
-            try
-            {
-                await resultTask;
-                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
-
-                // Mark as downloaded (only if succeeded)
-                Video.Excluded = true;
-                Video.Status = null;
-                Video.ExclusionReason = ExclusionReason.Watched;
-                DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
-            }
-            catch (Exception ex)
-            {
-                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
-            }
-            finally
-            {
-                progressCancellationToken.Cancel();
-            }
         }
+
+        private CancellationTokenSource _progressCancellationToken;
 
         public ICommand ExcludeVideoCommand => _excludeVideoCommand ??= new RelayCommand<object>(ExcludeVideo);
         private ICommand _excludeVideoCommand;
