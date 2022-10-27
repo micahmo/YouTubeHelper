@@ -228,6 +228,15 @@ namespace YouTubeHelper
                 {
                     MainControlViewModel.IsPlayerExpanded = false;
                 }
+                else if (MainControlViewModel.Channels.Count > 0
+                         && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) != 0)
+                {
+                    MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.FirstOrDefault();
+                }
+                else
+                {
+                    Environment.Exit(0);
+                }
             }
         }
     }
