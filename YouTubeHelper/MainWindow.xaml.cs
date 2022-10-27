@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ModernWpf.Controls;
 using YouTubeHelper.Models;
@@ -59,8 +60,11 @@ namespace YouTubeHelper
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Deselects any control when the window is clicked
-            Keyboard.ClearFocus();
+            // Deselects some controls when the window is clicked
+            if (Keyboard.FocusedElement is TextBox)
+            {
+                Keyboard.ClearFocus();
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
