@@ -112,7 +112,8 @@
                                                 </Grid>
                                             </Expander>
 
-                                            <Grid Grid.Row="1" Margin="0,0,30,15">
+                                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+                                            <Grid Margin="0,0,30,15">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="10"/>
@@ -186,7 +187,7 @@
                                                     <ui:FontIcon Glyph="&#xE761;"/>
                                                 </Button>
                                             </Grid>
-
+                                            </ScrollViewer>
 
                                             <ItemsControl Grid.Row="2" ItemsSource="{Binding Videos}" VirtualizingPanel.ScrollUnit="Pixel">
                                                 <!--
