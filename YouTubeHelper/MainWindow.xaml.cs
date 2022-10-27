@@ -235,7 +235,7 @@ namespace YouTubeHelper
                 }
                 else
                 {
-                    Environment.Exit(0);
+                    Close();
                 }
             }
         }
