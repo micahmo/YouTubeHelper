@@ -238,6 +238,34 @@ namespace YouTubeHelper
                     Close();
                 }
             }
+            else if (Keyboard.IsKeyDown(Key.F5))
+            {
+                MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+            }
+            else if (Keyboard.IsKeyDown(Key.PageUp) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                if (MainControlViewModel.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) - 1 >= 0)
+                {
+                    MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.ElementAt(MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) - 1);
+
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                    {
+                        MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                    }
+                }
+            }
+            else if (Keyboard.IsKeyDown(Key.PageDown) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                if (MainControlViewModel.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) + 1 < MainControlViewModel.Channels.Count - 1)
+                {
+                    MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.ElementAt(MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) + 1);
+
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                    {
+                        MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                    }
+                }
+            }
         }
     }
 }
