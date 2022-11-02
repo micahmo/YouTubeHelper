@@ -10,6 +10,7 @@
       xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:utilities="clr-namespace:YouTubeHelper.Utilities"
       xmlns:controls="clr-namespace:Notification.Wpf.Controls;assembly=Notification.Wpf"
+      xmlns:views="clr-namespace:YouTubeHelper.Views"
       d:DataContext="{d:DesignInstance Type=viewModels:MainControlViewModel, IsDesignTimeCreatable=True}"
       mc:Ignorable="d"
       Loaded="UserControl_Loaded">
@@ -210,12 +211,12 @@
                                                         <Border BorderThickness="{TemplateBinding BorderThickness}"
                                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                                 Background="{TemplateBinding Background}">
-                                                            <ScrollViewer CanContentScroll="True" 
-                                                                          Padding="{TemplateBinding Padding}"
-                                                                          Focusable="False"
-                                                                          ui:ScrollViewerHelper.AutoHideScrollBars="False">
+                                                            <views:MyScrollViewer CanContentScroll="True" 
+                                                                            Padding="{TemplateBinding Padding}"
+                                                                            Focusable="False"
+                                                                            ui:ScrollViewerHelper.AutoHideScrollBars="False">
                                                                 <ItemsPresenter />
-                                                            </ScrollViewer>
+                                                            </views:MyScrollViewer>
                                                         </Border>
                                                     </ControlTemplate>
                                                 </ItemsControl.Template>
