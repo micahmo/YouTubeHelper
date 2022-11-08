@@ -240,7 +240,7 @@ namespace YouTubeHelper
             }
             else if (Keyboard.IsKeyDown(Key.F5))
             {
-                MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                ExecuteMainCommand();
             }
             else if (Keyboard.IsKeyDown(Key.PageUp) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
@@ -250,7 +250,7 @@ namespace YouTubeHelper
 
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                     {
-                        MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                        ExecuteMainCommand();
                     }
                 }
             }
@@ -262,9 +262,21 @@ namespace YouTubeHelper
 
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                     {
-                        MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                        ExecuteMainCommand();
                     }
                 }
+            }
+        }
+
+        private static void ExecuteMainCommand()
+        {
+            if (MainControlViewModel.ExclusionsMode)
+            {
+                MainControlViewModel.SelectedChannel?.FindExclusionsCommand?.Execute(null);
+            }
+            else
+            {
+                MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
             }
         }
     }
