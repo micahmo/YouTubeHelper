@@ -1,9 +1,10 @@
-﻿using LiteDB;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace YouTubeHelper.Models
 {
-    public class Channel : ObservableObject
+    public class Channel : ObservableObject, IHasIdentifier<ObjectId>
     {
         public Channel() : this(false) { }
 
@@ -11,24 +12,31 @@ namespace YouTubeHelper.Models
         {
             if (!nonPersistent)
             {
-                PropertyChanged += (_, _) => DatabaseEngine.ChannelCollection.Upsert(this);
+                PropertyChanged += (_, args) =>
+                {
+                    if (args.PropertyName is not nameof(Id))
+                    {
+                        DatabaseEngine.ChannelCollection.Upsert<Channel, ObjectId>(this);
+                    }
+                };
             }
         }
 
         [BsonId]
-        public int ObjectId
+        [BsonIgnoreIfDefault]
+        public ObjectId Id
         {
             get => _objectId;
             set => SetProperty(ref _objectId, value);
         }
-        private int _objectId;
+        private ObjectId _objectId;
 
         public int Index
         {
-            get => _index == -1 ? ObjectId : _index;
+            get => _index;
             set => SetProperty(ref _index, value);
         }
-        private int _index = -1;
+        private int _index = int.MaxValue;
 
         public string Identifier
         {

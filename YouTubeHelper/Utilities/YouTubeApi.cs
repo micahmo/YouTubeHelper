@@ -11,6 +11,7 @@ using CliWrap.Buffered;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
+using MongoDB.Driver;
 using YouTubeHelper.Models;
 using Channel = YouTubeHelper.Models.Channel;
 using Video = Google.Apis.YouTube.v3.Data.Video;
@@ -65,7 +66,7 @@ namespace YouTubeHelper.Utilities
             List<string> videoIds = new List<string>();
 
             // Load known videos
-            List<string> knownVideos = DatabaseEngine.KnownVideosCollection.Find(v => v.ChannelPlaylist == channel.ChannelPlaylist).Select(v => v.Id).ToList();
+            List<string> knownVideos = DatabaseEngine.KnownVideosCollection.Find(v => v.ChannelPlaylist == channel.ChannelPlaylist).ToEnumerable().Select(v => v.Id).ToList();
             videoIds.AddRange(knownVideos);
 
 #if DEBUG
@@ -106,11 +107,15 @@ namespace YouTubeHelper.Utilities
             videoIds = videoIds.Distinct().ToList();
 
             // Save the newly loaded known videos
-            DatabaseEngine.KnownVideosCollection.InsertBulk(videoIds.Except(knownVideos).Select(v => new Models.Video
+            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new Models.Video
             {
                 Id = v,
                 ChannelPlaylist = channel.ChannelPlaylist
-            }));
+            });
+            if (knownVideosToAdd.Any())
+            {
+                DatabaseEngine.KnownVideosCollection.InsertMany(knownVideosToAdd);
+            }
 
             if (!showExclusions)
             {

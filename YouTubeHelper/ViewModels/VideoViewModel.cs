@@ -139,7 +139,7 @@ namespace YouTubeHelper.ViewModels
                             Video.Excluded = true;
                             Video.Status = null;
                             Video.ExclusionReason = ExclusionReason.Watched;
-                            DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
+                            DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
 
                             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                             return;
@@ -194,7 +194,7 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            DatabaseEngine.ExcludedVideosCollection.Upsert(Video);
+            DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
 
             if (!MainControlViewModel.ShowExcludedVideos)
             {

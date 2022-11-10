@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 using ModernWpf.Controls;
 using YouTubeHelper.Properties;
 
@@ -109,6 +110,32 @@ namespace YouTubeHelper.Utilities
             return default;
         }
 
+        /// <summary>
+        /// Show a message box into which the user can enter a single line of input
+        /// </summary>
+        public static async Task<(string Text, ContentDialogResult Result)> ShowInputBox(string message, string title, string initialInput = default)
+        {
+            var stackPanel = GetTextBoxContent(message, initialInput, out var textBox);
+
+            ContentDialog contentDialog = new ContentDialog
+            {
+                Title = title,
+                Content = stackPanel,
+                DefaultButton = ContentDialogButton.Primary,
+                PrimaryButtonText = Resources.OK,
+                CloseButtonText = Resources.Cancel
+            };
+
+            contentDialog.Loaded += (_, __) =>
+            {
+                Dispatcher.CurrentDispatcher.BeginInvoke(() => textBox.Focus());
+            };
+
+            var res = await contentDialog.ShowAsync();
+            return (textBox.Text, res);
+        }
+
+
         private static FrameworkElement GetTextBlockContent(string message, string textBlock, bool monospace, bool readOnly, out FlowDocument document)
         {
             StackPanel stackPanel = new StackPanel();
@@ -141,6 +168,28 @@ namespace YouTubeHelper.Utilities
             stackPanel.Children.Add(richTextBox);
 
             document = richTextBox.Document;
+            return stackPanel;
+        }
+
+        private static FrameworkElement GetTextBoxContent(string message, string initialInput, out TextBox textBox)
+        {
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Children.Add(new TextBlock
+            {
+                Text = message,
+                TextWrapping = TextWrapping.Wrap
+            });
+
+            textBox = new TextBox
+            {
+                Text = initialInput,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Margin = new Thickness(0, 5, 0, 5)
+            };
+            textBox.SelectAll();
+            stackPanel.Children.Add(textBox);
+
             return stackPanel;
         }
     }

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,9 +22,6 @@ namespace YouTubeHelper
         public MainWindow()
         {
             ApplicationSettings.Instance.Load();
-
-            DataContext = MainControlViewModel;
-
             InitializeComponent();
         }
 
@@ -32,11 +32,66 @@ namespace YouTubeHelper
             ApplicationSettings.Instance.Tracker.Track(this);
         }
 
-        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+        private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
+            await ConnectToDatabase();
+
+            MainControlViewModel = new();
+            MainControl = new() { DataContext = MainControlViewModel };
+            SettingsViewModel = new();
+            SettingsControl = new() { DataContext = SettingsViewModel };
+
+            DataContext = MainControlViewModel;
+
             MainControlViewModel.Load();
             NavigationView.SelectedItem = NavigationView.MenuItems.OfType<NavigationViewItem>().First();
             NavigationView.Content = MainControl;
+        }
+
+        private static async Task ConnectToDatabase()
+        {
+            // See if we already have a connection string encrypted
+            bool connected = false;
+            try
+            {
+                byte[] connectionStringUnencryptedBytes = ProtectedData.Unprotect(ApplicationSettings.Instance.ConnectionString, null, DataProtectionScope.CurrentUser);
+                string connectionString = Encoding.UTF8.GetString(connectionStringUnencryptedBytes);
+                DatabaseEngine.ConnectionString = connectionString;
+                if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
+                {
+                    connected = true;
+                }
+            }
+            catch
+            {
+                // We'll fall into the next block which prompts the user to re-enter
+            }
+
+            while (!connected)
+            {
+                var result = await MessageBoxHelper.ShowInputBox(Properties.Resources.EnterConnectionString, Properties.Resources.Database);
+
+                if (result.Result == ContentDialogResult.None)
+                {
+                    Environment.Exit(1);
+                }
+
+                DatabaseEngine.ConnectionString = result.Text;
+
+                if (DatabaseEngine.TestConnection() is { } error)
+                {
+                    await MessageBoxHelper.Show(string.Format(Properties.Resources.ErrorConnectingToDatabase, error), Properties.Resources.Error, MessageBoxButton.OK);
+                }
+                else
+                {
+                    connected = true;
+                }
+            }
+
+            // We made it here, so we must have connected successfully. Save the connection string.
+            byte[] connectionStringBytes = Encoding.UTF8.GetBytes(DatabaseEngine.ConnectionString);
+            var connectionStringEncryptedBytes = ProtectedData.Protect(connectionStringBytes, null, DataProtectionScope.CurrentUser);
+            ApplicationSettings.Instance.ConnectionString = connectionStringEncryptedBytes;
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -71,14 +126,13 @@ namespace YouTubeHelper
         {
             ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
-            DatabaseEngine.Shutdown();
         }
 
-        private static readonly MainControlViewModel MainControlViewModel = new();
-        private static readonly MainControl MainControl = new() {DataContext = MainControlViewModel};
+        private static MainControlViewModel MainControlViewModel;
+        private static MainControl MainControl;
 
-        private static readonly SettingsViewModel SettingsViewModel = new();
-        private static readonly SettingsControl SettingsControl = new() { DataContext = SettingsViewModel };
+        private static SettingsViewModel SettingsViewModel;
+        private static SettingsControl SettingsControl;
 
         private async void AddWatchedIds_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -98,7 +152,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
@@ -137,7 +191,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
@@ -176,7 +230,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert(new Video
+                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,

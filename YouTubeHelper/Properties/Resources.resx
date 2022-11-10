@@ -235,4 +235,15 @@ Updated the status of {1} video(s).</value>
   <data name="DownloadButtonToolTip" xml:space="preserve">
     <value>Download (hold Shift to download silently)</value>
   </data>
+  <data name="Database" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="EnterConnectionString" xml:space="preserve">
+    <value>Please enter a MongoDB connection string.</value>
+  </data>
+  <data name="ErrorConnectingToDatabase" xml:space="preserve">
+    <value>There was an error connecting to the database.
+
+{0}</value>
+  </data>
 </root>

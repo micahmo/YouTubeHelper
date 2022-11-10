@@ -142,6 +142,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database.
+        /// </summary>
+        public static string Database {
+            get {
+                return ResourceManager.GetString("Database", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string Description {
@@ -178,11 +187,31 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a MongoDB connection string..
+        /// </summary>
+        public static string EnterConnectionString {
+            get {
+                return ResourceManager.GetString("EnterConnectionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
             get {
                 return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error connecting to the database.
+        ///
+        ///{0}.
+        /// </summary>
+        public static string ErrorConnectingToDatabase {
+            get {
+                return ResourceManager.GetString("ErrorConnectingToDatabase", resourceCulture);
             }
         }
         
