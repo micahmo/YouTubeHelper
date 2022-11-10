@@ -25,7 +25,7 @@ namespace YouTubeHelper.ViewModels
                     {
                         Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                         {
-                            ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel, Index = Channels.MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 }, this);
+                            ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 }, this);
                             Channels.Insert(Channels.Count - 1, channelViewModel);
                             SelectedChannel = channelViewModel;
                         });
