@@ -277,7 +277,10 @@ namespace YouTubeHelper.ViewModels
                 try
                 {
                     SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
-                    SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
+                    if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
+                    {
+                        SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
+                    }
                 }
                 catch
                 {
