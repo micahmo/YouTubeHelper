@@ -110,6 +110,8 @@ namespace YouTubeHelper.Mobile
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.ExclusionsTabSelected));
 
             AppShellViewModel.ChannelViewModels.ForEach(c => c.Videos.Clear());
+
+            CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
         }
     }
 }
