@@ -7,6 +7,7 @@ namespace YouTubeHelper.Mobile.Views
         public BusyIndicatorPopup()
         {
             InitializeComponent();
+            CanBeDismissedByTappingOutsideOfPopup = false;
         }
     }
 
