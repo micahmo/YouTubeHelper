@@ -163,5 +163,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         public AppShell Page { get; }
 
         public string SearchCount => Videos.Any() ? string.Format(Resources.Resources.SearchCount, Videos.Count) : Resources.Resources.Search;
+
+        public bool Loading
+        {
+            get => _loading;
+            set => SetProperty(ref _loading, value);
+        }
+        private bool _loading = true;
     }
 }

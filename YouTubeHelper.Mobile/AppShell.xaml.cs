@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using YouTubeHelper.Mobile.ViewModels;
+﻿using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -39,33 +37,35 @@ namespace YouTubeHelper.Mobile
                 SearchTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
                 ExclusionsTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
             }
+
+            AppShellViewModel.ChannelViewModels.ForEach(c =>
+            {
+                c.Loading = false;
+            });
         }
 
         private async Task ConnectToDatabase()
         {
             bool connected = false;
 
-            using (new BusyIndicator(this))
+            try
             {
-                try
+                string connectionString = await SecureStorage.Default.GetAsync("connection_string");
+                DatabaseEngine.ConnectionString = connectionString;
+                if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
                 {
-                    string connectionString = await SecureStorage.Default.GetAsync("connection_string");
-                    DatabaseEngine.ConnectionString = connectionString;
-                    if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
-                    {
-                        connected = true;
-                    }
+                    connected = true;
                 }
-                catch
-                {
-                    // We'll fall into the next block which prompts the user to re-enter
-                }
+            }
+            catch
+            {
+                // We'll fall into the next block which prompts the user to re-enter
             }
 
             while (!connected)
             {
                 var res = await DisplayPromptAsync(Mobile.Resources.Resources.Database, Mobile.Resources.Resources.EnterConnectionString);
-                
+
                 if (string.IsNullOrEmpty(res))
                 {
                     Environment.Exit(1);
