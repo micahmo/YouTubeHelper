@@ -8,13 +8,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <Label Grid.Row="0" Text="Loading..." HorizontalOptions="Center" Padding="0,50,0,0" IsVisible="{Binding Loading}"/>
         
         <Grid Grid.Row="1" IsVisible="False">
             <Grid.Triggers>
                 <DataTrigger TargetType="Grid" Binding="{Binding Loading}" Value="False">
                     <Setter Property="IsVisible" Value="True"/>
+                </DataTrigger>
+                <DataTrigger TargetType="Grid" Binding="{Binding ShowPlayer}" Value="True">
+                    <Setter Property="IsVisible" Value="False"/>
                 </DataTrigger>
             </Grid.Triggers>
 
@@ -75,5 +78,13 @@
                 </Grid>
             </RefreshView>
         </Grid>
+
+        <WebView Grid.Row="1" Source="{Binding CurrentVideoUrl}" IsVisible="False">
+            <WebView.Triggers>
+                <DataTrigger TargetType="WebView" Binding="{Binding ShowPlayer}" Value="True">
+                    <Setter Property="IsVisible" Value="True"/>
+                </DataTrigger>
+            </WebView.Triggers>
+        </WebView>
     </Grid>
 </ContentPage>

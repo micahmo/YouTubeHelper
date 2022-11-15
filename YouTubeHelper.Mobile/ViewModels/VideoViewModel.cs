@@ -77,7 +77,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             if (action == Resources.Resources.Watch)
             {
-                await _page.Navigation.PushAsync(new NavigationPage(new ContentPage { Content = new WebView { Source = $"https://youtube.com/watch?v={Video.Id}" } }));
+                _channelViewModel.ShowPlayer = true;
+                _channelViewModel.CurrentVideoUrl = $"https://youtube.com/watch?v={Video.Id}";
             }
             else if (action == Resources.Resources.ExcludeWatched)
             {

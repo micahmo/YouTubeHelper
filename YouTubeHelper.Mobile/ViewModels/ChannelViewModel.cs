@@ -176,5 +176,20 @@ namespace YouTubeHelper.Mobile.ViewModels
             set => SetProperty(ref _loading, value);
         }
         private bool _loading = true;
+
+        public bool ShowPlayer
+        {
+            get => _showPlayer;
+            set => SetProperty(ref _showPlayer, value);
+        }
+        private bool _showPlayer = false;
+
+        public string CurrentVideoUrl
+        {
+            get => _currentVideoUrl;
+            set => SetProperty(ref _currentVideoUrl, value);
+        }
+
+        private string _currentVideoUrl;
     }
 }

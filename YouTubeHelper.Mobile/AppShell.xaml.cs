@@ -13,6 +13,17 @@ namespace YouTubeHelper.Mobile
             BindingContext = new AppShellViewModel(this);
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            AppShellViewModel.ChannelViewModels.ForEach(c =>
+            {
+                c.ShowPlayer = false;
+                c.CurrentVideoUrl = null;
+            });
+
+            return true;
+        }
+
         private async void Shell_Loaded(object sender, System.EventArgs e)
         {
             await ConnectToDatabase();
