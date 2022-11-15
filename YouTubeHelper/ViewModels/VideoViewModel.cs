@@ -11,9 +11,9 @@ using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Notification.Wpf;
-using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
-using YouTubeHelper.Utilities;
+using YouTubeHelper.Shared;
+using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Views;
 
 namespace YouTubeHelper.ViewModels
@@ -43,7 +43,7 @@ namespace YouTubeHelper.ViewModels
             Mouse.OverrideCursor = Cursors.Wait;
             try
             {
-                MainControlViewModel.ActiveVideo = Video.RawUrl ??= await YouTubeApi.Instance.GetRawUrl(Video.Id);
+                MainControlViewModel.ActiveVideo = Video.RawUrl ??= await GetRawUrl(Video.Id);
 
                 // In case the video didn't change, we want to start playing anyway, so always raise the property changed.
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPlayVideo));
@@ -224,5 +224,13 @@ namespace YouTubeHelper.ViewModels
         public MainControlViewModel MainControlViewModel { get; }
         
         private readonly ChannelViewModel _channelViewModel;
+
+        public static async Task<string> GetRawUrl(string videoId)
+        {
+            // Get URL with yt-dlp
+            return (await Cli.Wrap(Settings.Instance.YtDlpPath)
+                .WithArguments($"-f b --get-url https://youtube.com/watch?v={videoId}")
+                .ExecuteBufferedAsync()).StandardOutput;
+        }
     }
 }

@@ -6,17 +6,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using CliWrap;
-using CliWrap.Buffered;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using MongoDB.Driver;
-using YouTubeHelper.Models;
-using Channel = YouTubeHelper.Models.Channel;
+using YouTubeHelper.Shared.Models;
+using Channel = YouTubeHelper.Shared.Models.Channel;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 
-namespace YouTubeHelper.Utilities
+namespace YouTubeHelper.Shared.Utilities
 {
     public class YouTubeApi
     {
@@ -56,7 +54,7 @@ namespace YouTubeHelper.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
@@ -107,7 +105,7 @@ namespace YouTubeHelper.Utilities
             videoIds = videoIds.Distinct().ToList();
 
             // Save the newly loaded known videos
-            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new Models.Video
+            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new Shared.Models.Video
             {
                 Id = v,
                 ChannelPlaylist = channel.ChannelPlaylist
@@ -125,7 +123,7 @@ namespace YouTubeHelper.Utilities
             return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms);
         }
 
-        public async Task<IEnumerable<Models.Video>> SearchVideos(Channel channel, List<Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup)
+        public async Task<IEnumerable<Shared.Models.Video>> SearchVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup)
         {
             SearchResource.ListRequest videoSearchRequest = _youTubeService.Search.List("snippet");
             videoSearchRequest.Q = lookup;
@@ -141,9 +139,9 @@ namespace YouTubeHelper.Utilities
             return await FindVideoDetails(items, excludedVideos, channel, sortMode);
         }
 
-        public async Task<IEnumerable<Models.Video>> FindVideoDetails(List<string> videoIds, List<Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(List<string> videoIds, List<Shared.Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10)
         {
-            List<Models.Video> results = new();
+            List<Shared.Models.Video> results = new();
             List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
 
             // Use the videoIds to look up real info
@@ -219,7 +217,7 @@ namespace YouTubeHelper.Utilities
 
             foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : count))
             {
-                results.Add(new Models.Video
+                results.Add(new Shared.Models.Video
                 {
                     Excluded = (excludedVideoIds ?? new List<string>()).Contains(video.Id),
                     ExclusionReason = excludedVideos?.FirstOrDefault(v => v.Id == video.Id)?.ExclusionReason ?? ExclusionReason.None,
@@ -252,14 +250,6 @@ namespace YouTubeHelper.Utilities
                 default:
                     return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
             }
-        }
-
-        public async Task<string> GetRawUrl(string videoId)
-        {
-            // Get URL with yt-dlp
-            return (await Cli.Wrap(Settings.Instance.YtDlpPath)
-                .WithArguments($"-f b --get-url https://youtube.com/watch?v={videoId}")
-                .ExecuteBufferedAsync()).StandardOutput;
         }
 
         private readonly YouTubeService _youTubeService;

@@ -11,6 +11,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Shared;
+using YouTubeHelper.Shared.Models;
+using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels

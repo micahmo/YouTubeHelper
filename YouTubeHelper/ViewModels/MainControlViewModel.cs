@@ -9,6 +9,9 @@ using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Shared;
+using YouTubeHelper.Shared.Models;
+using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels

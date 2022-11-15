@@ -4,6 +4,7 @@ using System.Windows;
 using Jot;
 using Jot.Storage;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.Models

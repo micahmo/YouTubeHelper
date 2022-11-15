@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="YouTubeHelper.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:YouTubeHelper.Mobile.Views"
+    xmlns:viewModels="clr-namespace:YouTubeHelper.Mobile.ViewModels"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Loaded="Shell_Loaded"
+    Navigated="Shell_Navigated">
+
+    <Shell.Resources>
+        <Style TargetType="TabBar">
+            <Setter Property="Shell.TabBarBackgroundColor" Value="FireBrick" />
+            <Setter Property="Shell.TabBarTitleColor" Value="WhiteSmoke" />
+            <Setter Property="Shell.TabBarUnselectedColor" Value="DarkGray" />
+        </Style>
+    </Shell.Resources>
+
+    <TabBar>
+        <Tab Title="Watch" Icon="watch.svg" x:Name="WatchTab" x:FieldModifier="public">
+            <ShellContent Title="New Channel" ContentTemplate="{DataTemplate views:ChannelView}" />
+        </Tab>
+        <Tab Title="Search" Icon="search.svg" x:Name="SearchTab" x:FieldModifier="public"/>
+        <Tab Title="Exclusions" Icon="exclusions.svg" x:Name="ExclusionsTab" x:FieldModifier="public"/>
+    </TabBar>
+
+</Shell>
