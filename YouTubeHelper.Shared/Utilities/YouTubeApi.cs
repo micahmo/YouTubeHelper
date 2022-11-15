@@ -205,7 +205,10 @@ namespace YouTubeHelper.Shared.Utilities
             }
 
             // Remove videos that are not from this channel
-            videos = videos.Except(videos.Where(v => v.Snippet.ChannelId != channel.ChannelId)).ToList();
+            if (channel is not null)
+            {
+                videos = videos.Except(videos.Where(v => v.Snippet.ChannelId != channel.ChannelId)).ToList();
+            }
 
             // First sort by duration
             var videosSortedByDuration = videos.OrderByDescending(v => XmlConvert.ToTimeSpan(v.ContentDetails.Duration)).ToList();
@@ -223,7 +226,7 @@ namespace YouTubeHelper.Shared.Utilities
                     ExclusionReason = excludedVideos?.FirstOrDefault(v => v.Id == video.Id)?.ExclusionReason ?? ExclusionReason.None,
                     Title = video.Snippet.Title,
                     Id = video.Id,
-                    ChannelPlaylist = channel.ChannelPlaylist,
+                    ChannelPlaylist = channel?.ChannelPlaylist ?? video.Snippet.ChannelId.Replace("UC", "UU"),
                     Description = video.Snippet.Description,
                     Duration = XmlConvert.ToTimeSpan(video.ContentDetails.Duration),
                     ReleaseDate = new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue),

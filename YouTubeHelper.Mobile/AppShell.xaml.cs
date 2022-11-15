@@ -2,15 +2,19 @@
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
+using YouTubeHelper.Shared.Utilities;
 
 namespace YouTubeHelper.Mobile
 {
     public partial class AppShell : Shell
     {
+        public static AppShell Instance { get; private set; }
+
         public AppShell()
         {
             InitializeComponent();
             BindingContext = new AppShellViewModel(this);
+            Instance = this;
         }
 
         protected override bool OnBackButtonPressed()
@@ -24,8 +28,15 @@ namespace YouTubeHelper.Mobile
             return true;
         }
 
+        private bool _loaded;
+
         private async void Shell_Loaded(object sender, System.EventArgs e)
         {
+            if (_loaded)
+            {
+                return;
+            }
+
             await ConnectToDatabase();
 
             WatchTab.Items.Clear();
@@ -53,6 +64,8 @@ namespace YouTubeHelper.Mobile
             {
                 c.Loading = false;
             });
+
+            _loaded = true;
         }
 
         private async Task ConnectToDatabase()
@@ -112,6 +125,55 @@ namespace YouTubeHelper.Mobile
             AppShellViewModel.ChannelViewModels.ForEach(c => c.Videos.Clear());
 
             CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
+        }
+
+        public async void HandleSharedVideoId(string videoId)
+        {
+            Video video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
+            if (video is not null)
+            {
+                // See if this video is excluded
+                if (DatabaseEngine.ExcludedVideosCollection.FindById(video.Id) is { } excludedVideo)
+                {
+                    video.Excluded = true;
+                    video.ExclusionReason = excludedVideo.ExclusionReason;
+                }
+                
+                // Go to search tab
+                CurrentItem.CurrentItem = WatchTab;
+
+                bool foundChannel = false;
+                foreach (var content in WatchTab.Items)
+                {
+                    if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel 
+                            && channelViewModel.Channel.ChannelPlaylist == video.ChannelPlaylist)
+                    {
+                        WatchTab.CurrentItem = content;
+                        channelViewModel.Videos.Clear();
+                        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+                        foundChannel = true;
+                        break;
+                    }
+                }
+
+                if (!foundChannel)
+                {
+                    ChannelViewModel channelViewModel = new(this)
+                    {
+                        Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist },
+                        SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
+                    };
+                    AppShellViewModel.ChannelViewModels.Add(channelViewModel);
+
+                    channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+
+                    var channelView = new ChannelView { BindingContext = channelViewModel };
+                    var shellContent = new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView };
+                    WatchTab.Items.Insert(WatchTab.Items.IndexOf(WatchTab.CurrentItem), shellContent);
+
+                    channelViewModel.Loading = false;
+                }
+            }
         }
     }
 }
