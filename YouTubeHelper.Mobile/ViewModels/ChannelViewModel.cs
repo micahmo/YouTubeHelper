@@ -121,7 +121,13 @@ namespace YouTubeHelper.Mobile.ViewModels
         public int SelectedSortModeIndex
         {
             get => _selectedSortModeIndex;
-            set => SetProperty(ref _selectedSortModeIndex, value);
+            set
+            {
+                _selectedSortModeIndex = value;
+                
+                // Have to do an explicit raise here since setting to 0 doesn't.
+                OnPropertyChanged(nameof(SelectedSortModeIndex));
+            }
         }
         private int _selectedSortModeIndex;
 
