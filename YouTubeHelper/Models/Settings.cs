@@ -1,21 +1,25 @@
 ﻿using System;
-using LiteDB;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace YouTubeHelper.Models
 {
-    public class Settings : ObservableObject
+    public class Settings : ObservableObject, IHasIdentifier<int>
     {
         public Settings()
         {
-            PropertyChanged += (_, _) =>
+            PropertyChanged += (_, args) =>
             {
-                DatabaseEngine.SettingsCollection.Upsert(this);
+                if (args.PropertyName is not nameof(Id))
+                {
+                    DatabaseEngine.SettingsCollection.Upsert<Settings, int>(this);
+                }
             };
         }
 
         [BsonId]
-        public int ObjectId
+        [BsonIgnoreIfDefault]
+        public int Id
         {
             get => InstanceObjectId;
             set { }
@@ -59,7 +63,7 @@ namespace YouTubeHelper.Models
         public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {
             Settings settings = new Settings();
-            DatabaseEngine.SettingsCollection.Insert(settings);
+            DatabaseEngine.SettingsCollection.InsertOne(settings);
             return settings;
         })();
         private static Settings _instance;

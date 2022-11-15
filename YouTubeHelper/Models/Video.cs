@@ -1,13 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
-using LiteDB;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.Models
 {
-    public class Video : ObservableObject
+    public class Video : ObservableObject, IHasIdentifier<string>
     {
         [BsonIgnore]
         public string ThumbnailUrl { get; set; }
@@ -16,6 +17,7 @@ namespace YouTubeHelper.Models
         public string Title { get; set; }
 
         [BsonId]
+        [BsonIgnoreIfDefault]
         public string Id { get; set; }
 
         [BsonIgnore]
@@ -38,6 +40,7 @@ namespace YouTubeHelper.Models
         }
         private string _rawUrl;
 
+        [BsonRepresentation(BsonType.String)]
         public ExclusionReason ExclusionReason
         {
             get => _exclusionReason;

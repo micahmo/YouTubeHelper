@@ -7,6 +7,8 @@ using System.Windows.Input;
 using System.Windows.Shell;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Utilities;
@@ -43,7 +45,7 @@ namespace YouTubeHelper.ViewModels
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
             MainControlViewModel.Channels.Remove(this);
-            DatabaseEngine.ChannelCollection.Delete(Channel.ObjectId);
+            DatabaseEngine.ChannelCollection.Delete(Channel.Id);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
@@ -151,7 +153,7 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.Channels.ToList().ForEach(c =>
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                DatabaseEngine.ChannelCollection.Update(c.Channel);
+                DatabaseEngine.ChannelCollection.Update<Channel, ObjectId>(c.Channel);
             });
         }
 
@@ -170,7 +172,7 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.Channels.ToList().ForEach(c =>
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                DatabaseEngine.ChannelCollection.Update(c.Channel);
+                DatabaseEngine.ChannelCollection.Update<Channel, ObjectId>(c.Channel);
             });
         }
 

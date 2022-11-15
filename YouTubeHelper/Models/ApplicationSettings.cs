@@ -38,6 +38,7 @@ namespace YouTubeHelper.Models
             Tracker.Configure<ApplicationSettings>()
                 .Property(a => a.SelectedTabIndex)
                 .Property(a => a.SelectedSortMode)
+                .Property(a => a.ConnectionString)
                 .Track(this);
         }
 
@@ -59,6 +60,13 @@ namespace YouTubeHelper.Models
             set => SetProperty(ref _selectedSortMode, value);
         }
         private SortMode _selectedSortMode;
+
+        public byte[] ConnectionString
+        {
+            get => _connectionString;
+            set => SetProperty(ref _connectionString, value);
+        }
+        private byte[] _connectionString;
 
         #region Private fields
 

@@ -1,63 +1,51 @@
 ﻿using System;
-using System.Configuration;
-using System.IO;
-using LiteDB;
+using MongoDB.Driver;
 using YouTubeHelper.Models;
 
 namespace YouTubeHelper
 {
     public class DatabaseEngine
     {
-        public static LiteDatabase DatabaseInstance
+        public static string ConnectionString { get; set; }
+
+        private static IMongoDatabase DatabaseInstance
         {
             get
             {
-                return _databaseInstance ??= new Func<LiteDatabase>(() =>
+                return _databaseInstance ??= new Func<IMongoDatabase>(() =>
                 {
-                    if (!Directory.Exists(DatabaseDirectory))
-                    {
-                        Directory.CreateDirectory(DatabaseDirectory);
-                    }
-
-                    return new LiteDatabase(new ConnectionString(Path.Combine(DatabaseDirectory, DbName))
-                    {
-                        Connection = ConnectionType.Shared
-                    });
+                    var clientSettings = MongoClientSettings.FromConnectionString(ConnectionString);
+                    clientSettings.AllowInsecureTls = ConnectionString.Contains("tlsAllowInvalidCertificates=true");
+                    MongoClient mongoClient = new MongoClient(clientSettings);
+                    return mongoClient.GetDatabase("yth");
                 })();
             }
         }
-        private static LiteDatabase _databaseInstance;
+        private static IMongoDatabase _databaseInstance;
 
-
-        public static void Shutdown()
+        public static string TestConnection()
         {
-            _channelCollection = null;
-            DatabaseInstance?.Dispose();
-            _databaseInstance = null;
-        }
-
-        public static ILiteCollection<Channel> ChannelCollection => _channelCollection ??= DatabaseInstance.GetCollection<Channel>("channel");
-        private static ILiteCollection<Channel> _channelCollection;
-
-        public static ILiteCollection<Settings> SettingsCollection => _settingsCollection ??= DatabaseInstance.GetCollection<Settings>("settings");
-        private static ILiteCollection<Settings> _settingsCollection;
-
-        public static ILiteCollection<Video> ExcludedVideosCollection => _excludedVideosCollection ??= DatabaseInstance.GetCollection<Video>("excludedVideos");
-        private static ILiteCollection<Video> _excludedVideosCollection;
-
-        public static ILiteCollection<Video> KnownVideosCollection => _knownVideosCollection ??= DatabaseInstance.GetCollection<Video>("knownVideos");
-        private static ILiteCollection<Video> _knownVideosCollection;
-
-        private const string DbName = "YTH.db";
-        private static string DatabaseDirectory
-        {
-            get
+            try
             {
-                string overrideDirectory = ConfigurationManager.AppSettings["DatabaseDirectory"];
-                return string.IsNullOrEmpty(overrideDirectory)
-                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YTH")
-                    : overrideDirectory;
+                DatabaseInstance.ListCollectionNames();
+                return default;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
+
+        public static IMongoCollection<Channel> ChannelCollection => _channelCollection ??= DatabaseInstance.GetCollection<Channel>("channel");
+        private static IMongoCollection<Channel> _channelCollection;
+
+        public static IMongoCollection<Settings> SettingsCollection => _settingsCollection ??= DatabaseInstance.GetCollection<Settings>("settings");
+        private static IMongoCollection<Settings> _settingsCollection;
+
+        public static IMongoCollection<Video> ExcludedVideosCollection => _excludedVideosCollection ??= DatabaseInstance.GetCollection<Video>("excludedVideos");
+        private static IMongoCollection<Video> _excludedVideosCollection;
+
+        public static IMongoCollection<Video> KnownVideosCollection => _knownVideosCollection ??= DatabaseInstance.GetCollection<Video>("knownVideos");
+        private static IMongoCollection<Video> _knownVideosCollection;
     }
 }
