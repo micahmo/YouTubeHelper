@@ -18,7 +18,7 @@
         </Style>
     </Shell.Resources>
 
-    <TabBar>
+    <TabBar x:Name="TabBar">
         <Tab Title="Watch" Icon="watch.svg" x:Name="WatchTab" x:FieldModifier="public">
             <ShellContent Title="New Channel" ContentTemplate="{DataTemplate views:ChannelView}" />
         </Tab>
