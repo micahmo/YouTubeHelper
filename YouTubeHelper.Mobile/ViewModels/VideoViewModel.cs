@@ -77,8 +77,14 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             if (action == Resources.Resources.Watch)
             {
-                _channelViewModel.ShowPlayer = true;
-                _channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+                //_channelViewModel.ShowPlayer = true;
+                //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+                await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                {
+                    LaunchMode = BrowserLaunchMode.SystemPreferred,
+                    TitleMode = BrowserTitleMode.Hide,
+                    PreferredToolbarColor = Color.FromArgb("b22222")
+                });
             }
             else if (action == Resources.Resources.ExcludeWatched)
             {
