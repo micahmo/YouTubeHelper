@@ -134,7 +134,7 @@ namespace YouTubeHelper.Mobile
             if (_loaded)
             {
                 //Toast.Make("Please close the app before sharing.", ToastDuration.Long);
-                await DisplayAlert("", "Please close the app before sharing.", "OK");
+                await DisplayAlert(string.Empty, Mobile.Resources.Resources.CloseAppBeforeShare, Mobile.Resources.Resources.OK);
                 return;
             }
             

@@ -70,6 +70,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please close the app before sharing..
+        /// </summary>
+        internal static string CloseAppBeforeShare {
+            get {
+                return ResourceManager.GetString("CloseAppBeforeShare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Database.
         /// </summary>
         internal static string Database {

@@ -160,4 +160,7 @@
   <data name="Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
+  <data name="CloseAppBeforeShare" xml:space="preserve">
+    <value>Please close the app before sharing.</value>
+  </data>
 </root>
