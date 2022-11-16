@@ -21,11 +21,21 @@ namespace YouTubeHelper.Mobile
 
         protected override bool OnBackButtonPressed()
         {
+            bool anyPlayerOpen = false;
+
             AppShellViewModel.ChannelViewModels.ForEach(c =>
             {
+                anyPlayerOpen |= c.ShowPlayer;
+
                 c.ShowPlayer = false;
                 c.CurrentVideoUrl = null;
             });
+
+            if (!anyPlayerOpen)
+            {
+                TabBar.CurrentItem.CurrentItem = null;
+                TabBar.CurrentItem.CurrentItem = TabBar.CurrentItem.Items.FirstOrDefault();
+            }
 
             return true;
         }
