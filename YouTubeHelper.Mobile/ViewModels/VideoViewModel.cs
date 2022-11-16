@@ -78,7 +78,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             if (action == Resources.Resources.Watch)
             {
                 _channelViewModel.ShowPlayer = true;
-                _channelViewModel.CurrentVideoUrl = $"https://youtube.com/watch?v={Video.Id}";
+                _channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
             }
             else if (action == Resources.Resources.ExcludeWatched)
             {
@@ -120,6 +120,22 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     _channelViewModel.Videos.Remove(this);
                 }
+            }
+        }
+
+        public static async Task<string> GetRawUrl(string videoId)
+        {
+            try
+            {
+                return await (await Settings.Instance.TelegramApiAddress
+                    .AppendPathSegment("youtubelink")
+                    .AppendPathSegment(videoId)
+                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .GetAsync()).GetStringAsync();
+            }
+            catch
+            {
+                return "https://google.com";
             }
         }
 
