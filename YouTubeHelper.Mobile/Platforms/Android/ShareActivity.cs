@@ -19,11 +19,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string videoId)
                 {
-                    AppShell.Instance.HandleSharedVideoId(videoId);
+                    _ = AppShell.Instance.HandleSharedVideoId(videoId);
                 }
                 else if (url.Authority == "youtu.be")
                 {
-                    AppShell.Instance.HandleSharedVideoId(url.PathSegments[0]);
+                    _ = AppShell.Instance.HandleSharedVideoId(url.PathSegments[0]);
                 }
             }
         }

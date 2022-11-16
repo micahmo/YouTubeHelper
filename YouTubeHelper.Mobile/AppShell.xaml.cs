@@ -1,4 +1,6 @@
-﻿using YouTubeHelper.Mobile.ViewModels;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -30,7 +32,7 @@ namespace YouTubeHelper.Mobile
 
         private bool _loaded;
 
-        private async void Shell_Loaded(object sender, System.EventArgs e)
+        private async void Shell_Loaded(object sender, EventArgs e)
         {
             if (_loaded)
             {
@@ -127,80 +129,112 @@ namespace YouTubeHelper.Mobile
             CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
         }
 
-        public void HandleSharedVideoId(string videoId)
+        public async Task HandleSharedVideoId(string videoId)
         {
-            _ = Task.Run(async () =>
+            if (_loaded)
             {
-                while (!_loaded)
+                //Toast.Make("Please close the app before sharing.", ToastDuration.Long);
+                await DisplayAlert("", "Please close the app before sharing.", "OK");
+                return;
+            }
+            
+            while (!_loaded)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+
+            Video video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
+            if (video is not null)
+            {
+                // See if this video is excluded
+                if (DatabaseEngine.ExcludedVideosCollection.FindById(video.Id) is { } excludedVideo)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    video.Excluded = true;
+                    video.ExclusionReason = excludedVideo.ExclusionReason;
                 }
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                bool foundChannel = false;
+                foreach (var content in WatchTab.Items)
                 {
-                    
-                    
-                    Video video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
-                    if (video is not null)
+                    if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
+                        && channelViewModel.Channel.ChannelPlaylist == video.ChannelPlaylist)
                     {
-                        // See if this video is excluded
-                        if (DatabaseEngine.ExcludedVideosCollection.FindById(video.Id) is { } excludedVideo)
+                        try
                         {
-                            video.Excluded = true;
-                            video.ExclusionReason = excludedVideo.ExclusionReason;
+                            WatchTab.CurrentItem = content;
+                        }
+                        catch
+                        {
+                            // This throws an exception, but it gets far enough.
                         }
 
-                        // Go to search tab
-                        CurrentItem.CurrentItem = WatchTab;
-
-                        bool foundChannel = false;
-                        foreach (var content in WatchTab.Items)
-                        {
-                            if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
-                                && channelViewModel.Channel.ChannelPlaylist == video.ChannelPlaylist)
-                            {
-                                // Remove all other content
-                                foreach (var sc in WatchTab.Items.Where(c => c != content).ToList())
-                                    WatchTab.Items.Remove(sc);
-                                TabBar.Items.Remove(SearchTab);
-                                TabBar.Items.Remove(ExclusionsTab);
-
-                                WatchTab.Items.Add(content);
-
-                                channelViewModel.Videos.Clear();
-                                channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
-                                foundChannel = true;
-                                break;
-                            }
-                        }
-
-                        if (!foundChannel)
-                        {
-                            ChannelViewModel channelViewModel = new(this)
-                            {
-                                Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
-                                SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
-                            };
-                            AppShellViewModel.ChannelViewModels.Add(channelViewModel);
-
-                            var channelView = new ChannelView { BindingContext = channelViewModel };
-                            var shellContent = new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView };
-                            
-                            WatchTab.Items.Add(shellContent);
-
-                            // Remove all other content
-                            foreach (var sc in WatchTab.Items.Where(c => c != shellContent).ToList())
-                                WatchTab.Items.Remove(sc);
-                            TabBar.Items.Remove(SearchTab);
-                            TabBar.Items.Remove(ExclusionsTab);
-
-                            channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
-
-                            channelViewModel.Loading = false;
-                        }
+                        channelViewModel.Videos.Clear();
+                        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+                        foundChannel = true;
+                        break;
                     }
-                });
-            });
+                }
+
+                if (!foundChannel)
+                {
+                    ChannelViewModel channelViewModel = new(this)
+                    {
+                        Channel = new Channel(nonPersistent: true) {ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
+                        SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
+                    };
+                    AppShellViewModel.ChannelViewModels.Add(channelViewModel);
+
+                    var channelView = new ChannelView { BindingContext = channelViewModel };
+
+                    WatchTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
+                    SearchTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
+                    ExclusionsTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
+
+                    channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+
+                    channelViewModel.Loading = false;
+
+                    //TabBar.CurrentItem = ShareTab;
+                    //                    try
+                    //                    {
+                    //                        await Current.GoToAsync("//ShareTabRoute/Unknown");
+                    //                    }
+                    //                    catch
+                    //                    {
+                    ////
+                    //                    }
+
+                    //        ChannelViewModel channelViewModel = new(this)
+                    //        {
+                    //            Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
+                    //            SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
+                    //        };
+                    //        AppShellViewModel.ChannelViewModels.Add(channelViewModel);
+
+                    //        var channelView = new ChannelView { BindingContext = channelViewModel };
+                    //        var shellContent = new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView };
+
+                    //        WatchTab.Items.Insert(0, shellContent);
+
+                    //        // Remove all other content
+                    //        while (WatchTab.Items.Any(c => c != shellContent))
+                    //        {
+                    //            try
+                    //            {
+                    //                foreach (var sc in WatchTab.Items.Where(c => c != shellContent).ToList())
+                    //                    WatchTab.Items.Remove(sc);
+                    //            }
+                    //            catch {}
+                    //        }
+
+                    //        TabBar.Items.Remove(SearchTab);
+                    //        TabBar.Items.Remove(ExclusionsTab);
+
+                    //        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+
+                    //        channelViewModel.Loading = false;
+                }
+            }
         }
     }
 }
