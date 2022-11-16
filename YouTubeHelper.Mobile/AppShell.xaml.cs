@@ -160,7 +160,7 @@ namespace YouTubeHelper.Mobile
                 {
                     ChannelViewModel channelViewModel = new(this)
                     {
-                        Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist },
+                        Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
                     };
                     AppShellViewModel.ChannelViewModels.Add(channelViewModel);
