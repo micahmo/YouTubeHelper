@@ -37,6 +37,11 @@ namespace YouTubeHelper.Shared
             }
         }
 
+        public static void Reset()
+        {
+            _databaseInstance = null;
+        }
+
         public static IMongoCollection<Channel> ChannelCollection => _channelCollection ??= DatabaseInstance.GetCollection<Channel>("channel");
         private static IMongoCollection<Channel> _channelCollection;
 

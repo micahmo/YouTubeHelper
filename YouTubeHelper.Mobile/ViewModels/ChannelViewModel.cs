@@ -59,53 +59,77 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public async void FindVideos()
         {
-            IsRefreshing = false;
-            using (new BusyIndicator(Page))
+            if (_findInProgress)
             {
-                Videos.Clear();
+                return;
+            }
 
-                // FindVideos
-                if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
+            try
+            {
+                _findInProgress = true;
+                IsRefreshing = false;
+                using (new BusyIndicator(Page))
                 {
-                    List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
-                    List<string> searchTerms = null;
+                    Videos.Clear();
 
-                    //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
-                    //{
-                    //    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
-                    //}
-                    //else
+                    // FindVideos
+                    if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                     {
-                        if (Page.AppShellViewModel.SearchTabSelected)
+                        List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                        List<string> searchTerms = null;
+
+                        //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
+                        //{
+                        //    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                        //}
+                        //else
                         {
-                            if (!string.IsNullOrEmpty(ExactSearchTerm))
+                            if (Page.AppShellViewModel.SearchTabSelected)
                             {
-                                searchTerms = ExactSearchTerm.Split().ToList();
+                                if (!string.IsNullOrEmpty(ExactSearchTerm))
+                                {
+                                    searchTerms = ExactSearchTerm.Split().ToList();
+                                }
                             }
+
+                            (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
+                            {
+                                // TODO: Update progress?
+                            })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+
+                            // TODO: Reset progress?
+                        }
+                    }
+                    // FindExclusions
+                    else if (Page.AppShellViewModel.ExclusionsTabSelected)
+                    {
+                        List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+
+                        if (SelectedExclusionFilter.Value != ExclusionReason.None)
+                        {
+                            exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                         }
 
-                        (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
-                        {
-                            // TODO: Update progress?
-                        })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
-
-                        // TODO: Reset progress?
+                        (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
                     }
-                }
-                // FindExclusions
-                else if (Page.AppShellViewModel.ExclusionsTabSelected)
-                {
-                    List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
-
-                    if (SelectedExclusionFilter.Value != ExclusionReason.None)
-                    {
-                        exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
-                    }
-
-                    (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
                 }
             }
+            catch (Exception ex)
+            {
+                await Page.DisplayAlert(Resources.Resources.Error, Resources.Resources.ErrorProcessingRequest, Resources.Resources.OK);
+
+                if (ex is MongoConnectionPoolPausedException)
+                {
+                    DatabaseEngine.Reset();
+                }
+            }
+            finally
+            {
+                _findInProgress = false;
+            }
         }
+
+        private bool _findInProgress;
 
         public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
 

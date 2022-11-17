@@ -142,6 +142,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There was an error processing your request. Please try again..
+        /// </summary>
+        internal static string ErrorProcessingRequest {
+            get {
+                return ResourceManager.GetString("ErrorProcessingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exclude: Might Watch.
         /// </summary>
         internal static string ExcludeMightWatch {
