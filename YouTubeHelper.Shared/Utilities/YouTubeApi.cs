@@ -237,6 +237,15 @@ namespace YouTubeHelper.Shared.Utilities
             return results;
         }
 
+        public async Task<string> FindChannelName(string channelId, string defaultValue)
+        {
+            ChannelsResource.ListRequest request = _youTubeService.Channels.List("snippet");
+            request.Id = channelId;
+            ChannelListResponse response = await request.ExecuteAsync();
+
+            return response.Items.FirstOrDefault()?.Snippet.Title ?? defaultValue;
+        }
+
         private double SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
         {
             switch (sortMode)

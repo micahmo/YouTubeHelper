@@ -187,62 +187,30 @@ namespace YouTubeHelper.Mobile
 
                 if (!foundChannel)
                 {
+                    string channelId = video.ChannelPlaylist.Replace("UU", "UC");
+                    string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Mobile.Resources.Resources.Unknown);
+
                     ChannelViewModel channelViewModel = new(this)
                     {
-                        Channel = new Channel(nonPersistent: true) {ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
+                        Channel = new Channel(nonPersistent: true)
+                        {
+                            VanityName = channelName,
+                            ChannelPlaylist = video.ChannelPlaylist, 
+                            ChannelId = channelId
+                        },
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
                     };
                     AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
                     var channelView = new ChannelView { BindingContext = channelViewModel };
 
-                    WatchTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
-                    SearchTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
-                    ExclusionsTab.Items.Insert(0, new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView });
+                    WatchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
+                    SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
+                    ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
 
                     channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
 
                     channelViewModel.Loading = false;
-
-                    //TabBar.CurrentItem = ShareTab;
-                    //                    try
-                    //                    {
-                    //                        await Current.GoToAsync("//ShareTabRoute/Unknown");
-                    //                    }
-                    //                    catch
-                    //                    {
-                    ////
-                    //                    }
-
-                    //        ChannelViewModel channelViewModel = new(this)
-                    //        {
-                    //            Channel = new Channel(nonPersistent: true) { ChannelPlaylist = video.ChannelPlaylist, ChannelId = video.ChannelPlaylist.Replace("UU", "UC") },
-                    //            SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
-                    //        };
-                    //        AppShellViewModel.ChannelViewModels.Add(channelViewModel);
-
-                    //        var channelView = new ChannelView { BindingContext = channelViewModel };
-                    //        var shellContent = new ShellContent { Title = Mobile.Resources.Resources.Unknown, Content = channelView };
-
-                    //        WatchTab.Items.Insert(0, shellContent);
-
-                    //        // Remove all other content
-                    //        while (WatchTab.Items.Any(c => c != shellContent))
-                    //        {
-                    //            try
-                    //            {
-                    //                foreach (var sc in WatchTab.Items.Where(c => c != shellContent).ToList())
-                    //                    WatchTab.Items.Remove(sc);
-                    //            }
-                    //            catch {}
-                    //        }
-
-                    //        TabBar.Items.Remove(SearchTab);
-                    //        TabBar.Items.Remove(ExclusionsTab);
-
-                    //        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
-
-                    //        channelViewModel.Loading = false;
                 }
             }
         }
