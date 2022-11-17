@@ -10,7 +10,7 @@
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Text="Loading..." HorizontalOptions="Center" Padding="0,50,0,0" IsVisible="{Binding Loading}"/>
-        
+
         <Grid Grid.Row="1" IsVisible="False">
             <Grid.Triggers>
                 <DataTrigger TargetType="Grid" Binding="{Binding Loading}" Value="False">
@@ -66,17 +66,17 @@
 
             <Button Grid.Row="4" Text="{Binding SearchCount}" Command="{Binding FindVideosCommand}" Margin="10,0,10,0"/>
 
-            <RefreshView Grid.Row="5" Command="{Binding FindVideosCommand}" IsRefreshing="{Binding IsRefreshing}" HorizontalOptions="CenterAndExpand" VerticalOptions="StartAndExpand">
-                <Grid>
-                    <CollectionView Grid.Row="1" ItemsSource="{Binding Videos}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <views:VideoView BindingContext="{Binding}" />
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </Grid>
-            </RefreshView>
+            <!--<RefreshView Grid.Row="5" Command="{Binding FindVideosCommand}" IsRefreshing="{Binding IsRefreshing}" HorizontalOptions="CenterAndExpand" VerticalOptions="StartAndExpand">-->
+            <Grid Grid.Row="5">
+                <CollectionView ItemsSource="{Binding Videos}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <views:VideoView BindingContext="{Binding}" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+            <!--</RefreshView>-->
         </Grid>
 
         <WebView Grid.Row="1" Source="{Binding CurrentVideoUrl}" IsVisible="False">
