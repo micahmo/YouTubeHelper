@@ -35,7 +35,8 @@
                 <StackLayout Grid.Column="1" Grid.Row="1">
                     <Label Text="{Binding Video.TimeStringNewLine}" Margin="10,0,10,0"/>
                     <Label Text="{Binding ExcludedString}" Margin="10,0,10,0" TextColor="FireBrick" FontAttributes="Bold" IsVisible="{Binding Video.Excluded}"/>
-                    <Label Text="{Binding Video.Status}" Margin="10,0,10,0" TextColor="Green" FontAttributes="Bold"/>
+                    <Label Text="{Binding Video.Status}" Margin="10,0,10,0" TextColor="Green" FontAttributes="Bold" IsVisible="{Binding HasStatus}"/>
+                    <Label Text="▶" Margin="10,0,10,0" FontAttributes="Bold" IsVisible="{Binding IsPlaying}"/>
                 </StackLayout>
             </Grid>
         </StackLayout>

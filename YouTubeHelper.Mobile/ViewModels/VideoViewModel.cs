@@ -24,9 +24,10 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             Video.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(Video.Excluded) || args.PropertyName == nameof(Video.ExclusionReason))
+                if (args.PropertyName == nameof(Video.Excluded) || args.PropertyName == nameof(Video.ExclusionReason) || args.PropertyName == nameof(Video.Status))
                 {
                     OnPropertyChanged(nameof(ExcludedString));
+                    OnPropertyChanged(nameof(HasStatus));
                 }
             };
         }
@@ -40,6 +41,13 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private bool _isDescriptionExpanded;
 
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            set => SetProperty(ref _isPlaying, value);
+        }
+        private bool _isPlaying;
+
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
         private ICommand _toggleDescriptionCommand;
 
@@ -49,6 +57,8 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
 
         public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
+
+        public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
         private ICommand _videoTappedCommand;
@@ -79,6 +89,17 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 //_channelViewModel.ShowPlayer = true;
                 //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+
+                _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
+                {
+                    c.Videos.ToList().ForEach(v =>
+                    {
+                        v.IsPlaying = false;
+                    });
+                });
+
+                IsPlaying = true;
+
                 await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
                 {
                     LaunchMode = BrowserLaunchMode.SystemPreferred,
