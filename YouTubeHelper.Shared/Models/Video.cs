@@ -3,10 +3,8 @@ using System.ComponentModel;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using YouTubeHelper.Properties;
-using YouTubeHelper.Utilities;
 
-namespace YouTubeHelper.Models
+namespace YouTubeHelper.Shared.Models
 {
     public class Video : ObservableObject, IHasIdentifier<string>
     {
@@ -27,7 +25,10 @@ namespace YouTubeHelper.Models
         public DateTimeOffset ReleaseDate { get; set; }
 
         [BsonIgnore]
-        public string TimeString => string.Format(Resources.TimeStringFormat, ReleaseDate, (DateTimeOffset.Now - ReleaseDate).Days, Duration);
+        public string TimeString => $"{ReleaseDate:MMMM d, yyyy}  •  {(DateTimeOffset.Now - ReleaseDate).Days} day(s) ago  •  {Duration}";
+
+        [BsonIgnore]
+        public string TimeStringNewLine => $"{ReleaseDate:MMMM d, yyyy}{Environment.NewLine}{(DateTimeOffset.Now - ReleaseDate).Days} day(s) ago{Environment.NewLine}{Duration}";
 
         [BsonIgnore]
         public TimeSpan Duration { get; set; }

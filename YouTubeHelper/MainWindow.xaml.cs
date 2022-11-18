@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ModernWpf.Controls;
 using YouTubeHelper.Models;
+using YouTubeHelper.Shared;
+using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;

@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace YouTubeHelper.Models
+namespace YouTubeHelper.Shared.Models
 {
     public class Channel : ObservableObject, IHasIdentifier<ObjectId>
     {

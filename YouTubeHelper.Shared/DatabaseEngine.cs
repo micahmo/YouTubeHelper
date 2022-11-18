@@ -1,8 +1,8 @@
 ﻿using System;
 using MongoDB.Driver;
-using YouTubeHelper.Models;
+using YouTubeHelper.Shared.Models;
 
-namespace YouTubeHelper
+namespace YouTubeHelper.Shared
 {
     public class DatabaseEngine
     {
@@ -32,8 +32,14 @@ namespace YouTubeHelper
             }
             catch (Exception ex)
             {
+                _databaseInstance = null;
                 return ex.Message;
             }
+        }
+
+        public static void Reset()
+        {
+            _databaseInstance = null;
         }
 
         public static IMongoCollection<Channel> ChannelCollection => _channelCollection ??= DatabaseInstance.GetCollection<Channel>("channel");

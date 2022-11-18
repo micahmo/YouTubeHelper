@@ -2,7 +2,7 @@
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace YouTubeHelper.Models
+namespace YouTubeHelper.Shared.Models
 {
     public class Settings : ObservableObject, IHasIdentifier<int>
     {

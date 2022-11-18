@@ -1,4 +1,5 @@
 ﻿using YouTubeHelper.Models;
+using YouTubeHelper.Shared.Models;
 
 namespace YouTubeHelper.ViewModels
 {

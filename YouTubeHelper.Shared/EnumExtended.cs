@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 
-namespace YouTubeHelper.Utilities
+namespace YouTubeHelper.Shared
 {
     public class EnumExtended<T> where T : Enum
     {

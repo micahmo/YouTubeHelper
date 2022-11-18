@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Driver;
 
-namespace YouTubeHelper
+namespace YouTubeHelper.Shared
 {
     public interface IHasIdentifier<T>
     {
