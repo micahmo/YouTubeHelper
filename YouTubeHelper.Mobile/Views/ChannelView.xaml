@@ -60,7 +60,7 @@
 
             <Picker Grid.Row="1" Margin="10,-10,10,5" Title="Sort order" ItemsSource="{Binding SortModeValues}" ItemDisplayBinding="{Binding Description}" SelectedItem="{Binding SelectedSortMode}" SelectedIndex="{Binding SelectedSortModeIndex}"/>
 
-            <Picker Grid.Row="2" Margin="10,-10,10,0" Title="Sort order" ItemsSource="{Binding ExclusionReasonValues}" ItemDisplayBinding="{Binding Description}" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}" IsVisible="{Binding Page.AppShellViewModel.ExclusionsTabSelected}"/>
+            <Picker Grid.Row="2" Margin="10,-10,10,0" Title="Exclusion reason" ItemsSource="{Binding ExclusionReasonValues}" ItemDisplayBinding="{Binding Description}" SelectedItem="{Binding SelectedExclusionFilter}" SelectedIndex="{Binding SelectedExclusionFilterIndex}" IsVisible="{Binding Page.AppShellViewModel.ExclusionsTabSelected}"/>
 
             <Entry Grid.Row="3" Margin="10,-10,10,0" Text="{Binding ExactSearchTerm}" IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"/>
 
