@@ -166,4 +166,9 @@
   <data name="ErrorProcessingRequest" xml:space="preserve">
     <value>There was an error processing your request. Please try again.</value>
   </data>
+  <data name="ErrorProcessingRequestMessage" xml:space="preserve">
+    <value>There was an error processing your request. Please try again.
+
+{0}</value>
+  </data>
 </root>

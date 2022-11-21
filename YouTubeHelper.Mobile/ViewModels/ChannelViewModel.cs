@@ -69,13 +69,13 @@ namespace YouTubeHelper.Mobile.ViewModels
             IsRefreshing = false;
 
             await Policy
-                .Handle<Exception>().FallbackAsync(async _ =>
+                .Handle<Exception>().FallbackAsync(_ => Task.CompletedTask, async ex =>
                 {
                     // This happens once we've retried and failed.
                     // Show that there was an unhandled error.
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        await Page.DisplayAlert(Resources.Resources.Error, Resources.Resources.ErrorProcessingRequest, Resources.Resources.OK);
+                        await Page.DisplayAlert(Resources.Resources.Error, string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), Resources.Resources.OK);
                     });
                 })
                 .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
