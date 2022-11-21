@@ -77,38 +77,27 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindVideos()
         {
-            MainControlViewModel.IsBusy = true;
             MainControlViewModel.IsPlayerExpanded = false;
 
             Videos.Clear();
 
             await Policy
-                .Handle<Exception>().FallbackAsync(async _ =>
+                .Handle<Exception>().RetryAsync(5, (ex, _) =>
                 {
-                    // This happens once we've retried and failed.
-                    // Show that there was an unhandled error.
-                    await Dispatcher.CurrentDispatcher.Invoke(async () =>
+                    // This retries a few times and lets us reset things before we try again.
+                    if (ex is MongoConnectionPoolPausedException)
                     {
-                        await MessageBoxHelper.Show(Resources.ErrorProcessingRequest, Resources.Error, MessageBoxButton.OK);
-                    });
-                })
-                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
-                {
-                    // This retries ONCE and lets us reset things before we try again.
-                    await Dispatcher.CurrentDispatcher.Invoke(() =>
-                    {
-                        if (ex is MongoConnectionPoolPausedException)
-                        {
-                            DatabaseEngine.Reset();
-                        }
+                        DatabaseEngine.Reset();
+                    }
 
-                        return Task.CompletedTask;
-                    });
-                }))
+                    return Task.CompletedTask;
+                })
                 .ExecuteAsync(async () =>
                 {
-                    await Dispatcher.CurrentDispatcher.Invoke(async () =>
+                    try
                     {
+                        MainControlViewModel.IsBusy = true;
+
                         List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
                         List<string> searchTerms = null;
 
@@ -135,11 +124,12 @@ namespace YouTubeHelper.ViewModels
                             MainControlViewModel.Progress = 0;
                             MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
                         }
-                    });
+                    }
+                    finally
+                    {
+                        MainControlViewModel.IsBusy = false;
+                    }
                 });
-
-            MainControlViewModel.IsBusy = false;
-
         }
 
         public ICommand FindExclusionsCommand => _findExclusionsCommand ??= new RelayCommand(FindExclusions);
@@ -147,37 +137,24 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindExclusions()
         {
-            MainControlViewModel.IsBusy = true;
-
             Videos.Clear();
 
             await Policy
-                .Handle<Exception>().FallbackAsync(async _ =>
+                .Handle<Exception>().RetryAsync(5, (ex, _) =>
                 {
-                    // This happens once we've retried and failed.
-                    // Show that there was an unhandled error.
-                    await Dispatcher.CurrentDispatcher.Invoke(async () =>
+                    // This retries a few times and lets us reset things before we try again.
+                    if (ex is MongoConnectionPoolPausedException)
                     {
-                        await MessageBoxHelper.Show(Resources.ErrorProcessingRequest, Resources.Error, MessageBoxButton.OK);
-                    });
-                })
-                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
-                {
-                    // This retries ONCE and lets us reset things before we try again.
-                    await Dispatcher.CurrentDispatcher.Invoke(() =>
-                    {
-                        if (ex is MongoConnectionPoolPausedException)
-                        {
-                            DatabaseEngine.Reset();
-                        }
+                        DatabaseEngine.Reset();
+                    }
 
-                        return Task.CompletedTask;
-                    });
-                }))
+                    return Task.CompletedTask;
+                })
                 .ExecuteAsync(async () =>
                 {
-                    await Dispatcher.CurrentDispatcher.Invoke(async () =>
+                    try
                     {
+                        MainControlViewModel.IsBusy = true;
                         List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
 
                         if (MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None)
@@ -186,10 +163,14 @@ namespace YouTubeHelper.ViewModels
                         }
 
                         (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
-                    });
+                    }
+                    finally
+                    {
+                        MainControlViewModel.IsBusy = false;
+                    }
                 });
 
-            MainControlViewModel.IsBusy = false;
+            
         }
 
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);

@@ -80,7 +80,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 })
                 .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
                 {
-                    // This retries ONCE and lets us reset things before we try again.
+                    // This retries a few times and lets us reset things before we try again.
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
                         if (ex is MongoConnectionPoolPausedException)
