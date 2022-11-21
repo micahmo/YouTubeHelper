@@ -8,6 +8,7 @@ using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared;
+using YouTubeHelper.Mobile.Views;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -87,25 +88,28 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             if (action == Resources.Resources.Watch)
             {
-                //_channelViewModel.ShowPlayer = true;
-                //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
-
-                _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
+                using (new BusyIndicator(_page))
                 {
-                    c.Videos.ToList().ForEach(v =>
+                    //_channelViewModel.ShowPlayer = true;
+                    //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+
+                    _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
                     {
-                        v.IsPlaying = false;
+                        c.Videos.ToList().ForEach(v =>
+                        {
+                            v.IsPlaying = false;
+                        });
                     });
-                });
 
-                IsPlaying = true;
+                    IsPlaying = true;
 
-                await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
-                {
-                    LaunchMode = BrowserLaunchMode.SystemPreferred,
-                    TitleMode = BrowserTitleMode.Hide,
-                    PreferredToolbarColor = Color.FromArgb("b22222")
-                });
+                    await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                    {
+                        LaunchMode = BrowserLaunchMode.SystemPreferred,
+                        TitleMode = BrowserTitleMode.Hide,
+                        PreferredToolbarColor = Color.FromArgb("b22222")
+                    });
+                }
             }
             else if (action == Resources.Resources.ExcludeWatched)
             {
