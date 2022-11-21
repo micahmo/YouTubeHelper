@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />
     <PackageReference Include="Notification.WPF" Version="6.1.0.4" />
+    <PackageReference Include="Polly" Version="7.2.3" />
   </ItemGroup>
 
   <ItemGroup>

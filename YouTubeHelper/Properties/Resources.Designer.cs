@@ -216,6 +216,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There was an error processing your request. Please try again..
+        /// </summary>
+        public static string ErrorProcessingRequest {
+            get {
+                return ResourceManager.GetString("ErrorProcessingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exact search.
         /// </summary>
         public static string ExactSearch {
