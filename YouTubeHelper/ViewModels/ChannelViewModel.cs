@@ -8,8 +8,6 @@ using System.Windows.Shell;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Bson;
-using MongoDB.Driver;
-using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -44,11 +42,11 @@ namespace YouTubeHelper.ViewModels
         public ICommand DeleteCommand => _deleteChannelCommand ??= new RelayCommand(Delete);
         private ICommand _deleteChannelCommand;
 
-        private void Delete()
+        private async void Delete()
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
             MainControlViewModel.Channels.Remove(this);
-            DatabaseEngine.ChannelCollection.Delete(Channel.Id);
+            await DatabaseEngine.ChannelCollection.DeleteAsync(Channel.Id);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
@@ -82,7 +80,7 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
-                List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
                 List<string> searchTerms = null;
 
                 if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
@@ -126,7 +124,7 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
-                List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
 
                 if (MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None)
                 {
@@ -144,7 +142,7 @@ namespace YouTubeHelper.ViewModels
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
         private ICommand _moveRightCommand;
 
-        private void MoveRight()
+        private async void MoveRight()
         {
             MainControlViewModel.AllowCreateNewChannel = false;
             int previousIndex = MainControlViewModel.Channels.IndexOf(this);
@@ -153,17 +151,17 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.SelectedChannel = this;
             MainControlViewModel.AllowCreateNewChannel = true;
 
-            MainControlViewModel.Channels.ToList().ForEach(c =>
+            foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                DatabaseEngine.ChannelCollection.Update<Channel, ObjectId>(c.Channel);
-            });
+                await DatabaseEngine.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+            }
         }
 
         public ICommand MoveLeftCommand => _moveLeftCommand ??= new RelayCommand(MoveLeft);
         private ICommand _moveLeftCommand;
 
-        private void MoveLeft()
+        private async void MoveLeft()
         {
             MainControlViewModel.AllowCreateNewChannel = false;
             int previousIndex = MainControlViewModel.Channels.IndexOf(this);
@@ -172,11 +170,11 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.SelectedChannel = this;
             MainControlViewModel.AllowCreateNewChannel = true;
 
-            MainControlViewModel.Channels.ToList().ForEach(c =>
+            foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                DatabaseEngine.ChannelCollection.Update<Channel, ObjectId>(c.Channel);
-            });
+                await DatabaseEngine.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+            }
         }
 
         public string SearchGlyph

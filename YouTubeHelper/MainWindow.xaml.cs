@@ -45,7 +45,7 @@ namespace YouTubeHelper
 
             DataContext = MainControlViewModel;
 
-            MainControlViewModel.Load();
+            await MainControlViewModel.Load();
             NavigationView.SelectedItem = NavigationView.MenuItems.OfType<NavigationViewItem>().First();
             NavigationView.Content = MainControl;
         }
@@ -154,7 +154,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
+                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
@@ -193,7 +193,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
+                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
@@ -232,7 +232,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(new Video
+                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,

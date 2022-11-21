@@ -139,7 +139,7 @@ namespace YouTubeHelper.ViewModels
                             Video.Excluded = true;
                             Video.Status = null;
                             Video.ExclusionReason = ExclusionReason.Watched;
-                            DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
+                            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
                             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                             return;
@@ -172,7 +172,7 @@ namespace YouTubeHelper.ViewModels
         public ICommand ExcludeVideoCommand => _excludeVideoCommand ??= new RelayCommand<object>(ExcludeVideo);
         private ICommand _excludeVideoCommand;
 
-        private void ExcludeVideo(object sender)
+        private async void ExcludeVideo(object sender)
         {
             MainControl.OpenFlyouts.ForEach(f => f.Hide());
             MainControl.OpenFlyouts.Clear();
@@ -194,7 +194,7 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
+            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
             if (!MainControlViewModel.ShowExcludedVideos)
             {
@@ -205,11 +205,11 @@ namespace YouTubeHelper.ViewModels
         public ICommand UnexcludeVideoCommand => _enexcludeVideoCommand ??= new RelayCommand(UnexcludeVideo);
         private ICommand _enexcludeVideoCommand;
 
-        private void UnexcludeVideo()
+        private async void UnexcludeVideo()
         {
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
-            DatabaseEngine.ExcludedVideosCollection.Delete(Video.Id);
+            await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
 
             if (_channelViewModel.ExclusionsMode)
             {

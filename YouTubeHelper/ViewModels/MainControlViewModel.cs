@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
 using System.Windows.Shell;
@@ -12,7 +13,6 @@ using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
-using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels
 {
@@ -269,11 +269,15 @@ namespace YouTubeHelper.ViewModels
 
         public bool AllowCreateNewChannel { get; set; } = true;
 
-        public void Load()
+        public async Task Load()
         {
             if (!_loaded)
             {
-                DatabaseEngine.ChannelCollection.FindAll().OrderBy(c => c.Index).ToList().ForEach(c => { Channels.Add(new ChannelViewModel(c, this)); });
+                var channels = (await DatabaseEngine.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
+                foreach (var c in channels)
+                {
+                    Channels.Add(new ChannelViewModel(c, this));
+                }
 
                 Channels.Add(_newChannelTab);
 

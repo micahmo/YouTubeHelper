@@ -130,7 +130,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 Video.Excluded = false;
                 Video.ExclusionReason = ExclusionReason.None;
-                DatabaseEngine.ExcludedVideosCollection.Delete(Video.Id);
+                await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
 
                 if (_page.AppShellViewModel.ExclusionsTabSelected)
                 {
@@ -145,7 +145,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             if (excluded)
             {
                 Video.Excluded = true;
-                DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
+                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
                 if (!_channelViewModel.ShowExcludedVideos)
                 {
@@ -239,7 +239,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             Video.Excluded = true;
                             Video.Status = null;
                             Video.ExclusionReason = ExclusionReason.Watched;
-                            DatabaseEngine.ExcludedVideosCollection.Upsert<Video, string>(Video);
+                            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {

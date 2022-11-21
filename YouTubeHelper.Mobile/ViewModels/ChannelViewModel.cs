@@ -75,7 +75,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     // FindVideos
                     if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                     {
-                        List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
                         List<string> searchTerms = null;
 
                         //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
@@ -103,7 +103,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     // FindExclusions
                     else if (Page.AppShellViewModel.ExclusionsTabSelected)
                     {
-                        List<Video> exclusions = DatabaseEngine.ExcludedVideosCollection.Find(v => v.ChannelPlaylist == Channel.ChannelPlaylist).ToList();
+                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
 
                         if (SelectedExclusionFilter.Value != ExclusionReason.None)
                         {

@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
-using YouTubeHelper.Mobile.ViewModels;
+﻿using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -55,7 +53,9 @@ namespace YouTubeHelper.Mobile
             SearchTab.Items.Clear();
             ExclusionsTab.Items.Clear();
 
-            var channels = DatabaseEngine.ChannelCollection.FindAll().AsEnumerable().OrderByDescending(c => c.Index).ToList();
+            // I specifically want this call to be synchronous to freeze the UI on "Loading...".
+            // There is nothing else happening at this time, so there is no benefit to asynchronous.
+            var channels = DatabaseEngine.ChannelCollection.FindAll().OrderByDescending(c => c.Index);
             foreach (Channel channel in channels)
             {
                 ChannelViewModel channelViewModel = new(this)
@@ -157,7 +157,7 @@ namespace YouTubeHelper.Mobile
             if (video is not null)
             {
                 // See if this video is excluded
-                if (DatabaseEngine.ExcludedVideosCollection.FindById(video.Id) is { } excludedVideo)
+                if (await DatabaseEngine.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
                 {
                     video.Excluded = true;
                     video.ExclusionReason = excludedVideo.ExclusionReason;
