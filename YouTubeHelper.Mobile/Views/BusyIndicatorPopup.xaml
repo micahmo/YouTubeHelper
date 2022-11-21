@@ -2,9 +2,17 @@
     x:Class="YouTubeHelper.Mobile.Views.BusyIndicatorPopup"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
-    <VerticalStackLayout>
-        <ActivityIndicator IsRunning="True" Margin="100,10,100,10" />
-        <Label Text="Loading..." Margin="100,0,100,10" />
-    </VerticalStackLayout>
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Color="Transparent">
+    <!-- Note that we lose the shadow on the popup when we do this. I guess it's a sacrifice to make. -->
+    <Frame BackgroundColor="White"
+           CornerRadius="2"
+           HasShadow="True"
+           Padding="0"
+           BorderColor="Transparent">
+        <VerticalStackLayout>
+            <ActivityIndicator IsRunning="True" Margin="100,10,100,10" />
+            <Label Text="Loading..." Margin="100,0,100,10" />
+        </VerticalStackLayout>
+    </Frame>
 </toolkit:Popup>
