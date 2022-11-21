@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Driver;
+using Polly;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -64,69 +65,87 @@ namespace YouTubeHelper.Mobile.ViewModels
                 return;
             }
 
-            try
-            {
-                _findInProgress = true;
-                IsRefreshing = false;
-                using (new BusyIndicator(Page))
+            _findInProgress = true;
+            IsRefreshing = false;
+
+            await Policy
+                .Handle<Exception>().FallbackAsync(async _ =>
                 {
-                    Videos.Clear();
-
-                    // FindVideos
-                    if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
+                    // This happens once we've retried and failed.
+                    // Show that there was an unhandled error.
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
-                        List<string> searchTerms = null;
-
-                        //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
-                        //{
-                        //    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
-                        //}
-                        //else
+                        await Page.DisplayAlert(Resources.Resources.Error, Resources.Resources.ErrorProcessingRequest, Resources.Resources.OK);
+                    });
+                })
+                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
+                {
+                    // This retries ONCE and lets us reset things before we try again.
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        if (ex is MongoConnectionPoolPausedException)
                         {
-                            if (Page.AppShellViewModel.SearchTabSelected)
+                            DatabaseEngine.Reset();
+                        }
+
+                        return Task.CompletedTask;
+                    });
+                }))
+                .ExecuteAsync(async () =>
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        using (new BusyIndicator(Page))
+                        {
+                            // Perform the lookup. Polly executes this on the main thread. Any exceptions will be handled, with a single retry.
+
+                            Videos.Clear();
+
+                            // FindVideos
+                            if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                             {
-                                if (!string.IsNullOrEmpty(ExactSearchTerm))
+                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
+                                List<string> searchTerms = null;
+
+                                //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
+                                //{
+                                //    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                                //}
+                                //else
                                 {
-                                    searchTerms = ExactSearchTerm.Split().ToList();
+                                    if (Page.AppShellViewModel.SearchTabSelected)
+                                    {
+                                        if (!string.IsNullOrEmpty(ExactSearchTerm))
+                                        {
+                                            searchTerms = ExactSearchTerm.Split().ToList();
+                                        }
+                                    }
+
+                                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
+                                    {
+                                        // TODO: Update progress?
+                                    })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+
+                                    // TODO: Reset progress?
                                 }
                             }
-
-                            (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
+                            // FindExclusions
+                            else if (Page.AppShellViewModel.ExclusionsTabSelected)
                             {
-                                // TODO: Update progress?
-                            })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
 
-                            // TODO: Reset progress?
+                                if (SelectedExclusionFilter.Value != ExclusionReason.None)
+                                {
+                                    exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
+                                }
+
+                                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+                            }
                         }
-                    }
-                    // FindExclusions
-                    else if (Page.AppShellViewModel.ExclusionsTabSelected)
-                    {
-                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
+                    });
+                });
 
-                        if (SelectedExclusionFilter.Value != ExclusionReason.None)
-                        {
-                            exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
-                        }
-
-                        (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                await Page.DisplayAlert(Resources.Resources.Error, Resources.Resources.ErrorProcessingRequest, Resources.Resources.OK);
-
-                if (ex is MongoConnectionPoolPausedException)
-                {
-                    DatabaseEngine.Reset();
-                }
-            }
-            finally
-            {
-                _findInProgress = false;
-            }
+            _findInProgress = false;
         }
 
         private bool _findInProgress;
