@@ -179,7 +179,7 @@ namespace YouTubeHelper.Mobile
                         }
 
                         channelViewModel.Videos.Clear();
-                        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+                        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel) { IsDescriptionExpanded = true });
                         foundChannel = true;
                         break;
                     }
@@ -208,7 +208,7 @@ namespace YouTubeHelper.Mobile
                     SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
 
-                    channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel));
+                    channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel) { IsDescriptionExpanded = true });
 
                     channelViewModel.Loading = false;
                 }
