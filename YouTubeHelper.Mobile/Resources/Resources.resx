@@ -183,4 +183,13 @@
   <data name="EnterNumericalLimit" xml:space="preserve">
     <value>Please enter a numerical limit.</value>
   </data>
+  <data name="SearchHistoryNone" xml:space="preserve">
+    <value>Search history (none)</value>
+  </data>
+  <data name="SearchHistory" xml:space="preserve">
+    <value>Search history</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
 </root>

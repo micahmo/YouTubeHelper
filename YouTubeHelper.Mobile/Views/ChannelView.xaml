@@ -71,7 +71,14 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Text="{Binding SearchCount}" Command="{Binding FindVideosCommand}" Margin="10,0,10,0"/>
+                
+                <!-- These two buttons are identical, but are shown on different pages to give us an "or" visibility binding. -->
                 <Button Grid.Column="1" Command="{Binding ChannelOptionsCommand}" Margin="-5,0,10,0" IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}">
+                    <Button.ImageSource>
+                        <FontImageSource Glyph="&#xF280;" FontFamily="{OnPlatform Android=ionicons.ttf#}" Size="20"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Grid.Column="1" Command="{Binding ChannelOptionsCommand}" Margin="-5,0,10,0" IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}">
                     <Button.ImageSource>
                         <FontImageSource Glyph="&#xF280;" FontFamily="{OnPlatform Android=ionicons.ttf#}" Size="20"/>
                     </Button.ImageSource>

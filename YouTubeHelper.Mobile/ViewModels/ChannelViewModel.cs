@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Alerts;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Polly;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
@@ -123,7 +124,25 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     {
                                         if (!string.IsNullOrEmpty(ExactSearchTerm))
                                         {
-                                            searchTerms = ExactSearchTerm.Split().ToList();
+                                            string exactSearchTermTrimmed = ExactSearchTerm.Trim();
+                                            searchTerms = exactSearchTermTrimmed.Split().ToList();
+                                            
+                                            // Update the history
+                                            var searchTermHistory = Preferences.Default.Get<string>(nameof(ExactSearchTerm), null);
+                                            List<string> searchTermHistoryList;
+                                            try
+                                            {
+                                                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory) ?? new();
+                                            }
+                                            catch
+                                            {
+                                                searchTermHistoryList = new();
+                                            }
+
+                                            searchTermHistoryList.RemoveAll(s => s.Equals(exactSearchTermTrimmed, StringComparison.OrdinalIgnoreCase));
+                                            searchTermHistoryList.Insert(0, exactSearchTermTrimmed);
+                                            searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
+                                            Preferences.Default.Set(nameof(ExactSearchTerm), JsonConvert.SerializeObject(searchTermHistoryList));
                                         }
                                     }
 
@@ -170,8 +189,21 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                var action = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, null,
-                    Resources.Resources.SearchWithLimit);
+                List<string> options = new();
+
+                if (Page.AppShellViewModel.WatchTabSelected)
+                {
+                    options.Add(Resources.Resources.SearchWithLimit);
+                }
+
+                if (Page.AppShellViewModel.SearchTabSelected)
+                {
+                    options.Add(Preferences.Default.Get<string>(nameof(ExactSearchTerm), null) is null 
+                        ? Resources.Resources.SearchHistoryNone 
+                        : Resources.Resources.SearchHistory);
+                }
+                
+                var action = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, null, options.ToArray());
 
                 if (action == Resources.Resources.SearchWithLimit)
                 {
@@ -186,6 +218,31 @@ namespace YouTubeHelper.Mobile.ViewModels
                     else if (res is not null)
                     {
                         await Toast.Make(Resources.Resources.EnterNumericalLimit).Show();
+                    }
+                }
+                else if (action == Resources.Resources.SearchHistory)
+                {
+                    var searchTermHistory = Preferences.Default.Get<string>(nameof(ExactSearchTerm), null);
+                    List<string> searchTermHistoryList;
+                    try
+                    {
+                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory) ?? new();
+                    }
+                    catch
+                    {
+                        searchTermHistoryList = new();
+                    }
+
+                    var res = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, Resources.Resources.Clear, searchTermHistoryList.ToArray());
+
+                    if (res == Resources.Resources.Clear)
+                    {
+                        Preferences.Default.Set<string>(nameof(ExactSearchTerm), null);
+                    }
+                    else if (res is not null && res != Resources.Resources.Cancel)
+                    {
+                        ExactSearchTerm = res;
+                        FindVideos();
                     }
                 }
             }

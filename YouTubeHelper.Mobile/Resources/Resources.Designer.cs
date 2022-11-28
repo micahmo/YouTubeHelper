@@ -70,6 +70,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        internal static string Clear {
+            get {
+                return ResourceManager.GetString("Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please close the app before sharing..
         /// </summary>
         internal static string CloseAppBeforeShare {
@@ -230,6 +239,24 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string SearchCount {
             get {
                 return ResourceManager.GetString("SearchCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search history.
+        /// </summary>
+        internal static string SearchHistory {
+            get {
+                return ResourceManager.GetString("SearchHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search history (none).
+        /// </summary>
+        internal static string SearchHistoryNone {
+            get {
+                return ResourceManager.GetString("SearchHistoryNone", resourceCulture);
             }
         }
         
