@@ -192,4 +192,7 @@
   <data name="Clear" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="SearchNoLimit" xml:space="preserve">
+    <value>Search (no limit)</value>
+  </data>
 </root>

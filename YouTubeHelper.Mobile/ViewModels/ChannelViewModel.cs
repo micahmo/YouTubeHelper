@@ -49,7 +49,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public Channel Channel { get; set; }
 
-        public ObservableCollection<VideoViewModel> Videos { get; } = new();
+        public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
         public ICommand ToggleShowExcludedVideosCommand => _toggleShowExcludedVideosCommand ??= new RelayCommand(() =>
         {
@@ -146,10 +146,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         }
                                     }
 
-                                    (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
+                                    var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
                                     {
                                         // TODO: Update progress?
-                                    }, count)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+                                    }, count);
+                                    var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                    Videos.AddRange(videoViewModels);
 
                                     // TODO: Reset progress?
                                 }
@@ -164,7 +166,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                                 }
 
-                                (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+                                var videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue);
+                                var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                Videos.AddRange(videoViewModels);
                             }
                         }
                     });
@@ -193,7 +197,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 if (Page.AppShellViewModel.WatchTabSelected)
                 {
-                    options.Add(Resources.Resources.SearchWithLimit);
+                    //options.Add(Resources.Resources.SearchWithLimit);
+                    options.Add(Resources.Resources.SearchNoLimit);
                 }
 
                 if (Page.AppShellViewModel.SearchTabSelected)
@@ -219,6 +224,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                     {
                         await Toast.Make(Resources.Resources.EnterNumericalLimit).Show();
                     }
+                }
+                else if (action == Resources.Resources.SearchNoLimit)
+                {
+                    FindVideos(int.MaxValue);
                 }
                 else if (action == Resources.Resources.SearchHistory)
                 {
