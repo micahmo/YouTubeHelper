@@ -66,32 +66,41 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public async void VideoTapped()
         {
-            string action;
-            if (Video.Excluded)
+            if (_isPopupOpen)
             {
-                action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
-                    Resources.Resources.Watch,
-                    Resources.Resources.Unexclude,
-                    Resources.Resources.Download);
-            }
-            else
-            {
-                action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
-                    Resources.Resources.Watch,
-                    Resources.Resources.ExcludeWatched,
-                    Resources.Resources.ExcludeWontWatch,
-                    Resources.Resources.ExcludeMightWatch,
-                    Resources.Resources.Download);
+                return;
             }
 
-            bool excluded = false;
+            _isPopupOpen = true;
 
-            if (action == Resources.Resources.Watch)
+            try
             {
-                using (new BusyIndicator(_page))
+                string action;
+                if (Video.Excluded)
                 {
-                    //_channelViewModel.ShowPlayer = true;
-                    //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+                    action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
+                        Resources.Resources.Watch,
+                        Resources.Resources.Unexclude,
+                        Resources.Resources.Download);
+                }
+                else
+                {
+                    action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
+                        Resources.Resources.Watch,
+                        Resources.Resources.ExcludeWatched,
+                        Resources.Resources.ExcludeWontWatch,
+                        Resources.Resources.ExcludeMightWatch,
+                        Resources.Resources.Download);
+                }
+
+                bool excluded = false;
+
+                if (action == Resources.Resources.Watch)
+                {
+                    using (new BusyIndicator(_page))
+                    {
+                        //_channelViewModel.ShowPlayer = true;
+                        //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
 
                     _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
                     {
@@ -101,58 +110,64 @@ namespace YouTubeHelper.Mobile.ViewModels
                         });
                     });
 
-                    IsPlaying = true;
+                        IsPlaying = true;
 
-                    await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                        await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                        {
+                            LaunchMode = BrowserLaunchMode.SystemPreferred,
+                            TitleMode = BrowserTitleMode.Hide,
+                            PreferredToolbarColor = Color.FromArgb("b22222")
+                        });
+                    }
+                }
+                else if (action == Resources.Resources.ExcludeWatched)
+                {
+                    Video.ExclusionReason = ExclusionReason.Watched;
+                    excluded = true;
+                }
+                else if (action == Resources.Resources.ExcludeWontWatch)
+                {
+                    Video.ExclusionReason = ExclusionReason.WontWatch;
+                    excluded = true;
+                }
+                else if (action == Resources.Resources.ExcludeMightWatch)
+                {
+                    Video.ExclusionReason = ExclusionReason.MightWatch;
+                    excluded = true;
+                }
+                else if (action == Resources.Resources.Unexclude)
+                {
+                    Video.Excluded = false;
+                    Video.ExclusionReason = ExclusionReason.None;
+                    await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+
+                    if (_page.AppShellViewModel.ExclusionsTabSelected)
                     {
-                        LaunchMode = BrowserLaunchMode.SystemPreferred,
-                        TitleMode = BrowserTitleMode.Hide,
-                        PreferredToolbarColor = Color.FromArgb("b22222")
-                    });
+                        _channelViewModel.Videos.Remove(this);
+                    }
                 }
-            }
-            else if (action == Resources.Resources.ExcludeWatched)
-            {
-                Video.ExclusionReason = ExclusionReason.Watched;
-                excluded = true;
-            }
-            else if (action == Resources.Resources.ExcludeWontWatch)
-            {
-                Video.ExclusionReason = ExclusionReason.WontWatch;
-                excluded = true;
-            }
-            else if (action == Resources.Resources.ExcludeMightWatch)
-            {
-                Video.ExclusionReason = ExclusionReason.MightWatch;
-                excluded = true;
-            }
-            else if (action == Resources.Resources.Unexclude)
-            {
-                Video.Excluded = false;
-                Video.ExclusionReason = ExclusionReason.None;
-                await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
-
-                if (_page.AppShellViewModel.ExclusionsTabSelected)
+                else if (action == Resources.Resources.Download)
                 {
-                    _channelViewModel.Videos.Remove(this);
+                    await DownloadVideo();
                 }
-            }
-            else if (action == Resources.Resources.Download)
-            {
-                await DownloadVideo();
-            }
 
-            if (excluded)
-            {
-                Video.Excluded = true;
-                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
-
-                if (!_channelViewModel.ShowExcludedVideos)
+                if (excluded)
                 {
-                    _channelViewModel.Videos.Remove(this);
+                    Video.Excluded = true;
+                    await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+
+                    if (!_channelViewModel.ShowExcludedVideos)
+                    {
+                        _channelViewModel.Videos.Remove(this);
+                    }
                 }
+            }
+            finally
+            {
+                _isPopupOpen = false;
             }
         }
+        private static bool _isPopupOpen;
 
         public static async Task<string> GetRawUrl(string videoId)
         {
