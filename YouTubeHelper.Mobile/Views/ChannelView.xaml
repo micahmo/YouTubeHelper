@@ -64,7 +64,19 @@
 
             <Entry Grid.Row="3" Margin="10,-10,10,0" Text="{Binding ExactSearchTerm}" IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}" ReturnCommand="{Binding FindVideosCommand}" Placeholder="Exact search"/>
 
-            <Button Grid.Row="4" Text="{Binding SearchCount}" Command="{Binding FindVideosCommand}" Margin="10,0,10,0"/>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Text="{Binding SearchCount}" Command="{Binding FindVideosCommand}" Margin="10,0,10,0"/>
+                <Button Grid.Column="1" Command="{Binding ChannelOptionsCommand}" Margin="-5,0,10,0" IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}">
+                    <Button.ImageSource>
+                        <FontImageSource Glyph="&#xF280;" FontFamily="{OnPlatform Android=ionicons.ttf#}" Size="20"/>
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
 
             <!--<RefreshView Grid.Row="5" Command="{Binding FindVideosCommand}" IsRefreshing="{Binding IsRefreshing}" HorizontalOptions="CenterAndExpand" VerticalOptions="StartAndExpand">-->
             <Grid Grid.Row="5">

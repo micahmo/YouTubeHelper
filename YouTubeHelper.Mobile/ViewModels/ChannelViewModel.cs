@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Maui.Alerts;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Driver;
@@ -58,7 +59,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
         private ICommand _findVideosCommand;
 
-        public async void FindVideos()
+        public void FindVideos()
+        {
+            FindVideos(count: 10);
+        }
+        
+        public async void FindVideos(int count)
         {
             if (_findInProgress)
             {
@@ -124,7 +130,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     (await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
                                     {
                                         // TODO: Update progress?
-                                    })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
+                                    }, count)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, Page, this)));
 
                                     // TODO: Reset progress?
                                 }
@@ -149,6 +155,46 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
 
         private bool _findInProgress;
+
+        public ICommand ChannelOptionsCommand => _channelOptionsCommand ??= new RelayCommand(ChannelOptions);
+        private ICommand _channelOptionsCommand;
+
+        private async void ChannelOptions()
+        {
+            if (_isOptionsOpen)
+            {
+                return;
+            }
+
+            _isOptionsOpen = true;
+
+            try
+            {
+                var action = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, null,
+                    Resources.Resources.SearchWithLimit);
+
+                if (action == Resources.Resources.SearchWithLimit)
+                {
+                    int initialValue = Preferences.Default.Get("SearchLimit", 250);
+                    var res = await Page.DisplayPromptAsync(Resources.Resources.SearchLimit, Resources.Resources.EnterDesiredLimit, initialValue: initialValue.ToString(), keyboard: Keyboard.Numeric);
+
+                    if (int.TryParse(res, out int limit))
+                    {
+                        FindVideos(limit);
+                        Preferences.Default.Set("SearchLimit", limit);
+                    }
+                    else if (res is not null)
+                    {
+                        await Toast.Make(Resources.Resources.EnterNumericalLimit).Show();
+                    }
+                }
+            }
+            finally
+            {
+                _isOptionsOpen = false;
+            }
+        }
+        private static bool _isOptionsOpen;
 
         public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
 

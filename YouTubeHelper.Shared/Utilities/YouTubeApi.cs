@@ -53,7 +53,7 @@ namespace YouTubeHelper.Shared.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null, int count = 10)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
@@ -119,10 +119,10 @@ namespace YouTubeHelper.Shared.Utilities
                 videoIds = videoIds.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms);
+            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms, count);
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> SearchVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup)
+        public async Task<IEnumerable<Shared.Models.Video>> SearchVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup, int count = 10)
         {
             SearchResource.ListRequest videoSearchRequest = _youTubeService.Search.List("snippet");
             videoSearchRequest.Q = lookup;
@@ -135,7 +135,7 @@ namespace YouTubeHelper.Shared.Utilities
                 items = items.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(items, excludedVideos, channel, sortMode);
+            return await FindVideoDetails(items, excludedVideos, channel, sortMode, count: count);
         }
 
         public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(List<string> videoIds, List<Shared.Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10)

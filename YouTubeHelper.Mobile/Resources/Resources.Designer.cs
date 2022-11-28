@@ -124,6 +124,24 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter the desired limit:.
+        /// </summary>
+        internal static string EnterDesiredLimit {
+            get {
+                return ResourceManager.GetString("EnterDesiredLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter a numerical limit..
+        /// </summary>
+        internal static string EnterNumericalLimit {
+            get {
+                return ResourceManager.GetString("EnterNumericalLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
@@ -212,6 +230,24 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string SearchCount {
             get {
                 return ResourceManager.GetString("SearchCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search limit.
+        /// </summary>
+        internal static string SearchLimit {
+            get {
+                return ResourceManager.GetString("SearchLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search with limit.
+        /// </summary>
+        internal static string SearchWithLimit {
+            get {
+                return ResourceManager.GetString("SearchWithLimit", resourceCulture);
             }
         }
         

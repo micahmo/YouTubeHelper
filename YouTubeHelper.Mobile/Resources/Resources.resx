@@ -171,4 +171,16 @@
 
 {0}</value>
   </data>
+  <data name="SearchWithLimit" xml:space="preserve">
+    <value>Search with limit</value>
+  </data>
+  <data name="SearchLimit" xml:space="preserve">
+    <value>Search limit</value>
+  </data>
+  <data name="EnterDesiredLimit" xml:space="preserve">
+    <value>Enter the desired limit:</value>
+  </data>
+  <data name="EnterNumericalLimit" xml:space="preserve">
+    <value>Please enter a numerical limit.</value>
+  </data>
 </root>
