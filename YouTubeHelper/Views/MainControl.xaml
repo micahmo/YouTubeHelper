@@ -51,8 +51,8 @@
 
                                 <MediaElement x:Name="MediaElement" Grid.Row="1" Source="{Binding ActiveVideo}" LoadedBehavior="Manual" 
                                   PreviewMouseDown="MediaElement_PreviewMouseDown"
-                                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  MaxHeight="{c:Binding 'ActualHeight - 150', RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FrameworkElement}}"
+                                  MaxHeight="{c:Binding 'ActualHeight - 75', RelativeSource={RelativeSource AncestorType=FrameworkElement}}"/>
                                 <Label Grid.Row="2" Content="{Binding ActiveVideoTimeString}"
                                    HorizontalContentAlignment="Right" Padding="0,5,1,0"
                                    Width="{Binding ActualWidth, ElementName=MediaElement}"/>
