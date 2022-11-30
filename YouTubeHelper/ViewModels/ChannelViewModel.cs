@@ -77,6 +77,8 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindVideos()
         {
+            bool noLimit = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+
             MainControlViewModel.IsPlayerExpanded = false;
 
             Videos.Clear();
@@ -103,7 +105,7 @@ namespace YouTubeHelper.ViewModels
 
                         if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                         {
-                            (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                            (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm, noLimit ? int.MaxValue : 10)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
                         }
                         else
                         {
@@ -119,7 +121,7 @@ namespace YouTubeHelper.ViewModels
                             {
                                 MainControlViewModel.Progress = progress;
                                 MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
-                            })).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                            }, noLimit ? int.MaxValue : 10)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
 
                             MainControlViewModel.Progress = 0;
                             MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
