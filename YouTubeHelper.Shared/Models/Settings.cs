@@ -32,13 +32,6 @@ namespace YouTubeHelper.Shared.Models
         }
         private string _youTubeApiKey;
 
-        public string YtDlpPath
-        {
-            get => _ytDlpPath;
-            set => SetProperty(ref _ytDlpPath, value);
-        }
-        private string _ytDlpPath;
-
         public string ChromePath
         {
             get => _chromePath;

@@ -228,10 +228,18 @@ namespace YouTubeHelper.ViewModels
 
         public static async Task<string> GetRawUrl(string videoId)
         {
-            // Get URL with yt-dlp
-            return (await Cli.Wrap(Settings.Instance.YtDlpPath)
-                .WithArguments($"-f b --get-url https://youtube.com/watch?v={videoId}")
-                .ExecuteBufferedAsync()).StandardOutput;
+            try
+            {
+                return await (await Settings.Instance.TelegramApiAddress
+                    .AppendPathSegment("youtubelink")
+                    .AppendPathSegment(videoId)
+                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .GetAsync()).GetStringAsync();
+            }
+            catch
+            {
+                return "https://google.com";
+            }
         }
     }
 }
