@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using Humanizer;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -24,11 +25,43 @@ namespace YouTubeHelper.Shared.Models
         [BsonIgnore]
         public DateTimeOffset ReleaseDate { get; set; }
 
-        [BsonIgnore]
-        public string TimeString => $"{ReleaseDate:MMMM d, yyyy}  •  {(DateTimeOffset.Now - ReleaseDate).Days} day(s) ago  •  {Duration}";
+        private string GetAgeString()
+        {
+            DateTimeOffset now = DateTimeOffset.Now;
+            TimeSpan ago = now - ReleaseDate;
+            // https://stackoverflow.com/a/4127477/4206279
+            int years = now.Year - ReleaseDate.Year - 1 + (now.Month > ReleaseDate.Month || (now.Month == ReleaseDate.Month && now.Day >= ReleaseDate.Day) ? 1 : 0);
+            int positiveYearDay = now.DayOfYear - ReleaseDate.DayOfYear;
+            int negativeYearDayDif = (new DateTimeOffset(now.Year - years, now.Month, now.Day, now.Hour, now.Minute, now.Second, TimeZoneInfo.Local.BaseUtcOffset) - ReleaseDate).Days;
+
+            if (ago.Days < 28)
+            {
+                return ReleaseDate.Humanize();
+            }
+
+            if (ago.Days < 365)
+            {
+                return $"{"day".ToQuantity(ago.Days)} ago";
+            }
+
+            if (positiveYearDay > 0)
+            {
+                return $"{"year".ToQuantity(years)}, {"day".ToQuantity(positiveYearDay)} ago";
+            }
+
+            if (negativeYearDayDif > 0)
+            {
+                return $"{"year".ToQuantity(years)}, {"day".ToQuantity(negativeYearDayDif)} ago";
+            }
+
+            return $"{"year".ToQuantity(years)} ago";
+        }
 
         [BsonIgnore]
-        public string TimeStringNewLine => $"{ReleaseDate:MMMM d, yyyy}{Environment.NewLine}{(DateTimeOffset.Now - ReleaseDate).Days} day(s) ago{Environment.NewLine}{Duration}";
+        public string TimeString => $"{ReleaseDate:MMMM d, yyyy}  •  {GetAgeString()}  •  {Duration}";
+
+        [BsonIgnore]
+        public string TimeStringNewLine => $"{ReleaseDate:MMMM d, yyyy}{Environment.NewLine}{GetAgeString()}{Environment.NewLine}{Duration}";
 
         [BsonIgnore]
         public TimeSpan Duration { get; set; }
