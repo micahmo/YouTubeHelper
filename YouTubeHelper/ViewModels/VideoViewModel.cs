@@ -44,6 +44,7 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 MainControlViewModel.ActiveVideo = Video.RawUrl ??= await GetRawUrl(Video.Id);
+                MainControlViewModel.ActiveVideoTitle = Video.Title;
 
                 // In case the video didn't change, we want to start playing anyway, so always raise the property changed.
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPlayVideo));
