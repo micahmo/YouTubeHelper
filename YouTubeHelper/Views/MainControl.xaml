@@ -46,17 +46,19 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <MediaElement x:Name="MediaElement" Grid.Row="1" Source="{Binding ActiveVideo}" LoadedBehavior="Manual" 
-                                  PreviewMouseDown="MediaElement_PreviewMouseDown"
-                                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FrameworkElement}}"
-                                  MaxHeight="{c:Binding 'ActualHeight - 75', RelativeSource={RelativeSource AncestorType=FrameworkElement}}"/>
-                                <Label Grid.Row="2" Content="{Binding ActiveVideoTimeString}"
-                                   HorizontalContentAlignment="Right" Padding="0,5,1,0"
-                                   Width="{Binding ActualWidth, ElementName=MediaElement}"/>
-                                <Slider x:Name="MediaScrub" Grid.Row="3" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"
+                                <Label Grid.Row="1" Content="{Binding ActiveVideoTitle}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <MediaElement x:Name="MediaElement" Grid.Row="2" Source="{Binding ActiveVideo}" LoadedBehavior="Manual" 
+                                    PreviewMouseDown="MediaElement_PreviewMouseDown"
+                                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FrameworkElement}}"
+                                    MaxHeight="{c:Binding 'ActualHeight - 75', RelativeSource={RelativeSource AncestorType=FrameworkElement}}"/>
+                                <Label Grid.Row="3" Content="{Binding ActiveVideoTimeString}"
+                                    HorizontalContentAlignment="Right" Padding="0,5,1,0"
+                                    Width="{Binding ActualWidth, ElementName=MediaElement}"/>
+                                <Slider x:Name="MediaScrub" Grid.Row="4" Minimum="0" Maximum="1" IsMoveToPointEnabled="True"
                                     Width="{Binding ActualWidth, ElementName=MediaElement}"/>
                             </Grid>
                         </Expander>

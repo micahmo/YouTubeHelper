@@ -142,6 +142,13 @@ namespace YouTubeHelper.ViewModels
         }
         private string _activeVideo;
 
+        public string ActiveVideoTitle
+        {
+            get => _activeVideoTitle;
+            set => SetProperty(ref _activeVideoTitle, value);
+        }
+        private string _activeVideoTitle;
+
         // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
         public object SignalPlayVideo { get; set; }
 
