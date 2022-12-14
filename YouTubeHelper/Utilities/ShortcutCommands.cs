@@ -16,6 +16,7 @@ namespace YouTubeHelper.Utilities
             ChangeView.InputGestures.Add(new KeyGesture(Key.D3, ModifierKeys.Control));
             ChangeView.InputGestures.Add(new KeyGesture(Key.Escape));
             ChangeView.InputGestures.Add(new KeyGesture(Key.F5));
+            ChangeView.InputGestures.Add(new KeyGesture(Key.F5, ModifierKeys.Shift));
             ChangeView.InputGestures.Add(new KeyGesture(Key.PageUp, ModifierKeys.Control));
             ChangeView.InputGestures.Add(new KeyGesture(Key.PageDown, ModifierKeys.Control));
             ChangeView.InputGestures.Add(new KeyGesture(Key.PageUp, ModifierKeys.Control | ModifierKeys.Shift));

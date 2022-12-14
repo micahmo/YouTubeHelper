@@ -77,7 +77,8 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindVideos()
         {
-            bool noLimit = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+            bool noLimit = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                           && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl);
 
             MainControlViewModel.IsPlayerExpanded = false;
 
