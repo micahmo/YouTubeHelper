@@ -106,7 +106,12 @@ namespace YouTubeHelper.ViewModels
 
                         if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                         {
-                            (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm, noLimit ? int.MaxValue : 10)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                            var videos = await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm, noLimit ? int.MaxValue : 10);
+                            var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Videos.AddRange(videoViewModels);
+                            });
                         }
                         else
                         {
@@ -118,11 +123,16 @@ namespace YouTubeHelper.ViewModels
                                 }
                             }
 
-                            (await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, (progress, indeterminate) =>
+                            var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, (progress, indeterminate) =>
                             {
                                 MainControlViewModel.Progress = progress;
                                 MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
-                            }, noLimit ? int.MaxValue : 10)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                            }, noLimit ? int.MaxValue : 10);
+                            var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Videos.AddRange(videoViewModels);
+                            });
 
                             MainControlViewModel.Progress = 0;
                             MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
@@ -165,7 +175,12 @@ namespace YouTubeHelper.ViewModels
                             exclusions = exclusions.Where(v => MainControlViewModel.SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                         }
 
-                        (await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
+                        var videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue);
+                        var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            Videos.AddRange(videoViewModels);
+                        });
                     }
                     finally
                     {
@@ -221,7 +236,7 @@ namespace YouTubeHelper.ViewModels
         }
         private string _searchGlyph = Icons.Search;
 
-        public ObservableCollection<VideoViewModel> Videos { get; } = new();
+        public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
         public bool WatchMode => MainControlViewModel.Mode == MainControlMode.Watch;
 
