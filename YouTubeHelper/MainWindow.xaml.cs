@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,10 +7,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Flurl;
 using ModernWpf.Controls;
 using YouTubeHelper.Models;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
+using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
@@ -333,6 +336,75 @@ namespace YouTubeHelper
             else
             {
                 MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+            }
+        }
+
+        private async void HandlePaste_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            string rawUrl = Clipboard.GetText();
+            string videoId = default;
+
+            if (!string.IsNullOrEmpty(rawUrl))
+            {
+                Url url = new Url(rawUrl);
+
+                if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string id)
+                {
+                    videoId = id;
+                }
+                else if (url.Authority == "youtu.be")
+                {
+                    videoId = url.PathSegments[0];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(videoId))
+            {
+                MainControlViewModel.IsBusy = true;
+
+                Video video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
+                if (video is not null)
+                {
+                    // See if this video is excluded
+                    if (await DatabaseEngine.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    {
+                        video.Excluded = true;
+                        video.ExclusionReason = excludedVideo.ExclusionReason;
+                    }
+
+                    bool foundChannel = false;
+                    foreach (var channelViewModel in MainControlViewModel.Channels)
+                    {
+                        if (channelViewModel.Channel.ChannelPlaylist == video.ChannelPlaylist)
+                        {
+                            MainControlViewModel.SelectedChannel = channelViewModel;
+
+                            channelViewModel.Videos.Clear();
+                            channelViewModel.Videos.Add(new VideoViewModel(video, MainControlViewModel, channelViewModel) { IsDescriptionExpanded = true });
+                            foundChannel = true;
+                            break;
+                        }
+                    }
+
+                    if (!foundChannel)
+                    {
+                        string channelId = video.ChannelPlaylist.Replace("UU", "UC");
+                        string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Properties.Resources.Unknown);
+
+                        ChannelViewModel channelViewModel = new(new Channel(nonPersistent: true)
+                        {
+                            VanityName = channelName,
+                            ChannelPlaylist = video.ChannelPlaylist,
+                            ChannelId = channelId
+                        }, MainControlViewModel);
+                        MainControlViewModel.Channels.Insert(0, channelViewModel);
+                        MainControlViewModel.SelectedChannel = channelViewModel;
+
+                        channelViewModel.Videos.Add(new VideoViewModel(video, MainControlViewModel, channelViewModel) { IsDescriptionExpanded = true });
+                    }
+                }
+
+                MainControlViewModel.IsBusy = false;
             }
         }
     }

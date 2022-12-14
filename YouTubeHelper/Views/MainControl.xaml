@@ -262,7 +262,7 @@
                                                                     <TextBlock Text="{x:Static properties:Resources.Playing}" TextWrapping="Wrap" Foreground="Black" FontWeight="Medium" Visibility="{c:Binding 'Video.RawUrl != null and Video.RawUrl == MainControlViewModel.ActiveVideo', FalseToVisibility=Collapsed}"/>
                                                                 </StackPanel>
 
-                                                                <Expander Grid.Row="3" Header="Description">
+                                                                <Expander Grid.Row="3" Header="Description" IsExpanded="{Binding IsDescriptionExpanded}">
                                                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="200">
                                                                         <TextBlock Text="{Binding Video.Description}" FontSize="13"/>
                                                                     </ScrollViewer>

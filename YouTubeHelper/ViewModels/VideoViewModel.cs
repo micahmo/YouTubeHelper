@@ -222,6 +222,13 @@ namespace YouTubeHelper.ViewModels
 
         public Video Video { get; }
 
+        public bool IsDescriptionExpanded
+        {
+            get => _isDescriptionExpanded;
+            set => SetProperty(ref _isDescriptionExpanded, value);
+        }
+        private bool _isDescriptionExpanded;
+
         public MainControlViewModel MainControlViewModel { get; }
         
         private readonly ChannelViewModel _channelViewModel;
