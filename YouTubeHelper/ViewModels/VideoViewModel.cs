@@ -211,11 +211,6 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
             await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
-
-            if (_channelViewModel.ExclusionsMode)
-            {
-                _channelViewModel.Videos.Remove(this);
-            }
         }
 
         public string ExcludedString => $"{Resources.Excluded} - {new ExclusionReasonExtended(Video.ExclusionReason).Description}";
