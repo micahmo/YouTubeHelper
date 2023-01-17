@@ -420,14 +420,11 @@ namespace YouTubeHelper
                     MainControlViewModel.SelectedChannel = foundChannelViewModel;
                 }
 
-                if (foundChannelViewModel is not null)
-                {
-                    foundChannelViewModel.Videos.Clear();
+                foundChannelViewModel.Videos.Clear();
 
-                    if (video is not null)
-                    {
-                        foundChannelViewModel.Videos.Add(new VideoViewModel(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true });
-                    }
+                if (video is not null)
+                {
+                    foundChannelViewModel.Videos.Add(new VideoViewModel(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true });
                 }
             }
 
