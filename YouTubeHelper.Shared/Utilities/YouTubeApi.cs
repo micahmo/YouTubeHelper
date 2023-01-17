@@ -236,6 +236,15 @@ namespace YouTubeHelper.Shared.Utilities
             return results;
         }
 
+        public async Task<string> FindChannelId(string channelHandle, string defaultValue = default)
+        {
+            SearchResource.ListRequest request = _youTubeService.Search.List("snippet");
+            request.Q = channelHandle;
+            SearchListResponse response = await request.ExecuteAsync();
+
+            return response.Items.FirstOrDefault()?.Snippet.ChannelId ?? defaultValue;
+        }
+
         public async Task<string> FindChannelName(string channelId, string defaultValue)
         {
             ChannelsResource.ListRequest request = _youTubeService.Channels.List("snippet");
@@ -244,6 +253,10 @@ namespace YouTubeHelper.Shared.Utilities
 
             return response.Items.FirstOrDefault()?.Snippet.Title ?? defaultValue;
         }
+
+        public string ToChannelPlaylist(string channelId) => channelId?.Replace("UC", "UU");
+
+        public string ToChannelId(string channelPlaylist) => channelPlaylist?.Replace("UU", "UC");
 
         private double SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
         {
