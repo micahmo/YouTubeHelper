@@ -139,7 +139,7 @@ namespace YouTubeHelper.Mobile
             CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
         }
 
-        public async Task HandleSharedVideoId(string videoId)
+        public async Task HandleSharedLink(string videoId, string channelHandle)
         {
             if (_loaded)
             {
@@ -153,22 +153,45 @@ namespace YouTubeHelper.Mobile
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
-            Video video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
-            if (video is not null)
+
+            Video video = default;
+            string channelId = default;
+            string channelPlaylist = default;
+
+            if (!string.IsNullOrEmpty(videoId))
             {
-                // See if this video is excluded
-                if (await DatabaseEngine.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
+                if (video is not null)
                 {
-                    video.Excluded = true;
-                    video.ExclusionReason = excludedVideo.ExclusionReason;
+                    // See if this video is excluded
+                    if (await DatabaseEngine.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    {
+                        video.Excluded = true;
+                        video.ExclusionReason = excludedVideo.ExclusionReason;
+                    }
+
+                    channelPlaylist = video.ChannelPlaylist;
+                    channelId = YouTubeApi.Instance.ToChannelId(channelPlaylist);
                 }
 
-                bool foundChannel = false;
+            }
+
+            if (!string.IsNullOrEmpty(channelHandle))
+            {
+                channelId = await YouTubeApi.Instance.FindChannelId(channelHandle);
+                channelPlaylist = YouTubeApi.Instance.ToChannelPlaylist(channelId);
+            }
+
+            if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
+            {
+                ChannelViewModel foundChannelViewModel = default;
                 foreach (var content in WatchTab.Items)
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
-                        && channelViewModel.Channel.ChannelPlaylist == video.ChannelPlaylist)
+                        && channelViewModel.Channel.ChannelPlaylist == channelPlaylist)
                     {
+                        foundChannelViewModel = channelViewModel;
+
                         try
                         {
                             WatchTab.CurrentItem = content;
@@ -178,39 +201,40 @@ namespace YouTubeHelper.Mobile
                             // This throws an exception, but it gets far enough.
                         }
 
-                        channelViewModel.Videos.Clear();
-                        channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel) { IsDescriptionExpanded = true });
-                        foundChannel = true;
                         break;
                     }
                 }
 
-                if (!foundChannel)
+                if (foundChannelViewModel is null)
                 {
-                    string channelId = video.ChannelPlaylist.Replace("UU", "UC");
                     string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Mobile.Resources.Resources.Unknown);
 
-                    ChannelViewModel channelViewModel = new(this)
+                    foundChannelViewModel = new(this)
                     {
                         Channel = new Channel(nonPersistent: true)
                         {
                             VanityName = channelName,
-                            ChannelPlaylist = video.ChannelPlaylist, 
+                            ChannelPlaylist = channelPlaylist, 
                             ChannelId = channelId
                         },
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
                     };
-                    AppShellViewModel.ChannelViewModels.Add(channelViewModel);
+                    AppShellViewModel.ChannelViewModels.Add(foundChannelViewModel);
 
-                    var channelView = new ChannelView { BindingContext = channelViewModel };
+                    var channelView = new ChannelView { BindingContext = foundChannelViewModel };
 
                     WatchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
 
-                    channelViewModel.Videos.Add(new VideoViewModel(video, this, channelViewModel) { IsDescriptionExpanded = true });
+                    foundChannelViewModel.Loading = false;
+                }
 
-                    channelViewModel.Loading = false;
+                foundChannelViewModel.Videos.Clear();
+
+                if (video is not null)
+                {
+                    foundChannelViewModel.Videos.Add(new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true });
                 }
             }
         }
