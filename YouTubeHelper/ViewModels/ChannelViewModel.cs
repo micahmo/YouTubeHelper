@@ -119,7 +119,16 @@ namespace YouTubeHelper.ViewModels
                             {
                                 if (!string.IsNullOrEmpty(MainControlViewModel.ExactSearchTerm))
                                 {
-                                    searchTerms = MainControlViewModel.ExactSearchTerm.Split().ToList();
+                                    if (MainControlViewModel.ExactSearchTerm.StartsWith('"')
+                                        && MainControlViewModel.ExactSearchTerm.EndsWith('"')
+                                        && !string.IsNullOrEmpty(MainControlViewModel.ExactSearchTerm.TrimStart('"').TrimEnd('"')))
+                                    {
+                                        searchTerms = new List<string> { MainControlViewModel.ExactSearchTerm.TrimStart('"').TrimEnd('"') };
+                                    }
+                                    else
+                                    {
+                                        searchTerms = MainControlViewModel.ExactSearchTerm.Split().ToList();
+                                    }
                                 }
                             }
 
