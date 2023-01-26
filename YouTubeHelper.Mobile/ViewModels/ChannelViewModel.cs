@@ -125,8 +125,18 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         if (!string.IsNullOrEmpty(ExactSearchTerm))
                                         {
                                             string exactSearchTermTrimmed = ExactSearchTerm.Trim();
-                                            searchTerms = exactSearchTermTrimmed.Split().ToList();
-                                            
+
+                                            if (exactSearchTermTrimmed.StartsWith('"')
+                                                && exactSearchTermTrimmed.EndsWith('"')
+                                                && !string.IsNullOrEmpty(exactSearchTermTrimmed.TrimStart('"').TrimEnd('"')))
+                                            {
+                                                searchTerms = new List<string> { exactSearchTermTrimmed.TrimStart('"').TrimEnd('"') };
+                                            }
+                                            else
+                                            {
+                                                searchTerms = exactSearchTermTrimmed.Split().ToList();
+                                            }
+
                                             // Update the history
                                             var searchTermHistory = Preferences.Default.Get<string>(nameof(ExactSearchTerm), null);
                                             List<string> searchTermHistoryList;
