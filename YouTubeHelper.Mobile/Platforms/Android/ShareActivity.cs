@@ -25,6 +25,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 {
                     _ = AppShell.Instance.HandleSharedLink(url.PathSegments[0], null);
                 }
+                else if (url.Authority == "www.youtube.com" && url.PathSegments.Count >= 2 && url.PathSegments[0] == "live")
+                {
+                    _ = AppShell.Instance.HandleSharedLink(url.PathSegments[1], null);
+                }
 
                 if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
                 {

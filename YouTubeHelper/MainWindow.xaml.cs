@@ -362,6 +362,10 @@ namespace YouTubeHelper
                 {
                     videoId = url.PathSegments[0];
                 }
+                else if (url.Authority == "www.youtube.com" && url.PathSegments.Count >= 2 && url.PathSegments[0] == "live")
+                {
+                    videoId = url.PathSegments[1];
+                }
 
                 if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } cid)
                 {
