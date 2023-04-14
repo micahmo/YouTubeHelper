@@ -269,7 +269,7 @@
                                                                 </Expander>
                                                             </Grid>
 
-                                                            <Grid Grid.Column="2">
+                                                            <Grid Grid.Column="2" VerticalAlignment="Top">
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition/>
                                                                     <ColumnDefinition Width="5"/>
@@ -277,7 +277,7 @@
                                                                 </Grid.ColumnDefinitions>
 
                                                                 <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="*"/>
+                                                                    <RowDefinition Height="10"/>
                                                                     <RowDefinition/>
                                                                     <RowDefinition Height="5"/>
                                                                     <RowDefinition/>
