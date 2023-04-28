@@ -131,6 +131,7 @@ namespace YouTubeHelper
         {
             ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
+            ApplicationSettings.Instance.SelectedExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value;
         }
 
         private static MainControlViewModel MainControlViewModel;

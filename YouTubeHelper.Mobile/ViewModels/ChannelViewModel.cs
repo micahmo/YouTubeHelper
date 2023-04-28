@@ -29,13 +29,23 @@ namespace YouTubeHelper.Mobile.ViewModels
                 if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortMode) or nameof(SelectedExclusionFilter) or nameof(ExactSearchTerm))
                 {
                     Preferences.Default.Set(nameof(SelectedSortModeIndex), SelectedSortModeIndex);
-                    
+                    Preferences.Default.Set(nameof(SelectedExclusionFilterIndex), SelectedExclusionFilterIndex);
+
                     _listeningToPropertyChanges = false;
                     Page.AppShellViewModel.ChannelViewModels.ForEach(c =>
                     {
                         c.ShowExcludedVideos = ShowExcludedVideos;
-                        c.SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SelectedSortMode);
-                        c.SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(SelectedExclusionFilter);
+
+                        if (args.PropertyName is nameof(SelectedSortMode))
+                        {
+                            c.SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SelectedSortMode);
+                        }
+
+                        if (args.PropertyName is nameof(SelectedExclusionFilter))
+                        {
+                            c.SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(SelectedExclusionFilter);
+                        }
+
                         c.ExactSearchTerm = ExactSearchTerm;
                     });
                     _listeningToPropertyChanges = true;
@@ -298,7 +308,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public ExclusionReasonExtended SelectedExclusionFilter
         {
-            get => _selectedExclusionFilter ?? ExclusionReasonValues.FirstOrDefault();
+            get => _selectedExclusionFilter;
             set => SetProperty(ref _selectedExclusionFilter, value);
         }
         private ExclusionReasonExtended _selectedExclusionFilter;
@@ -306,7 +316,13 @@ namespace YouTubeHelper.Mobile.ViewModels
         public int SelectedExclusionFilterIndex
         {
             get => _selectedExclusionFilterIndex;
-            set => SetProperty(ref _selectedExclusionFilterIndex, value);
+            set
+            {
+                _selectedExclusionFilterIndex = value;
+
+                // Have to do an explicit raise here since setting to 0 doesn't.
+                OnPropertyChanged(nameof(SelectedExclusionFilterIndex));
+            }
         }
         private int _selectedExclusionFilterIndex;
 

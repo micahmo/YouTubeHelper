@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Windows;
-using Jot;
+﻿using Jot;
 using Jot.Storage;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using System;
+using System.IO;
+using System.Windows;
+using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
-using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.Models
 {
@@ -39,6 +39,7 @@ namespace YouTubeHelper.Models
             Tracker.Configure<ApplicationSettings>()
                 .Property(a => a.SelectedTabIndex)
                 .Property(a => a.SelectedSortMode)
+                .Property(a => a.SelectedExclusionReason)
                 .Property(a => a.ConnectionString)
                 .Track(this);
         }
@@ -62,6 +63,13 @@ namespace YouTubeHelper.Models
         }
         private SortMode _selectedSortMode;
 
+        public ExclusionReason SelectedExclusionReason
+        {
+            get => _selectedExclusionReason;
+            set => SetProperty(ref _selectedExclusionReason, value);
+        }
+        private ExclusionReason _selectedExclusionReason;
+
         public byte[] ConnectionString
         {
             get => _connectionString;
@@ -69,7 +77,7 @@ namespace YouTubeHelper.Models
         }
         private byte[] _connectionString;
 
-        #region Private fields
+        #region Tracker instance
 
         public Tracker Tracker { get; } = new(new JsonFileStore(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YTH")));
 

@@ -291,6 +291,7 @@ namespace YouTubeHelper.ViewModels
                 try
                 {
                     SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
+                    SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
                     if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
                     {
                         SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];

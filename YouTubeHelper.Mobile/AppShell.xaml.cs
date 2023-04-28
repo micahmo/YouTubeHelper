@@ -61,7 +61,8 @@ namespace YouTubeHelper.Mobile
                 ChannelViewModel channelViewModel = new(this)
                 {
                     Channel = channel, 
-                    SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
+                    SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+                    SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)
                 };
                 AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
@@ -217,7 +218,8 @@ namespace YouTubeHelper.Mobile
                             ChannelPlaylist = channelPlaylist, 
                             ChannelId = channelId
                         },
-                        SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0)
+                        SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+                        SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)
                     };
                     AppShellViewModel.ChannelViewModels.Add(foundChannelViewModel);
 
