@@ -98,8 +98,7 @@
                 Margin="10,-10,10,5"
                 ItemDisplayBinding="{Binding Description}"
                 ItemsSource="{Binding SortModeValues}"
-                SelectedIndex="{Binding SelectedSortModeIndex}"
-                SelectedItem="{Binding SelectedSortMode}" />
+                SelectedIndex="{Binding SelectedSortModeIndex}" />
 
             <Picker
                 Title="Exclusion reason"
@@ -108,8 +107,7 @@
                 IsVisible="{Binding Page.AppShellViewModel.ExclusionsTabSelected}"
                 ItemDisplayBinding="{Binding Description}"
                 ItemsSource="{Binding ExclusionReasonValues}"
-                SelectedIndex="{Binding SelectedExclusionFilterIndex}"
-                SelectedItem="{Binding SelectedExclusionFilter}" />
+                SelectedIndex="{Binding SelectedExclusionFilterIndex}" />
 
             <Entry
                 Grid.Row="3"

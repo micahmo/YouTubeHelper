@@ -26,7 +26,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     return;
                 }
 
-                if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortMode) or nameof(SelectedExclusionFilter) or nameof(ExactSearchTerm))
+                if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(ExactSearchTerm))
                 {
                     Preferences.Default.Set(nameof(SelectedSortModeIndex), SelectedSortModeIndex);
                     Preferences.Default.Set(nameof(SelectedExclusionFilterIndex), SelectedExclusionFilterIndex);
@@ -36,14 +36,14 @@ namespace YouTubeHelper.Mobile.ViewModels
                     {
                         c.ShowExcludedVideos = ShowExcludedVideos;
 
-                        if (args.PropertyName is nameof(SelectedSortMode))
+                        if (args.PropertyName is nameof(SelectedSortModeIndex))
                         {
-                            c.SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SelectedSortMode);
+                            c.SelectedSortModeIndex = SelectedSortModeIndex;
                         }
 
                         if (args.PropertyName is nameof(SelectedExclusionFilter))
                         {
-                            c.SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(SelectedExclusionFilter);
+                            c.SelectedExclusionFilterIndex = SelectedExclusionFilterIndex;
                         }
 
                         c.ExactSearchTerm = ExactSearchTerm;
@@ -292,12 +292,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
 
-        public SortModeExtended SelectedSortMode
-        {
-            get => _selectedSortMode;
-            set => SetProperty(ref _selectedSortMode, value);
-        }
-        private SortModeExtended _selectedSortMode;
+        public SortModeExtended SelectedSortMode => SortModeValues.ElementAt(SelectedSortModeIndex);
 
         public int SelectedSortModeIndex
         {
@@ -312,12 +307,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private int _selectedSortModeIndex;
 
-        public ExclusionReasonExtended SelectedExclusionFilter
-        {
-            get => _selectedExclusionFilter;
-            set => SetProperty(ref _selectedExclusionFilter, value);
-        }
-        private ExclusionReasonExtended _selectedExclusionFilter;
+        public ExclusionReasonExtended SelectedExclusionFilter => ExclusionReasonValues.ElementAt(SelectedExclusionFilterIndex);
 
         public int SelectedExclusionFilterIndex
         {

@@ -53,6 +53,9 @@ namespace YouTubeHelper.Mobile
             SearchTab.Items.Clear();
             ExclusionsTab.Items.Clear();
 
+            int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0);
+            int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
+
             // I specifically want this call to be synchronous to freeze the UI on "Loading...".
             // There is nothing else happening at this time, so there is no benefit to asynchronous.
             var channels = DatabaseEngine.ChannelCollection.FindAll().OrderByDescending(c => c.Index);
@@ -61,8 +64,8 @@ namespace YouTubeHelper.Mobile
                 ChannelViewModel channelViewModel = new(this)
                 {
                     Channel = channel, 
-                    SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
-                    SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)
+                    SelectedSortModeIndex = selectedSortModeIndex,
+                    SelectedExclusionFilterIndex = selectedExclusionFilterIndex
                 };
                 AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
