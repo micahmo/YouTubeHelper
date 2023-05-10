@@ -119,6 +119,43 @@
                 ReturnCommand="{Binding FindVideosCommand}"
                 Text="{Binding ExactSearchTerm}" />
 
+            <Grid Grid.Row="3" Margin="0,-11,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="15" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <CheckBox
+                    Grid.RowSpan="3"
+                    Grid.Column="0"
+                    Margin="10,5,10,4"
+                    IsChecked="{Binding Channel.EnableDateRangeLimit}"
+                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
+
+                <Label
+                    Grid.Column="1"
+                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}"
+                    Text="Do not show videos before"
+                    VerticalOptions="CenterAndExpand"
+                    VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" NumberOfTapsRequired="1" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <DatePicker
+                    Grid.Column="3"
+                    Date="{Binding Channel.DateRangeLimit}"
+                    IsEnabled="{Binding Channel.EnableDateRangeLimit}"
+                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
+            </Grid>
+
             <Grid Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

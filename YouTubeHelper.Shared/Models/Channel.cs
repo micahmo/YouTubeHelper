@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace YouTubeHelper.Shared.Models
 {
@@ -86,5 +87,19 @@ namespace YouTubeHelper.Shared.Models
 
         [BsonIgnore]
         public int ResultIndex { get; set; } = -1;
+
+        public DateTime? DateRangeLimit
+        {
+            get => _dateRangeLimit;
+            set => SetProperty(ref _dateRangeLimit, value);
+        }
+        private DateTime? _dateRangeLimit;
+
+        public bool EnableDateRangeLimit
+        {
+            get => _enableDateRangeLimit;
+            set => SetProperty(ref _enableDateRangeLimit, value);
+        }
+        private bool _enableDateRangeLimit;
     }
 }

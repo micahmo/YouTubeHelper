@@ -265,6 +265,13 @@
                                                         Visibility="{c:Binding ExclusionsMode,
                                                                                FalseToVisibility=Collapsed}" />
 
+                                                    <CheckBox
+                                                        Grid.Column="6"
+                                                        Content="{x:Static properties:Resources.DoNotShowVideosBefore}"
+                                                        IsChecked="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
+                                                        Visibility="{c:Binding WatchMode,
+                                                                               FalseToVisibility=Collapsed}" />
+
                                                     <TextBox
                                                         Grid.Column="6"
                                                         MinWidth="250"
@@ -275,6 +282,14 @@
                                                         KeyDown="Search_KeyDown"
                                                         Text="{Binding MainControlViewModel.ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
                                                         Visibility="{c:Binding 'SearchMode',
+                                                                               FalseToVisibility=Collapsed}" />
+
+                                                    <DatePicker
+                                                        Grid.Column="8"
+                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.DateRangeLimit}"
+                                                        IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
+                                                        SelectedDate="{Binding MainControlViewModel.SelectedChannel.Channel.DateRangeLimit}"
+                                                        Visibility="{c:Binding WatchMode,
                                                                                FalseToVisibility=Collapsed}" />
 
                                                     <TextBox

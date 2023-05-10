@@ -151,11 +151,29 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date range limit.
+        /// </summary>
+        public static string DateRangeLimit {
+            get {
+                return ResourceManager.GetString("DateRangeLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
         public static string Description {
             get {
                 return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do not show videos before.
+        /// </summary>
+        public static string DoNotShowVideosBefore {
+            get {
+                return ResourceManager.GetString("DoNotShowVideosBefore", resourceCulture);
             }
         }
         

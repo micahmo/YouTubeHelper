@@ -53,7 +53,7 @@ namespace YouTubeHelper.Shared.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null, int count = 10)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null, int count = 10, DateTime? dateRangeLimit = null)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
@@ -119,7 +119,7 @@ namespace YouTubeHelper.Shared.Utilities
                 videoIds = videoIds.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms, count);
+            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms, count, dateRangeLimit);
         }
 
         public async Task<IEnumerable<Shared.Models.Video>> SearchVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup, int count = 10)
@@ -138,7 +138,7 @@ namespace YouTubeHelper.Shared.Utilities
             return await FindVideoDetails(items, excludedVideos, channel, sortMode, count: count);
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(List<string> videoIds, List<Shared.Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(List<string> videoIds, List<Shared.Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10, DateTime? dateRangeLimit = null)
         {
             List<Shared.Models.Video> results = new();
             List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
@@ -201,6 +201,12 @@ namespace YouTubeHelper.Shared.Utilities
                 }
 
                 videos = filteredVideos.ToList();
+            }
+
+            // Filter by date range
+            if (dateRangeLimit.HasValue)
+            {
+                videos = videos.Except(videos.Where(v => v.Snippet.PublishedAt < dateRangeLimit.Value)).ToList();
             }
 
             // Remove videos that are not from this channel

@@ -252,4 +252,10 @@ Updated the status of {1} video(s).</value>
   <data name="Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
+        <data name="DoNotShowVideosBefore" xml:space="preserve">
+          <value>Do not show videos before</value>
+        </data>
+        <data name="DateRangeLimit" xml:space="preserve">
+          <value>Date range limit</value>
+        </data>
 </root>

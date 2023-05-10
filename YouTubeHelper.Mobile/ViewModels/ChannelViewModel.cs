@@ -67,6 +67,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         });
         private ICommand _toggleShowExcludedVideosCommand;
 
+        public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() =>
+        {
+            Channel.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
+        });
+        private ICommand _toggleEnableDateRangeLimitCommand;
+
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
         private ICommand _findVideosCommand;
 
@@ -169,7 +175,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, searchTerms, (progress, indeterminate) =>
                                     {
                                         // TODO: Update progress?
-                                    }, count);
+                                    }, count, Page.AppShellViewModel.WatchTabSelected && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null);
                                     var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 

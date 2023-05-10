@@ -136,7 +136,7 @@ namespace YouTubeHelper.ViewModels
                             {
                                 MainControlViewModel.Progress = progress;
                                 MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
-                            }, noLimit ? int.MaxValue : 10);
+                            }, noLimit ? int.MaxValue : 10, MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null);
                             var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                             Application.Current.Dispatcher.Invoke(() =>
                             {
@@ -197,7 +197,7 @@ namespace YouTubeHelper.ViewModels
                     }
                 });
 
-            
+
         }
 
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
