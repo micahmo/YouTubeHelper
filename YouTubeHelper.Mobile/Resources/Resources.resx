@@ -195,4 +195,10 @@
   <data name="SearchNoLimit" xml:space="preserve">
     <value>Search (no limit)</value>
   </data>
+        <data name="ActiveDownloads" xml:space="preserve">
+          <value>Active Downloads</value>
+        </data>
+        <data name="ActiveDownloadsText" xml:space="preserve">
+          <value>There are {0} download(s) in progress.</value>
+        </data>
 </root>

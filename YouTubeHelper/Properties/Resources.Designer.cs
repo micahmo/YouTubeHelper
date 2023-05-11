@@ -61,6 +61,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active downloads: {0}.
+        /// </summary>
+        public static string ActiveDownloads {
+            get {
+                return ResourceManager.GetString("ActiveDownloads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enter video IDs (one per line) to mark as Might Watch for channel &apos;{0}&apos; ({1}).
         /// </summary>
         public static string AddMightWatchIdsMessage {

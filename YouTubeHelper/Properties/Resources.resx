@@ -258,4 +258,7 @@ Updated the status of {1} video(s).</value>
         <data name="DateRangeLimit" xml:space="preserve">
           <value>Date range limit</value>
         </data>
+        <data name="ActiveDownloads" xml:space="preserve">
+          <value>Active downloads: {0}</value>
+        </data>
 </root>

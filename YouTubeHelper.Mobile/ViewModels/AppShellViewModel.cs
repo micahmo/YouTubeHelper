@@ -1,4 +1,5 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Plugin.LocalNotification;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -19,6 +20,32 @@ namespace YouTubeHelper.Mobile.ViewModels
         public void RaisePropertyChanged(string propertyName)
         {
             OnPropertyChanged(propertyName);
+        }
+
+        public async Task UpdateNotification()
+        {
+            int activeDownloads = ChannelViewModels.Select(c => c.Videos.Count(v => v.HasStatus)).Sum();
+
+            if (activeDownloads > 0)
+            {
+                if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+                {
+                    await LocalNotificationCenter.Current.RequestNotificationPermission();
+                }
+
+                var notification = new NotificationRequest
+                {
+                    NotificationId = 100,
+                    Title = Resources.Resources.ActiveDownloads,
+                    Description = string.Format(Resources.Resources.ActiveDownloadsText, activeDownloads),
+                    Android = { Ongoing = true, IconLargeName = { ResourceName = "splash" }, IconSmallName = { ResourceName = "notification_icon" } }
+                };
+                await LocalNotificationCenter.Current.Show(notification);
+            }
+            else
+            {
+                LocalNotificationCenter.Current.Clear(100);
+            }
         }
     }
 }

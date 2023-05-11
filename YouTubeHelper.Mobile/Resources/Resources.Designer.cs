@@ -61,6 +61,24 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active Downloads.
+        /// </summary>
+        internal static string ActiveDownloads {
+            get {
+                return ResourceManager.GetString("ActiveDownloads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are {0} download(s) in progress..
+        /// </summary>
+        internal static string ActiveDownloadsText {
+            get {
+                return ResourceManager.GetString("ActiveDownloadsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string Cancel {

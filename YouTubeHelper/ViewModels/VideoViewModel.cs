@@ -133,6 +133,7 @@ namespace YouTubeHelper.ViewModels
                     {
                         dynamic result = await progressResponse.GetJsonAsync();
                         Video.Status = string.Format(Resources.DownloadingProgress, $"{result.progress}%");
+                        MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
 
                         if (result.status == 1)
                         {
@@ -141,6 +142,7 @@ namespace YouTubeHelper.ViewModels
                             Video.Status = null;
                             Video.ExclusionReason = ExclusionReason.Watched;
                             await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
 
                             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                             return;
@@ -166,6 +168,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.Status = Resources.Downloading;
             Video.ExclusionReason = ExclusionReason.None;
+            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
         }
 
         private CancellationTokenSource _progressCancellationToken;

@@ -1,14 +1,14 @@
-﻿using System.Net;
-using Microsoft.Toolkit.Mvvm.Input;
-using System.Windows.Input;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using Flurl;
 using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using YouTubeHelper.Shared.Models;
-using YouTubeHelper.Shared;
+using Microsoft.Toolkit.Mvvm.Input;
+using System.Net;
+using System.Windows.Input;
 using YouTubeHelper.Mobile.Views;
+using YouTubeHelper.Shared;
+using YouTubeHelper.Shared.Models;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -29,6 +29,14 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     OnPropertyChanged(nameof(ExcludedString));
                     OnPropertyChanged(nameof(HasStatus));
+                }
+            };
+
+            PropertyChanged += async (_, args) =>
+            {
+                if (args.PropertyName == nameof(HasStatus))
+                {
+                    await _page.AppShellViewModel.UpdateNotification();
                 }
             };
         }
