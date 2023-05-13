@@ -41,7 +41,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             c.SelectedSortModeIndex = SelectedSortModeIndex;
                         }
 
-                        if (args.PropertyName is nameof(SelectedExclusionFilter))
+                        if (args.PropertyName is nameof(SelectedExclusionFilterIndex))
                         {
                             c.SelectedExclusionFilterIndex = SelectedExclusionFilterIndex;
                         }
