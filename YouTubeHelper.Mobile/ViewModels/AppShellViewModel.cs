@@ -33,19 +33,26 @@ namespace YouTubeHelper.Mobile.ViewModels
                     await LocalNotificationCenter.Current.RequestNotificationPermission();
                 }
 
-                var notification = new NotificationRequest
+                string newNotificationText = string.Format(Resources.Resources.ActiveDownloadsText, activeDownloads);
+                if (_currentNotificationText != newNotificationText)
                 {
-                    NotificationId = 100,
-                    Title = Resources.Resources.ActiveDownloads,
-                    Description = string.Format(Resources.Resources.ActiveDownloadsText, activeDownloads),
-                    Android = { Ongoing = true, IconLargeName = { ResourceName = "splash" }, IconSmallName = { ResourceName = "notification_icon" } }
-                };
-                await LocalNotificationCenter.Current.Show(notification);
+                    var notification = new NotificationRequest
+                    {
+                        NotificationId = 100,
+                        Title = Resources.Resources.ActiveDownloads,
+                        Description = _currentNotificationText = newNotificationText,
+                        Android = { Ongoing = true, IconLargeName = { ResourceName = "splash" }, IconSmallName = { ResourceName = "notification_icon" } }
+                    };
+                    await LocalNotificationCenter.Current.Show(notification);
+                }
             }
             else
             {
+                _currentNotificationText = default;
                 LocalNotificationCenter.Current.Clear(100);
             }
         }
+
+        private string _currentNotificationText;
     }
 }
