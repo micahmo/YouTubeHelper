@@ -34,7 +34,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             PropertyChanged += async (_, args) =>
             {
-                if (args.PropertyName == nameof(HasStatus))
+                if (args.PropertyName == nameof(UpdateNotification))
                 {
                     await _page.AppShellViewModel.UpdateNotification();
                 }
@@ -68,6 +68,9 @@ namespace YouTubeHelper.Mobile.ViewModels
         public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
+
+        // This object serves only as a way to trigger PropertyChanged and it never holds a value.
+        private object UpdateNotification => throw new NotImplementedException();
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
         private ICommand _videoTappedCommand;
@@ -148,6 +151,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
                     await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+                    OnPropertyChanged(nameof(UpdateNotification));
                 }
                 else if (action == Resources.Resources.Download)
                 {
@@ -158,6 +162,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     Video.Excluded = true;
                     await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                    OnPropertyChanged(nameof(UpdateNotification));
 
                     if (!_channelViewModel.ShowExcludedVideos)
                     {
@@ -250,6 +255,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     {
                         dynamic result = await progressResponse.GetJsonAsync();
                         Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.progress}%");
+                        OnPropertyChanged(nameof(UpdateNotification));
 
                         if (result.status == 1)
                         {
@@ -258,6 +264,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             Video.Status = null;
                             Video.ExclusionReason = ExclusionReason.Watched;
                             await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                            OnPropertyChanged(nameof(UpdateNotification));
 
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
@@ -289,6 +296,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Excluded = false;
             Video.Status = Resources.Resources.Downloading;
             Video.ExclusionReason = ExclusionReason.None;
+            OnPropertyChanged(nameof(UpdateNotification));
         }
 
         private CancellationTokenSource _progressCancellationToken;
