@@ -116,6 +116,11 @@ namespace YouTubeHelper
 
             NavigationView.Content = args.IsSettingsInvoked ? SettingsControl : MainControl;
             NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                Keyboard.Focus((NavigationView.Content as MainControl)?.Expander);
+            });
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
