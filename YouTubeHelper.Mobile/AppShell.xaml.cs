@@ -9,12 +9,14 @@ namespace YouTubeHelper.Mobile
     public partial class AppShell : Shell
     {
         public static AppShell Instance { get; private set; }
+        private Tab _currentTab;
 
         public AppShell()
         {
             InitializeComponent();
             BindingContext = new AppShellViewModel(this);
             Instance = this;
+            _currentTab = WatchTab;
         }
 
         protected override bool OnBackButtonPressed()
@@ -138,9 +140,17 @@ namespace YouTubeHelper.Mobile
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.SearchTabSelected));
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.ExclusionsTabSelected));
 
-            AppShellViewModel.ChannelViewModels.ForEach(c => c.Videos.Clear());
+            // Clear video lists when switching bottom tabs (NOT top tabs)
+            if (CurrentItem.CurrentItem != _currentTab)
+            {
+                _currentTab = CurrentItem.CurrentItem as Tab;
+                AppShellViewModel.ChannelViewModels.ForEach(c => c.Videos.Clear());
 
-            CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
+                // There's a weird issue where changing bottom tabs focuses the last top tab.
+                // Manually fix that here.
+                // ONLY do this when changing bottom tabs, otherwise this causes issues in VS 17.6.2.
+                CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
+            }
         }
 
         public async Task HandleSharedLink(string videoId, string channelHandle)
