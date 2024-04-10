@@ -131,6 +131,12 @@
   <data name="Download" xml:space="preserve">
     <value>Download</value>
   </data>
+  <data name="DownloadPath" xml:space="preserve">
+    <value>Download ({0})</value>
+  </data>
+  <data name="DownloadCustom" xml:space="preserve">
+    <value>Download (custom path)...</value>
+  </data>
   <data name="Unexclude" xml:space="preserve">
     <value>Unexclude</value>
   </data>
@@ -201,4 +207,10 @@
         <data name="ActiveDownloadsText" xml:space="preserve">
           <value>There are {0} download(s) in progress.</value>
         </data>
+  <data name="DownloadDirectoryMessage" xml:space="preserve">
+    <value>Please enter the download directory to use.</value>
+  </data>
+    <data name="DownloadDirectoryTitle" xml:space="preserve">
+  <value>Download Directory</value>
+  </data>
 </root>

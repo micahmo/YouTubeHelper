@@ -151,6 +151,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current download directory: {0}.
+        /// </summary>
+        public static string CurrentDownloadDirectory {
+            get {
+                return ResourceManager.GetString("CurrentDownloadDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Database.
         /// </summary>
         public static string Database {
@@ -187,11 +196,29 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download (hold Shift to download silently).
+        ///   Looks up a localized string similar to Download (hold Shift to download silently, right-click to specify download directory).
         /// </summary>
         public static string DownloadButtonToolTip {
             get {
                 return ResourceManager.GetString("DownloadButtonToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter the download directory to use..
+        /// </summary>
+        public static string DownloadDirectoryMessage {
+            get {
+                return ResourceManager.GetString("DownloadDirectoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Directory.
+        /// </summary>
+        public static string DownloadDirectoryTitle {
+            get {
+                return ResourceManager.GetString("DownloadDirectoryTitle", resourceCulture);
             }
         }
         

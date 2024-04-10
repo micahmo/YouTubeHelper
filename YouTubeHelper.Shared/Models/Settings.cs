@@ -53,6 +53,13 @@ namespace YouTubeHelper.Shared.Models
         }
         private string _telegramApiAddress;
 
+        public string DownloadDirectory
+        {
+            get => string.IsNullOrWhiteSpace(_downloadDirectory) ? "plex" : _downloadDirectory;
+            set => SetProperty(ref _downloadDirectory, value);
+        }
+        private string _downloadDirectory;
+
         public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {
             Settings settings = new Settings();

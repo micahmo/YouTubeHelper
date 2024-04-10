@@ -233,7 +233,7 @@ Updated the status of {1} video(s).</value>
     <value>▶</value>
   </data>
   <data name="DownloadButtonToolTip" xml:space="preserve">
-    <value>Download (hold Shift to download silently)</value>
+    <value>Download (hold Shift to download silently, right-click to specify download directory)</value>
   </data>
   <data name="Database" xml:space="preserve">
     <value>Database</value>
@@ -261,4 +261,13 @@ Updated the status of {1} video(s).</value>
         <data name="ActiveDownloads" xml:space="preserve">
           <value>Active downloads: {0}</value>
         </data>
+  <data name="DownloadDirectoryMessage" xml:space="preserve">
+    <value>Please enter the download directory to use.</value>
+  </data>
+  <data name="DownloadDirectoryTitle" xml:space="preserve">
+    <value>Download Directory</value>
+  </data>
+  <data name="CurrentDownloadDirectory" xml:space="preserve">
+    <value>Current download directory: {0}</value>
+  </data>
 </root>

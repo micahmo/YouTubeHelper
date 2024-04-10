@@ -101,7 +101,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                         Resources.Resources.ExcludeWatched,
                         Resources.Resources.ExcludeWontWatch,
                         Resources.Resources.ExcludeMightWatch,
-                        Resources.Resources.Download);
+                        Resources.Resources.DownloadCustom,
+                        string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
                 }
 
                 bool excluded = false;
@@ -153,9 +154,21 @@ namespace YouTubeHelper.Mobile.ViewModels
                     await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
                     OnPropertyChanged(nameof(UpdateNotification));
                 }
-                else if (action == Resources.Resources.Download)
+                else if (action == Resources.Resources.DownloadCustom)
                 {
-                    await DownloadVideo();
+                    string res = await _page.DisplayPromptAsync(Resources.Resources.DownloadDirectoryTitle, Resources.Resources.DownloadDirectoryMessage, initialValue: Settings.Instance.DownloadDirectory);
+
+                    if (string.IsNullOrWhiteSpace(res))
+                    {
+                        // Cancel or entered nothing
+                        return;
+                    }
+
+                    await DownloadVideo(Settings.Instance.DownloadDirectory = res);
+                }
+                else if (action.StartsWith(Resources.Resources.Download))
+                {
+                    await DownloadVideo(Settings.Instance.DownloadDirectory);
                 }
 
                 if (excluded)
@@ -193,7 +206,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
 
-        private async Task DownloadVideo()
+        private async Task DownloadVideo(string dataDirectorySubpath)
         {
             if (_progressCancellationToken is not null)
             {
@@ -218,6 +231,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                     .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
                     .SetQueryParam("silent", false)
                     .SetQueryParam("requestId", requestId)
+                    .SetQueryParam("dataDirectorySubpath", dataDirectorySubpath)
+                    .SetQueryParam("idInChannelFolder", dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
                     .GetAsync();
             }
             catch (Exception ex)

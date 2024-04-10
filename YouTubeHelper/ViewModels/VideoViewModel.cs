@@ -10,10 +10,12 @@ using Flurl;
 using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using ModernWpf.Controls;
 using Notification.Wpf;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
+using YouTubeHelper.Utilities;
 using YouTubeHelper.Views;
 
 namespace YouTubeHelper.ViewModels
@@ -68,10 +70,13 @@ namespace YouTubeHelper.ViewModels
                 .ExecuteBufferedAsync();
         }
 
-        public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(DownloadVideo);
+        public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(() => DownloadVideo(false));
         private ICommand _downloadVideoCommand;
 
-        private async void DownloadVideo()
+        public ICommand DownloadVideoCommandRightClick => _downloadVideoCommandRightClick ??= new RelayCommand(() => DownloadVideo(true));
+        private ICommand _downloadVideoCommandRightClick;
+
+        private async void DownloadVideo(bool rightClick)
         {
             if (_progressCancellationToken is not null)
             {
@@ -91,6 +96,21 @@ namespace YouTubeHelper.ViewModels
             // Generate request ID
             string requestId = Guid.NewGuid().ToString();
 
+            if (rightClick)
+            {
+                (string Text, ContentDialogResult Result) res = await MessageBoxHelper.ShowInputBox(Resources.DownloadDirectoryMessage, Resources.DownloadDirectoryMessage, Settings.Instance.DownloadDirectory);
+
+                if (res.Result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(res.Text))
+                {
+                    // Canceled or entered nothing
+                    _progressCancellationToken = null;
+                    return;
+                }
+
+                Settings.Instance.DownloadDirectory = res.Text;
+                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CurrentDownloadDirectoryLabel));
+            }
+
             try
             {
                 await Settings.Instance.TelegramApiAddress
@@ -99,6 +119,8 @@ namespace YouTubeHelper.ViewModels
                     .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
                     .SetQueryParam("silent", silent)
                     .SetQueryParam("requestId", requestId)
+                    .SetQueryParam("dataDirectorySubpath", Settings.Instance.DownloadDirectory)
+                    .SetQueryParam("idInChannelFolder", Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
                     .GetAsync();
             }
             catch (Exception ex)

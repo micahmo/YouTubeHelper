@@ -124,6 +124,33 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download (custom path)....
+        /// </summary>
+        internal static string DownloadCustom {
+            get {
+                return ResourceManager.GetString("DownloadCustom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter the download directory to use..
+        /// </summary>
+        internal static string DownloadDirectoryMessage {
+            get {
+                return ResourceManager.GetString("DownloadDirectoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Directory.
+        /// </summary>
+        internal static string DownloadDirectoryTitle {
+            get {
+                return ResourceManager.GetString("DownloadDirectoryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Downloading....
         /// </summary>
         internal static string Downloading {
@@ -138,6 +165,15 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string DownloadingProgress {
             get {
                 return ResourceManager.GetString("DownloadingProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download ({0}).
+        /// </summary>
+        internal static string DownloadPath {
+            get {
+                return ResourceManager.GetString("DownloadPath", resourceCulture);
             }
         }
         
