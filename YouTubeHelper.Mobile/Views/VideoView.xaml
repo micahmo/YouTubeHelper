@@ -17,7 +17,7 @@
                 <TapGestureRecognizer Command="{Binding VideoTappedCommand}"/>
             </StackLayout.GestureRecognizers>
 
-            <Grid Margin="10">
+            <Grid Margin="10" x:Name="VideoGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -29,6 +29,8 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Video.Title}" Margin="0,0,0,10" LineBreakMode="TailTruncation" MaxLines="5" FontAttributes="Bold"/>
+
+                <Grid Grid.Column="0" Grid.Row="1" BackgroundColor="LightGray" HeightRequest="{Binding ThumbnailHeight}"/>
 
                 <Image Grid.Column="0" Grid.Row="1" Source="{Binding Video.ThumbnailUrl}"/>
                 

@@ -57,6 +57,13 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private bool _isPlaying;
 
+        public double ThumbnailHeight
+        {
+            get => _thumbnailHeight;
+            set => SetProperty(ref _thumbnailHeight, value);
+        }
+        private double _thumbnailHeight;
+
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
         private ICommand _toggleDescriptionCommand;
 
