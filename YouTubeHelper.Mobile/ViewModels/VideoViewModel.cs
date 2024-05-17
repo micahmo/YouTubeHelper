@@ -92,7 +92,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                     action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
                         Resources.Resources.Watch,
                         Resources.Resources.Unexclude,
-                        Resources.Resources.Download);
+                        Resources.Resources.DownloadCustom,
+                        string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
                 }
                 else
                 {
@@ -166,7 +167,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                     await DownloadVideo(Settings.Instance.DownloadDirectory = res);
                 }
-                else if (action.StartsWith(Resources.Resources.Download))
+                else if (action?.StartsWith(Resources.Resources.Download) == true)
                 {
                     await DownloadVideo(Settings.Instance.DownloadDirectory);
                 }
