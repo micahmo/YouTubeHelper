@@ -32,7 +32,7 @@
 
                 <Grid Grid.Column="0" Grid.Row="1" BackgroundColor="LightGray" HeightRequest="{Binding ThumbnailHeight}"/>
 
-                <Image Grid.Column="0" Grid.Row="1" Source="{Binding Video.ThumbnailUrl}"/>
+                <Image Grid.Column="0" Grid.Row="1" Source="{Binding Video.ThumbnailUrl}" HeightRequest="{Binding ThumbnailHeight}"/>
                 
                 <StackLayout Grid.Column="1" Grid.Row="1">
                     <Label Text="{Binding Video.TimeStringNewLine}" Margin="10,0,10,0"/>
