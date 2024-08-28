@@ -342,14 +342,18 @@
                                                         Grid.Column="10"
                                                         Margin="15,0,0,0"
                                                         VerticalAlignment="Stretch"
-                                                        Command="{Binding MoveLeftCommand}">
+                                                        Command="{Binding MoveLeftCommand}"
+                                                        Visibility="{c:Binding '!QueueMode',
+                                                                               FalseToVisibility=Collapsed}">
                                                         <ui:FontIcon Glyph="&#xE760;" />
                                                     </Button>
                                                     <Button
                                                         Grid.Column="12"
                                                         Margin="0,0,0,0"
                                                         VerticalAlignment="Stretch"
-                                                        Command="{Binding MoveRightCommand}">
+                                                        Command="{Binding MoveRightCommand}"
+                                                        Visibility="{c:Binding '!QueueMode',
+                                                                               FalseToVisibility=Collapsed}">
                                                         <ui:FontIcon Glyph="&#xE761;" />
                                                     </Button>
                                                 </Grid>
