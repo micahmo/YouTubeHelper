@@ -294,9 +294,14 @@ namespace YouTubeHelper.Shared.Utilities
                     return -new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
                 case SortMode.AgeAsc:
                     return new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
-                case SortMode.DurationPlusRecency:
-                default:
+                case SortMode.DurationDescPlusAgeDesc:
                     return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
+                case SortMode.DurationAscPlusAgeDesc:
+                    List<Video> videosSortedByDurationReverse = videosSortedByDuration.ToList();
+                    videosSortedByDurationReverse.Reverse();
+                    return videosSortedByDurationReverse.IndexOf(video) + videosSortedByAge.IndexOf(video);
+                default:
+                    return 0;
             }
         }
 
@@ -305,8 +310,11 @@ namespace YouTubeHelper.Shared.Utilities
 
     public enum SortMode
     {
-        [Description("Duration + Recency")]
-        DurationPlusRecency,
+        [Description("Duration Descending + Age Descending (Longest + Newest)")]
+        DurationDescPlusAgeDesc,
+
+        [Description("Duration Ascending + Age Descending (Shortest + Newest)")]
+        DurationAscPlusAgeDesc,
 
         [Description("Duration Descending (Longest First)")]
         DurationDesc,
