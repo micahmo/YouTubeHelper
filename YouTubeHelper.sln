@@ -8,11 +8,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A5DBFF5-F387-4D64-AC97-5B80C2C4C5B2}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeHelper.Shared", "YouTubeHelper.Shared\YouTubeHelper.Shared.csproj", "{F2FB7080-01E5-4564-A669-D36190A5D094}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeHelper.Mobile", "YouTubeHelper.Mobile\YouTubeHelper.Mobile.csproj", "{E101F5DB-4BEB-4C07-9FED-74EB562D1195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeHelper.Mobile", "YouTubeHelper.Mobile\YouTubeHelper.Mobile.csproj", "{E101F5DB-4BEB-4C07-9FED-74EB562D1195}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

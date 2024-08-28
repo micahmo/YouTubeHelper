@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using CommunityToolkit.Maui.Alerts;
+using Flurl;
+using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Driver;
@@ -195,6 +196,41 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 var videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.DurationPlusRecency, count: int.MaxValue);
                                 var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                 Videos.AddRange(videoViewModels);
+                            }
+                            else if (Page.AppShellViewModel.QueueTabSelected)
+                            {
+                                // Get the queue from the server
+                                List<dynamic> queue = await (await Settings.Instance.TelegramApiAddress
+                                    .AppendPathSegment("queue")
+                                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                                    .GetAsync()).GetJsonAsync<List<dynamic>>();
+
+                                // De-duplicate by videoId, keeping the item with the highest dateAdded
+                                List<dynamic> distinctQueue = queue
+                                    .GroupBy(item => (string)item.videoId)
+                                    .Select(group => group.OrderByDescending(item => (DateTime)item.dateAdded).First())
+                                    .ToList();
+
+                                // Get all excluded videos
+                                List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();
+
+                                List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
+                                    distinctQueue.Select(queueItem => (string)queueItem.videoId).ToList(),
+                                    excludedVideos: excludedVideos,
+                                    customSort: videos => videos.OrderByDescending(video =>
+                                    {
+                                        dynamic? queueItem = distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id);
+                                        DateTimeOffset dateAdded = DateTimeOffset.TryParse(queueItem?.dateAdded?.ToString(), out DateTimeOffset parsedDateAdded) ? parsedDateAdded : DateTimeOffset.MinValue;
+                                        return dateAdded;
+                                    }).ToList()
+                                )).ToList();
+
+                                queuedVideos.ForEach(video =>
+                                {
+                                    VideoViewModel videoViewModel = new VideoViewModel(video, Page, this);
+                                    Videos.Add(videoViewModel);
+                                    videoViewModel.StartUpdateCheck((string)distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id)?.requestGuid!, showInAppNotifications: false);
+                                });
                             }
                         }
                     });

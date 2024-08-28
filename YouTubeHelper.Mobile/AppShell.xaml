@@ -3,12 +3,12 @@
     x:Class="YouTubeHelper.Mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:YouTubeHelper.Mobile.Views"
     xmlns:viewModels="clr-namespace:YouTubeHelper.Mobile.ViewModels"
-    Shell.FlyoutBehavior="Disabled"
-    Shell.NavBarIsVisible="False"
+    xmlns:views="clr-namespace:YouTubeHelper.Mobile.Views"
     Loaded="Shell_Loaded"
-    Navigated="Shell_Navigated">
+    Navigated="Shell_Navigated"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
 
     <Shell.Resources>
         <Style TargetType="TabBar">
@@ -19,11 +19,28 @@
     </Shell.Resources>
 
     <TabBar x:Name="TabBar">
-        <Tab Title="Watch" Icon="watch.svg" x:Name="WatchTab" x:FieldModifier="public">
+        <Tab
+            x:Name="WatchTab"
+            Title="Watch"
+            x:FieldModifier="public"
+            Icon="watch.svg">
             <ShellContent Title="New Channel" ContentTemplate="{DataTemplate views:ChannelView}" />
         </Tab>
-        <Tab Title="Search" Icon="search.svg" x:Name="SearchTab" x:FieldModifier="public"/>
-        <Tab Title="Exclusions" Icon="exclusions.svg" x:Name="ExclusionsTab" x:FieldModifier="public"/>
+        <Tab
+            x:Name="SearchTab"
+            Title="Search"
+            x:FieldModifier="public"
+            Icon="search.svg" />
+        <Tab
+            x:Name="ExclusionsTab"
+            Title="Exclusions"
+            x:FieldModifier="public"
+            Icon="exclusions.svg" />
+        <Tab
+            x:Name="QueueTab"
+            Title="Queue"
+            x:FieldModifier="public"
+            Icon="list.svg" />
     </TabBar>
 
 </Shell>

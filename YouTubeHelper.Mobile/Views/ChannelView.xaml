@@ -96,6 +96,7 @@
                 Title="Sort order"
                 Grid.Row="1"
                 Margin="10,-10,10,5"
+                IsVisible="{Binding Page.AppShellViewModel.NotQueueTabSelected}"
                 ItemDisplayBinding="{Binding Description}"
                 ItemsSource="{Binding SortModeValues}"
                 SelectedIndex="{Binding SelectedSortModeIndex}" />

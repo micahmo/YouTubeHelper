@@ -138,10 +138,18 @@ namespace YouTubeHelper.Shared.Utilities
             return await FindVideoDetails(items, excludedVideos, channel, sortMode, count: count);
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(List<string> videoIds, List<Shared.Models.Video> excludedVideos, Channel channel, SortMode sortMode, List<string> searchTerms = null, int count = 10, DateTime? dateRangeLimit = null)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(
+            List<string> videoIds,
+            List<Models.Video>? excludedVideos = null, 
+            Channel? channel = null,
+            SortMode? sortMode = null,
+            List<string>? searchTerms = null,
+            int count = 10,
+            DateTime? dateRangeLimit = null,
+            Func<List<Video>, List<Video>>? customSort = null)
         {
             List<Shared.Models.Video> results = new();
-            List<string> excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
+            List<string>? excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
 
             // Use the videoIds to look up real info
             ConcurrentBag<IList<Video>> videoResults = new();
@@ -221,7 +229,17 @@ namespace YouTubeHelper.Shared.Utilities
             // Then sort by age
             var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAt).ToList();
 
-            var rankedVideos = videos.OrderBy(v => SortFunction(sortMode, v, videosSortedByDuration, videosSortedByAge)).ToList();
+            List<Video> rankedVideos = videos;
+            
+            if (sortMode != null)
+            {
+                rankedVideos = videos.OrderBy(v => SortFunction(sortMode.Value, v, videosSortedByDuration, videosSortedByAge)).ToList();
+            }
+
+            if (customSort != null)
+            {
+                rankedVideos = customSort(videos);
+            }    
 
             foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : count))
             {

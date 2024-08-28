@@ -111,6 +111,8 @@ namespace YouTubeHelper.ViewModels
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CurrentDownloadDirectoryLabel));
             }
 
+            UnexcludeVideo();
+
             try
             {
                 await Settings.Instance.TelegramApiAddress
@@ -130,10 +132,29 @@ namespace YouTubeHelper.ViewModels
                 return;
             }
 
+            StartUpdateCheck(requestId);
+
+            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
+
+            // Mark as downloading
+            Video.Excluded = false;
+            Video.Status = Resources.Downloading;
+            Video.ExclusionReason = ExclusionReason.None;
+            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+        }
+
+        private CancellationTokenSource? _progressCancellationToken;
+
+        internal void StartUpdateCheck(string requestId, bool showInAppNotifications = true)
+        {
+            _progressCancellationToken ??= new();
+            
             // Spin up a task to check for progress
             _ = Task.Run(async () =>
             {
-                while (!_progressCancellationToken.IsCancellationRequested)
+                bool statusWasEverNotDone = false;
+                
+                while (_progressCancellationToken?.IsCancellationRequested == false)
                 {
                     IFlurlResponse progressResponse;
                     try
@@ -147,7 +168,11 @@ namespace YouTubeHelper.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                        if (showInAppNotifications)
+                        {
+                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                        }
+
                         return;
                     }
 
@@ -157,22 +182,40 @@ namespace YouTubeHelper.ViewModels
                         Video.Status = string.Format(Resources.DownloadingProgress, $"{result.progress}%");
                         MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
 
+                        if (result.status == 0)
+                        {
+                            statusWasEverNotDone = true;
+                        }
+                        
                         if (result.status == 1)
                         {
                             // Mark as downloaded (only if succeeded)
-                            Video.Excluded = true;
                             Video.Status = null;
-                            Video.ExclusionReason = ExclusionReason.Watched;
-                            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+
+                            if (statusWasEverNotDone)
+                            {
+                                Video.Excluded = true;
+                                Video.ExclusionReason = ExclusionReason.Watched;
+                                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                            }
+
                             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
 
-                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
+                            if (showInAppNotifications)
+                            {
+                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
+                            }
+
                             return;
                         }
 
                         if (result.status == 2)
                         {
-                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.status), NotificationType.Error, "NotificationArea");
+                            if (showInAppNotifications)
+                            {
+                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.status), NotificationType.Error, "NotificationArea");
+                            }
+
                             return;
                         }
                     }
@@ -183,17 +226,7 @@ namespace YouTubeHelper.ViewModels
             {
                 _progressCancellationToken = null;
             });
-
-            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
-
-            // Mark as downloading
-            Video.Excluded = false;
-            Video.Status = Resources.Downloading;
-            Video.ExclusionReason = ExclusionReason.None;
-            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
         }
-
-        private CancellationTokenSource _progressCancellationToken;
 
         public ICommand ExcludeVideoCommand => _excludeVideoCommand ??= new RelayCommand<object>(ExcludeVideo);
         private ICommand _excludeVideoCommand;

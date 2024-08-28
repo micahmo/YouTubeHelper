@@ -31,14 +31,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                     OnPropertyChanged(nameof(HasStatus));
                 }
             };
-
-            PropertyChanged += async (_, args) =>
-            {
-                if (args.PropertyName == nameof(UpdateNotification))
-                {
-                    await _page.AppShellViewModel.UpdateNotification();
-                }
-            };
         }
 
         public Video Video { get; }
@@ -57,13 +49,6 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private bool _isPlaying;
 
-        public double ThumbnailHeight
-        {
-            get => _thumbnailHeight;
-            set => SetProperty(ref _thumbnailHeight, value);
-        }
-        private double _thumbnailHeight;
-
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
         private ICommand _toggleDescriptionCommand;
 
@@ -75,9 +60,6 @@ namespace YouTubeHelper.Mobile.ViewModels
         public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
-
-        // This object serves only as a way to trigger PropertyChanged and it never holds a value.
-        private object UpdateNotification => throw new NotImplementedException();
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
         private ICommand _videoTappedCommand;
@@ -160,7 +142,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
                     await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
-                    OnPropertyChanged(nameof(UpdateNotification));
                 }
                 else if (action == Resources.Resources.DownloadCustom)
                 {
@@ -183,7 +164,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     Video.Excluded = true;
                     await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
-                    OnPropertyChanged(nameof(UpdateNotification));
 
                     if (!_channelViewModel.ShowExcludedVideos)
                     {
@@ -231,6 +211,11 @@ namespace YouTubeHelper.Mobile.ViewModels
             // Generate request ID
             string requestId = Guid.NewGuid().ToString();
 
+            // Unexclude the video before downloading again
+            Video.Excluded = false;
+            Video.ExclusionReason = ExclusionReason.None;
+            await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+
             try
             {
                 await Settings.Instance.TelegramApiAddress
@@ -250,10 +235,28 @@ namespace YouTubeHelper.Mobile.ViewModels
                 return;
             }
 
+            StartUpdateCheck(requestId);
+
+            await Toast.Make(string.Format(Resources.Resources.VideoDownloadRequested, Video.Title), ToastDuration.Long).Show();
+
+            // Mark as downloading
+            Video.Excluded = false;
+            Video.Status = Resources.Resources.Downloading;
+            Video.ExclusionReason = ExclusionReason.None;
+        }
+
+        private CancellationTokenSource? _progressCancellationToken;
+
+        internal void StartUpdateCheck(string requestId, bool showInAppNotifications = true)
+        {
+            _progressCancellationToken ??= new();
+
             // Spin up a task to check for progress
             _ = Task.Run(async () =>
             {
-                while (!_progressCancellationToken.IsCancellationRequested)
+                bool statusWasEverNotDone = false;
+
+                while (_progressCancellationToken?.IsCancellationRequested == false)
                 {
                     IFlurlResponse progressResponse;
                     try
@@ -267,10 +270,14 @@ namespace YouTubeHelper.Mobile.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        MainThread.BeginInvokeOnMainThread(async () =>
+                        if (showInAppNotifications)
                         {
-                            await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), ToastDuration.Long).Show();
-                        });
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), ToastDuration.Long).Show();
+                            });
+                        }
+
                         return;
                     }
 
@@ -278,30 +285,45 @@ namespace YouTubeHelper.Mobile.ViewModels
                     {
                         dynamic result = await progressResponse.GetJsonAsync();
                         Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.progress}%");
-                        OnPropertyChanged(nameof(UpdateNotification));
+
+                        if (result.status == 0)
+                        {
+                            statusWasEverNotDone = true;
+                        }
 
                         if (result.status == 1)
                         {
                             // Mark as downloaded (only if succeeded)
-                            Video.Excluded = true;
                             Video.Status = null;
-                            Video.ExclusionReason = ExclusionReason.Watched;
-                            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
-                            OnPropertyChanged(nameof(UpdateNotification));
 
-                            MainThread.BeginInvokeOnMainThread(async () =>
+                            if (statusWasEverNotDone)
                             {
-                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show();
-                            });
+                                Video.Excluded = true;
+                                Video.ExclusionReason = ExclusionReason.Watched;
+                                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                            }
+
+                            if (showInAppNotifications)
+                            {
+                                MainThread.BeginInvokeOnMainThread(async () =>
+                                {
+                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show();
+                                });
+                            }
+
                             return;
                         }
 
                         if (result.status == 2)
                         {
-                            MainThread.BeginInvokeOnMainThread(async () =>
+                            if (showInAppNotifications)
                             {
-                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, result.status), ToastDuration.Long).Show();
-                            });
+                                MainThread.BeginInvokeOnMainThread(async () =>
+                                {
+                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, result.status), ToastDuration.Long).Show();
+                                });
+                            }
+
                             return;
                         }
                     }
@@ -312,16 +334,6 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 _progressCancellationToken = null;
             });
-
-            await Toast.Make(string.Format(Resources.Resources.VideoDownloadRequested, Video.Title), ToastDuration.Long).Show();
-
-            // Mark as downloading
-            Video.Excluded = false;
-            Video.Status = Resources.Resources.Downloading;
-            Video.ExclusionReason = ExclusionReason.None;
-            OnPropertyChanged(nameof(UpdateNotification));
         }
-
-        private CancellationTokenSource _progressCancellationToken;
     }
 }

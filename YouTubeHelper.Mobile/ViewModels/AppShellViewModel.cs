@@ -15,7 +15,13 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public bool ExclusionsTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.ExclusionsTab;
 
+        public bool QueueTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.QueueTab;
+
+        public bool NotQueueTabSelected => _appShell.CurrentItem?.CurrentItem != _appShell.QueueTab;
+
         public List<ChannelViewModel> ChannelViewModels { get; } = new();
+
+        public ChannelViewModel QueueChannelViewModel { get; set; }
 
         public void RaisePropertyChanged(string propertyName)
         {
@@ -24,7 +30,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public async Task UpdateNotification()
         {
-            int activeDownloads = ChannelViewModels.Select(c => c.Videos.Count(v => v.HasStatus)).Sum();
+            int activeDownloads = (QueueTabSelected ? new List<ChannelViewModel> { QueueChannelViewModel } : ChannelViewModels)
+                .Select(c => c.Videos.Count(v => v.HasStatus)).Sum();
 
             if (activeDownloads > 0)
             {

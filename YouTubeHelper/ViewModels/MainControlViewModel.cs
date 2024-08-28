@@ -37,6 +37,11 @@ namespace YouTubeHelper.ViewModels
 
                 if (args.PropertyName == nameof(Mode))
                 {
+                    ChannelViewModel previouslySelectedChannel = SelectedChannel;
+                    Channels.Clear();
+                    _realChannels?.ForEach(Channels.Add);
+                    SelectedChannel = previouslySelectedChannel;
+
                     switch (Mode)
                     {
                         case MainControlMode.Search:
@@ -59,6 +64,11 @@ namespace YouTubeHelper.ViewModels
                                 c.Videos.Clear();
                             });
                             break;
+                        case MainControlMode.Queue:
+                            Channels.Clear();
+                            Channels.Add(_queueChannelTab);
+                            SelectedChannel = _queueChannelTab;
+                            break;
                         default:
                             break;
                     }
@@ -66,6 +76,7 @@ namespace YouTubeHelper.ViewModels
             };
 
             _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
+            _queueChannelTab = new(new Channel(nonPersistent: true) { VanityName = Resources.Queue }, this);
         }
 
         public void RaisePropertyChanged(string propertyName)
@@ -92,7 +103,14 @@ namespace YouTubeHelper.ViewModels
 
         public bool ExclusionsMode => Mode == MainControlMode.Exclusions;
 
+        public bool QueueMode => Mode == MainControlMode.Queue;
+
         public ObservableCollection<ChannelViewModel> Channels { get; } = new();
+
+        /// <summary>
+        /// Represents the "real" list of channels from the database. Can be used to repopulate <see cref="Channels"/> when needed.
+        /// </summary>
+        private List<ChannelViewModel> _realChannels;
 
         public bool IsBusy
         {
@@ -113,6 +131,7 @@ namespace YouTubeHelper.ViewModels
         private ChannelViewModel _selectedChannel;
 
         private readonly ChannelViewModel _newChannelTab;
+        private readonly ChannelViewModel _queueChannelTab;
 
         #region Active video
 
@@ -306,6 +325,8 @@ namespace YouTubeHelper.ViewModels
                     // ignored
                 }
 
+                _realChannels = Channels.ToList();
+
                 _loaded = true;
             }
         }
@@ -318,6 +339,7 @@ namespace YouTubeHelper.ViewModels
     {
         Watch,
         Search,
-        Exclusions
+        Exclusions,
+        Queue
     }
 }

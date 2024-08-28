@@ -306,6 +306,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load.
+        /// </summary>
+        public static string Load {
+            get {
+                return ResourceManager.GetString("Load", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lookup.
         /// </summary>
         public static string Lookup {
@@ -413,6 +422,15 @@ namespace YouTubeHelper.Properties {
         public static string Playing {
             get {
                 return ResourceManager.GetString("Playing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queue.
+        /// </summary>
+        public static string Queue {
+            get {
+                return ResourceManager.GetString("Queue", resourceCulture);
             }
         }
         

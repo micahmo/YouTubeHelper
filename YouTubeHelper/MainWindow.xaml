@@ -43,6 +43,11 @@
                         <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA39;"/>
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="{x:Static properties:Resources.Queue}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE14C;"/>
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
     </Grid>

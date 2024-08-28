@@ -83,12 +83,12 @@ namespace YouTubeHelper.Shared.Models
         private ExclusionReason _exclusionReason;
 
         [BsonIgnore]
-        public string Status
+        public string? Status
         {
             get => _status;
             set => SetProperty(ref _status, value);
         }
-        private string _status;
+        private string? _status;
 
         public string ChannelPlaylist { get; set; }
 

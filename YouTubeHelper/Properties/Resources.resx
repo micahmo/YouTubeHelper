@@ -270,4 +270,10 @@ Updated the status of {1} video(s).</value>
   <data name="CurrentDownloadDirectory" xml:space="preserve">
     <value>Current download directory: {0}</value>
   </data>
+  <data name="Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
 </root>

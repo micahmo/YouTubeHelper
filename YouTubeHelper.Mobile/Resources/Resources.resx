@@ -213,4 +213,7 @@
     <data name="DownloadDirectoryTitle" xml:space="preserve">
   <value>Download Directory</value>
   </data>
+  <data name="Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
 </root>

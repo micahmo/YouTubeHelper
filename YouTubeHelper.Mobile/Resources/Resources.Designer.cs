@@ -279,6 +279,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Queue.
+        /// </summary>
+        internal static string Queue {
+            get {
+                return ResourceManager.GetString("Queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
         internal static string Search {

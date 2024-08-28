@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="YouTubeHelper.Mobile.Views.VideoView"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+<ContentView
+    x:Class="YouTubeHelper.Mobile.Views.VideoView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
     <VerticalStackLayout>
         <StackLayout>
             <StackLayout.Behaviors>
@@ -14,42 +15,75 @@
             </StackLayout.Behaviors>
 
             <StackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding VideoTappedCommand}"/>
+                <TapGestureRecognizer Command="{Binding VideoTappedCommand}" />
             </StackLayout.GestureRecognizers>
 
-            <Grid Margin="10" x:Name="VideoGrid">
+            <Grid x:Name="VideoGrid" Margin="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Video.Title}" Margin="0,0,0,10" LineBreakMode="TailTruncation" MaxLines="5" FontAttributes="Bold"/>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="0,0,0,10"
+                    FontAttributes="Bold"
+                    LineBreakMode="TailTruncation"
+                    MaxLines="5"
+                    Text="{Binding Video.Title}" />
 
-                <Grid Grid.Column="0" Grid.Row="1" BackgroundColor="LightGray" HeightRequest="{Binding ThumbnailHeight}"/>
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <BoxView HeightRequest="112.5" Color="LightGray" />
 
-                <Image Grid.Column="0" Grid.Row="1" Source="{Binding Video.ThumbnailUrl}" HeightRequest="{Binding ThumbnailHeight}"/>
-                
-                <StackLayout Grid.Column="1" Grid.Row="1">
-                    <Label Text="{Binding Video.TimeStringNewLine}" Margin="10,0,10,0"/>
-                    <Label Text="{Binding ExcludedString}" Margin="10,0,10,0" TextColor="FireBrick" FontAttributes="Bold" IsVisible="{Binding Video.Excluded}"/>
-                    <Label Text="{Binding Video.Status}" Margin="10,0,10,0" TextColor="Green" FontAttributes="Bold" IsVisible="{Binding HasStatus}"/>
-                    <Label Text="▶" Margin="10,0,10,0" FontAttributes="Bold" IsVisible="{Binding IsPlaying}"/>
+                    <Image HeightRequest="112.5">
+                        <Image.Source>
+                            <UriImageSource CachingEnabled="False" Uri="{Binding Video.ThumbnailUrl}" />
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <StackLayout Grid.Row="1" Grid.Column="1">
+                    <Label Margin="10,0,10,0" Text="{Binding Video.TimeStringNewLine}" />
+                    <Label
+                        Margin="10,0,10,0"
+                        FontAttributes="Bold"
+                        IsVisible="{Binding Video.Excluded}"
+                        Text="{Binding ExcludedString}"
+                        TextColor="FireBrick" />
+                    <Label
+                        Margin="10,0,10,0"
+                        FontAttributes="Bold"
+                        IsVisible="{Binding HasStatus}"
+                        Text="{Binding Video.Status}"
+                        TextColor="Green" />
+                    <Label
+                        Margin="10,0,10,0"
+                        FontAttributes="Bold"
+                        IsVisible="{Binding IsPlaying}"
+                        Text="▶" />
                 </StackLayout>
             </Grid>
         </StackLayout>
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="10"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Text="{Binding Video.Description}" LineBreakMode="TailTruncation" MaxLines="1" Padding="10,0,10,0">
+            <Label
+                Grid.Row="0"
+                Padding="10,0,10,0"
+                LineBreakMode="TailTruncation"
+                MaxLines="1"
+                Text="{Binding Video.Description}">
                 <Label.Behaviors>
                     <toolkit:AnimationBehavior>
                         <toolkit:AnimationBehavior.AnimationType>
@@ -57,24 +91,35 @@
                         </toolkit:AnimationBehavior.AnimationType>
                     </toolkit:AnimationBehavior>
                 </Label.Behaviors>
-                
+
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
-                
+
                 <Label.Triggers>
-                    <DataTrigger TargetType="Label" Binding="{Binding IsDescriptionExpanded}" Value="True">
+                    <DataTrigger
+                        Binding="{Binding IsDescriptionExpanded}"
+                        TargetType="Label"
+                        Value="True">
                         <Setter Property="LineBreakMode" Value="WordWrap" />
                         <Setter Property="MaxLines" Value="-1" />
                     </DataTrigger>
-                    <DataTrigger TargetType="Label" Binding="{Binding IsDescriptionExpanded}" Value="False">
+                    <DataTrigger
+                        Binding="{Binding IsDescriptionExpanded}"
+                        TargetType="Label"
+                        Value="False">
                         <Setter Property="LineBreakMode" Value="TailTruncation" />
                         <Setter Property="MaxLines" Value="1" />
                     </DataTrigger>
                 </Label.Triggers>
             </Label>
 
-            <Grid Grid.Row="1" BackgroundColor="LightGray" HorizontalOptions="Fill" VerticalOptions="Fill" Margin="10,5,10,0"/>
+            <Grid
+                Grid.Row="1"
+                Margin="10,5,10,0"
+                BackgroundColor="LightGray"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
         </Grid>
     </VerticalStackLayout>
 </ContentView>

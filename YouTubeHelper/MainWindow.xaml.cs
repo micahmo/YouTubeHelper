@@ -113,6 +113,11 @@ namespace YouTubeHelper
             {
                 MainControlViewModel.Mode = MainControlMode.Exclusions;
             }
+            else if (args.InvokedItem?.ToString() == Properties.Resources.Queue)
+            {
+                MainControlViewModel.Mode = MainControlMode.Queue;
+                MainControlViewModel.SelectedChannel?.LoadQueueCommand?.Execute(null);
+            }
 
             NavigationView.Content = args.IsSettingsInvoked ? SettingsControl : MainControl;
             NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;
@@ -338,6 +343,10 @@ namespace YouTubeHelper
             if (MainControlViewModel.ExclusionsMode)
             {
                 MainControlViewModel.SelectedChannel?.FindExclusionsCommand?.Execute(null);
+            }
+            else if (MainControlViewModel.QueueMode)
+            {
+                MainControlViewModel.SelectedChannel?.LoadQueueCommand?.Execute(null);
             }
             else
             {

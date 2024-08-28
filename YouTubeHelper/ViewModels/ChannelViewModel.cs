@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shell;
-using System.Windows.Threading;
+using Flurl;
+using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Bson;
@@ -34,6 +34,7 @@ namespace YouTubeHelper.ViewModels
                     OnPropertyChanged(nameof(SearchMode));
                     OnPropertyChanged(nameof(WatchMode));
                     OnPropertyChanged(nameof(ExclusionsMode));
+                    OnPropertyChanged(nameof(QueueMode));
                 }
             };
 
@@ -196,8 +197,56 @@ namespace YouTubeHelper.ViewModels
                         MainControlViewModel.IsBusy = false;
                     }
                 });
+        }
 
+        public ICommand LoadQueueCommand => _loadQueueCommand ??= new RelayCommand(LoadQueue);
+        private ICommand _loadQueueCommand;
 
+        private async void LoadQueue()
+        {
+            Videos.Clear();
+
+            try
+            {
+                MainControlViewModel.IsBusy = true;
+
+                // Get the queue from the server
+                List<dynamic> queue = await (await Settings.Instance.TelegramApiAddress
+                    .AppendPathSegment("queue")
+                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .GetAsync()).GetJsonAsync<List<dynamic>>();
+
+                // De-duplicate by videoId, keeping the item with the highest dateAdded
+                List<dynamic> distinctQueue = queue
+                    .GroupBy(item => (string)item.videoId)
+                    .Select(group => group.OrderByDescending(item => (DateTime)item.dateAdded).First())
+                    .ToList();
+
+                // Get all excluded videos
+                List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();
+
+                List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
+                    distinctQueue.Select(queueItem => (string)queueItem.videoId).ToList(),
+                    excludedVideos: excludedVideos,
+                    customSort: videos => videos.OrderByDescending(video =>
+                    {
+                        dynamic? queueItem = distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id);
+                        DateTimeOffset dateAdded = DateTimeOffset.TryParse(queueItem?.dateAdded?.ToString(), out DateTimeOffset parsedDateAdded) ? parsedDateAdded : DateTimeOffset.MinValue;
+                        return dateAdded;
+                    }).ToList()
+                )).ToList();
+
+                queuedVideos.ForEach(video =>
+                {
+                    VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
+                    Videos.Add(videoViewModel);
+                    videoViewModel.StartUpdateCheck((string)distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id)?.requestGuid!, showInAppNotifications: false);
+                });
+            }
+            finally
+            {
+                MainControlViewModel.IsBusy = false;
+            }
         }
 
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
@@ -252,6 +301,8 @@ namespace YouTubeHelper.ViewModels
         public bool SearchMode => MainControlViewModel.Mode == MainControlMode.Search;
 
         public bool ExclusionsMode => MainControlViewModel.Mode == MainControlMode.Exclusions;
+
+        public bool QueueMode => MainControlViewModel.Mode == MainControlMode.Queue;
 
         public string CountLabel => string.Format(Resources.CountLabel, Videos.Count);
 

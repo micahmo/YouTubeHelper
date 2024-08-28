@@ -54,6 +54,7 @@ namespace YouTubeHelper.Mobile
             WatchTab.Items.Clear();
             SearchTab.Items.Clear();
             ExclusionsTab.Items.Clear();
+            QueueTab.Items.Clear();
 
             int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0);
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
@@ -78,9 +79,35 @@ namespace YouTubeHelper.Mobile
                 ExclusionsTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
             }
 
+            // Add one placeholder to the queue tab
+            QueueTab.Items.Insert(0, new ShellContent
+            {
+                Title = Mobile.Resources.Resources.Queue, Content = new ChannelView
+                {
+                    BindingContext = AppShellViewModel.QueueChannelViewModel = new ChannelViewModel(this)
+                    {
+                        Loading = false,
+                        ShowExcludedVideos = true
+                    }
+                }
+            });
+
             AppShellViewModel.ChannelViewModels.ForEach(c =>
             {
                 c.Loading = false;
+            });
+
+            _ = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await AppShellViewModel.UpdateNotification();
+                    });
+
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                }
             });
 
             _loaded = true;
@@ -139,6 +166,8 @@ namespace YouTubeHelper.Mobile
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.WatchTabSelected));
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.SearchTabSelected));
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.ExclusionsTabSelected));
+            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.QueueTabSelected));
+            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.NotQueueTabSelected));
 
             // Clear video lists when switching bottom tabs (NOT top tabs)
             if (CurrentItem.CurrentItem != _currentTab)
@@ -150,6 +179,11 @@ namespace YouTubeHelper.Mobile
                 // Manually fix that here.
                 // ONLY do this when changing bottom tabs, otherwise this causes issues in VS 17.6.2.
                 CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
+
+                if (AppShellViewModel.QueueTabSelected)
+                {
+                    AppShellViewModel.QueueChannelViewModel.FindVideos();
+                }
             }
         }
 
@@ -241,6 +275,7 @@ namespace YouTubeHelper.Mobile
                     WatchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
+                    QueueTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
 
                     foundChannelViewModel.Loading = false;
                 }

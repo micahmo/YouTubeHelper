@@ -123,7 +123,13 @@
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
 
-                                            <Expander Grid.Row="0" Margin="15,15,30,15">
+                                            <Grid Margin="15,10,30,10" Visibility="{c:Binding 'QueueMode', FalseToVisibility=Collapsed}" />
+
+                                            <Expander
+                                                Grid.Row="0"
+                                                Margin="15,15,30,15"
+                                                Visibility="{c:Binding '!QueueMode',
+                                                                       FalseToVisibility=Collapsed}">
                                                 <Expander.Header>
                                                     <!--  Need to use this width hack in order for the header content to stretch horizontally  -->
                                                     <!--  https://stackoverflow.com/a/680512/4206279  -->
@@ -215,7 +221,7 @@
                                                         Margin="15,0,0,0"
                                                         VerticalAlignment="Stretch"
                                                         Command="{Binding FindVideosCommand}"
-                                                        Visibility="{c:Binding '!ExclusionsMode',
+                                                        Visibility="{c:Binding '!ExclusionsMode and !QueueMode',
                                                                                FalseToVisibility=Collapsed}">
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
@@ -234,7 +240,7 @@
                                                         Margin="15,0,0,0"
                                                         VerticalAlignment="Stretch"
                                                         Command="{Binding FindExclusionsCommand}"
-                                                        Visibility="{c:Binding 'ExclusionsMode',
+                                                        Visibility="{c:Binding 'ExclusionsMode and !QueueMode',
                                                                                FalseToVisibility=Collapsed}">
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
@@ -248,19 +254,40 @@
                                                         </Grid>
                                                     </Button>
 
+                                                    <Button
+                                                        Grid.Column="0"
+                                                        Margin="15,0,0,0"
+                                                        VerticalAlignment="Stretch"
+                                                        Command="{Binding LoadQueueCommand}"
+                                                        Visibility="{c:Binding 'QueueMode',
+                                                                               FalseToVisibility=Collapsed}">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="5" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
+                                                            <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Load}" />
+                                                        </Grid>
+                                                    </Button>
+
                                                     <ComboBox
                                                         Grid.Column="2"
                                                         VerticalAlignment="Stretch"
                                                         DisplayMemberPath="Description"
                                                         ItemsSource="{Binding MainControlViewModel.SortModeValues}"
                                                         SelectedIndex="{Binding MainControlViewModel.SelectedSortModeIndex}"
-                                                        SelectedItem="{Binding MainControlViewModel.SelectedSortMode}" />
+                                                        SelectedItem="{Binding MainControlViewModel.SelectedSortMode}"
+                                                        Visibility="{c:Binding '!QueueMode',
+                                                                               FalseToVisibility=Collapsed}" />
 
                                                     <CheckBox
                                                         Grid.Column="4"
                                                         Content="{x:Static properties:Resources.ShowExcludedVideos}"
                                                         IsChecked="{Binding MainControlViewModel.ShowExcludedVideos}"
-                                                        Visibility="{c:Binding '!ExclusionsMode',
+                                                        Visibility="{c:Binding '!ExclusionsMode and !QueueMode',
                                                                                FalseToVisibility=Collapsed}" />
 
                                                     <ComboBox
@@ -473,7 +500,7 @@
                                                                     ToolTip="{x:Static properties:Resources.DownloadButtonToolTip}">
                                                                     <ui:FontIcon Glyph="&#xE896;" />
                                                                     <Button.InputBindings>
-                                                                        <MouseBinding Gesture="RightClick" Command="{Binding DownloadVideoCommandRightClick}" />
+                                                                        <MouseBinding Command="{Binding DownloadVideoCommandRightClick}" Gesture="RightClick" />
                                                                     </Button.InputBindings>
                                                                 </Button>
 
