@@ -39,7 +39,7 @@ namespace YouTubeHelper.ViewModels
                 {
                     ChannelViewModel previouslySelectedChannel = SelectedChannel;
                     Channels.Clear();
-                    _realChannels?.ForEach(Channels.Add);
+                    RealChannels.ForEach(Channels.Add);
                     SelectedChannel = previouslySelectedChannel;
 
                     switch (Mode)
@@ -93,6 +93,7 @@ namespace YouTubeHelper.ViewModels
                 OnPropertyChanged(nameof(WatchMode));
                 OnPropertyChanged(nameof(SearchMode));
                 OnPropertyChanged(nameof(ExclusionsMode));
+                OnPropertyChanged(nameof(QueueMode));
             }
         }
         private MainControlMode _mode;
@@ -110,7 +111,7 @@ namespace YouTubeHelper.ViewModels
         /// <summary>
         /// Represents the "real" list of channels from the database. Can be used to repopulate <see cref="Channels"/> when needed.
         /// </summary>
-        private List<ChannelViewModel> _realChannels;
+        public List<ChannelViewModel> RealChannels { get; } = new();
 
         public bool IsBusy
         {
@@ -325,7 +326,8 @@ namespace YouTubeHelper.ViewModels
                     // ignored
                 }
 
-                _realChannels = Channels.ToList();
+                RealChannels.Clear();
+                RealChannels.AddRange(Channels);
 
                 _loaded = true;
             }

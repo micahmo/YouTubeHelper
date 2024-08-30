@@ -1,51 +1,58 @@
-﻿<Window x:Class="YouTubeHelper.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        xmlns:properties="clr-namespace:YouTubeHelper.Properties"
-        xmlns:local="clr-namespace:YouTubeHelper.Utilities"
-        xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
-        mc:Ignorable="d"
-        Title="{x:Static properties:Resources.ApplicationName}" Height="700" Width="1450"
-        Closing="Window_Closing"
-        MouseDown="Window_MouseDown">
+﻿<Window
+    x:Class="YouTubeHelper.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:YouTubeHelper.Utilities"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:properties="clr-namespace:YouTubeHelper.Properties"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="{x:Static properties:Resources.ApplicationName}"
+    Width="1450"
+    Height="700"
+    Closing="Window_Closing"
+    MouseDown="Window_MouseDown"
+    mc:Ignorable="d">
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWatchedIds}" Executed="AddWatchedIds_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWontWatchIds}" Executed="AddWontWatchIds_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.ChangeView}" Executed="ChangeView_Executed"/>
-        <CommandBinding Command="{x:Static local:ShortcutCommands.HandlePaste}" Executed="HandlePaste_Executed"/>
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWatchedIds}" Executed="AddWatchedIds_Executed" />
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddWontWatchIds}" Executed="AddWontWatchIds_Executed" />
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed" />
+        <CommandBinding Command="{x:Static local:ShortcutCommands.ChangeView}" Executed="ChangeView_Executed" />
+        <CommandBinding Command="{x:Static local:ShortcutCommands.HandlePaste}" Executed="HandlePaste_Executed" />
     </Window.CommandBindings>
 
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo ProgressValue="{c:Binding 'Progress'}" ProgressState="{c:Binding ProgressState}"/>
+        <TaskbarItemInfo ProgressState="{c:Binding ProgressState}" ProgressValue="{c:Binding 'Progress'}" />
     </Window.TaskbarItemInfo>
 
     <Grid>
-        <ui:NavigationView x:Name="NavigationView" IsBackButtonVisible="Collapsed" CompactModeThresholdWidth="0" ExpandedModeThresholdWidth="99999"
-                           Loaded="NavigationView_Loaded"
-                           ItemInvoked="NavigationView_ItemInvoked">
+        <ui:NavigationView
+            x:Name="NavigationView"
+            CompactModeThresholdWidth="0"
+            ExpandedModeThresholdWidth="99999"
+            IsBackButtonVisible="Collapsed"
+            ItemInvoked="NavigationView_ItemInvoked"
+            Loaded="NavigationView_Loaded">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="{x:Static properties:Resources.Watch}">
+                <ui:NavigationViewItem x:Name="WatchNavigationItem" Content="{x:Static properties:Resources.Watch}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7F4;"/>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7F4;" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{x:Static properties:Resources.Search}">
+                <ui:NavigationViewItem x:Name="SearchNavigationITem" Content="{x:Static properties:Resources.Search}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;"/>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{x:Static properties:Resources.Exclusions}">
+                <ui:NavigationViewItem x:Name="ExclusionsNavigationItem" Content="{x:Static properties:Resources.Exclusions}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA39;"/>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA39;" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{x:Static properties:Resources.Queue}">
+                <ui:NavigationViewItem x:Name="QueueNavigationItem" Content="{x:Static properties:Resources.Queue}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE14C;"/>
+                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE14C;" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>

@@ -275,7 +275,6 @@ namespace YouTubeHelper.Mobile
                     WatchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
-                    QueueTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
 
                     foundChannelViewModel.Loading = false;
                 }

@@ -101,26 +101,31 @@ namespace YouTubeHelper
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.InvokedItem?.ToString() == Properties.Resources.Watch)
+            HandleNavigationItemChanged(args.InvokedItem?.ToString(), args.IsSettingsInvoked);
+        }
+
+        private void HandleNavigationItemChanged(string? name, bool isSettingsInvoked)
+        {
+            if (name == Properties.Resources.Watch)
             {
                 MainControlViewModel.Mode = MainControlMode.Watch;
             }
-            else if (args.InvokedItem?.ToString() == Properties.Resources.Search)
+            else if (name == Properties.Resources.Search)
             {
                 MainControlViewModel.Mode = MainControlMode.Search;
             }
-            else if (args.InvokedItem?.ToString() == Properties.Resources.Exclusions)
+            else if (name == Properties.Resources.Exclusions)
             {
                 MainControlViewModel.Mode = MainControlMode.Exclusions;
             }
-            else if (args.InvokedItem?.ToString() == Properties.Resources.Queue)
+            else if (name == Properties.Resources.Queue)
             {
                 MainControlViewModel.Mode = MainControlMode.Queue;
                 MainControlViewModel.SelectedChannel?.LoadQueueCommand?.Execute(null);
             }
 
-            NavigationView.Content = args.IsSettingsInvoked ? SettingsControl : MainControl;
-            NavigationView.Header = args.IsSettingsInvoked ? Properties.Resources.Settings : null;
+            NavigationView.Content = isSettingsInvoked ? SettingsControl : MainControl;
+            NavigationView.Header = isSettingsInvoked ? Properties.Resources.Settings : null;
 
             Dispatcher.BeginInvoke(() =>
             {
@@ -413,6 +418,13 @@ namespace YouTubeHelper
 
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
             {
+                // Navigate to the watch tab if we're on the queue tab
+                if ((NavigationViewItem)NavigationView.SelectedItem != WatchNavigationItem)
+                {
+                    NavigationView.SelectedItem = WatchNavigationItem;
+                    HandleNavigationItemChanged(Properties.Resources.Watch, false);
+                }
+
                 ChannelViewModel foundChannelViewModel = default;
                 foreach (var channelViewModel in MainControlViewModel.Channels)
                 {
@@ -436,6 +448,7 @@ namespace YouTubeHelper
                         ChannelId = channelId
                     }, MainControlViewModel);
                     MainControlViewModel.Channels.Insert(0, foundChannelViewModel);
+                    MainControlViewModel.RealChannels.Insert(0, foundChannelViewModel);
                     MainControlViewModel.SelectedChannel = foundChannelViewModel;
                 }
 
