@@ -12,6 +12,7 @@ using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Polly;
+using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -211,36 +212,31 @@ namespace YouTubeHelper.ViewModels
                 MainControlViewModel.IsBusy = true;
 
                 // Get the queue from the server
-                List<dynamic> queue = await (await Settings.Instance.TelegramApiAddress
+                List<RequestData> queue = await (await Settings.Instance.TelegramApiAddress
                     .AppendPathSegment("queue")
                     .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
-                    .GetAsync()).GetJsonAsync<List<dynamic>>();
+                    .GetAsync()).GetJsonAsync<List<RequestData>>();
 
                 // De-duplicate by videoId, keeping the item with the highest dateAdded
-                List<dynamic> distinctQueue = queue
-                    .GroupBy(item => (string)item.videoId)
-                    .Select(group => group.OrderByDescending(item => (DateTime)item.dateAdded).First())
+                List<RequestData> distinctQueue = queue
+                    .GroupBy(item => item.VideoId!)
+                    .Select(group => group.OrderByDescending(item => item.DateAdded).First())
                     .ToList();
 
                 // Get all excluded videos
                 List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();
 
                 List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
-                    distinctQueue.Select(queueItem => (string)queueItem.videoId).ToList(),
+                    distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
                     excludedVideos: excludedVideos,
-                    customSort: videos => videos.OrderByDescending(video =>
-                    {
-                        dynamic? queueItem = distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id);
-                        DateTimeOffset dateAdded = DateTimeOffset.TryParse(queueItem?.dateAdded?.ToString(), out DateTimeOffset parsedDateAdded) ? parsedDateAdded : DateTimeOffset.MinValue;
-                        return dateAdded;
-                    }).ToList()
+                    customSort: videos => videos.OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue).ToList()
                 )).ToList();
 
                 queuedVideos.ForEach(video =>
                 {
                     VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
                     Videos.Add(videoViewModel);
-                    videoViewModel.StartUpdateCheck((string)distinctQueue.FirstOrDefault(v => (string)v.videoId == video.Id)?.requestGuid!, showInAppNotifications: false);
+                    videoViewModel.StartUpdateCheck(distinctQueue.First(v => v.VideoId! == video.Id).RequestGuid.ToString(), showInAppNotifications: false);
                 });
             }
             finally

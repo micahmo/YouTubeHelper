@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Images\logo.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
@@ -13,15 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BusyIndicator" Version="2.0.0.1" />
+    <PackageReference Include="BusyIndicator" Version="2.0.2.1" />
     <PackageReference Include="CalcBinding" Version="2.5.2" />
-    <PackageReference Include="CliWrap" Version="3.4.4" />
-    <PackageReference Include="Flurl.Http" Version="3.2.4" />
-    <PackageReference Include="Jot" Version="2.1.13" />
+    <PackageReference Include="CliWrap" Version="3.6.6" />
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
+    <PackageReference Include="Jot" Version="2.1.17" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.5" />
-    <PackageReference Include="Notification.WPF" Version="6.1.0.4" />
-    <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <PackageReference Include="Notification.WPF" Version="8.0.0" />
+    <PackageReference Include="Polly" Version="8.4.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ using System.Windows.Input;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
+using ServerStatusBot.Definitions.Models;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -283,15 +284,15 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                     if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
                     {
-                        dynamic result = await progressResponse.GetJsonAsync();
-                        Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.progress}%");
+                        RequestData result = await progressResponse.GetJsonAsync<RequestData>();
+                        Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
 
-                        if (result.status == 0)
+                        if (result.Status == DownloadStatus.InProgress)
                         {
                             statusWasEverNotDone = true;
                         }
 
-                        if (result.status == 1)
+                        if (result.Status == DownloadStatus.Completed)
                         {
                             // Mark as downloaded (only if succeeded)
                             Video.Status = null;
@@ -314,13 +315,13 @@ namespace YouTubeHelper.Mobile.ViewModels
                             return;
                         }
 
-                        if (result.status == 2)
+                        if (result.Status == DownloadStatus.Failed)
                         {
                             if (showInAppNotifications)
                             {
                                 MainThread.BeginInvokeOnMainThread(async () =>
                                 {
-                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, result.status), ToastDuration.Long).Show();
+                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, result.Status), ToastDuration.Long).Show();
                                 });
                             }
 

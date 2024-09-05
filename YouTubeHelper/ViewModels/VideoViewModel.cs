@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -12,6 +13,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
 using Notification.Wpf;
+using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -164,7 +166,7 @@ namespace YouTubeHelper.ViewModels
                             .AppendPathSegment("progress")
                             .AppendPathSegment(requestId)
                             .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
-                            .GetAsync(_progressCancellationToken.Token);
+                            .GetAsync(HttpCompletionOption.ResponseContentRead, _progressCancellationToken.Token);
                     }
                     catch (Exception ex)
                     {
@@ -178,16 +180,16 @@ namespace YouTubeHelper.ViewModels
 
                     if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
                     {
-                        dynamic result = await progressResponse.GetJsonAsync();
-                        Video.Status = string.Format(Resources.DownloadingProgress, $"{result.progress}%");
+                        RequestData result = await progressResponse.GetJsonAsync<RequestData>();
+                        Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress}%");
                         MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
 
-                        if (result.status == 0)
+                        if (result.Status == DownloadStatus.InProgress)
                         {
                             statusWasEverNotDone = true;
                         }
                         
-                        if (result.status == 1)
+                        if (result.Status == DownloadStatus.Completed)
                         {
                             // Mark as downloaded (only if succeeded)
                             Video.Status = null;
@@ -209,11 +211,11 @@ namespace YouTubeHelper.ViewModels
                             return;
                         }
 
-                        if (result.status == 2)
+                        if (result.Status == DownloadStatus.Failed)
                         {
                             if (showInAppNotifications)
                             {
-                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.status), NotificationType.Error, "NotificationArea");
+                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.Status), NotificationType.Error, "NotificationArea");
                             }
 
                             return;
