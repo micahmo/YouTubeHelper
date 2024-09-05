@@ -8,7 +8,7 @@ namespace YouTubeHelper.Shared
 {
     public interface IHasIdentifier<T>
     {
-        T Id { get; set; }
+        T Id { get; init; }
     }
 
     public static class MongoDbExtensions
@@ -28,7 +28,7 @@ namespace YouTubeHelper.Shared
                 // If the ID is not empty, that's still no guarantee that the object is in the db
                 // (since we might have generated the id programmatcally)
                 // Therefore, we need to do an upsert (rather than something like a replace).
-                var result = await collection.ReplaceOneAsync(o => o.Id.Equals(obj.Id), obj, new ReplaceOptions { IsUpsert = true });
+                ReplaceOneResult? result = await collection.ReplaceOneAsync(o => o.Id!.Equals(obj.Id), obj, new ReplaceOptions { IsUpsert = true });
                 return result.ModifiedCount > 0;
             }
         }
@@ -49,7 +49,7 @@ namespace YouTubeHelper.Shared
                 // If the ID is not empty, that's still no guarantee that the object is in the db
                 // (since we might have generated the id programmatcally)
                 // Therefore, we need to do an upsert (rather than something like a replace).
-                var result = collection.ReplaceOne(o => o.Id.Equals(obj.Id), obj, new ReplaceOptions { IsUpsert = true });
+                var result = collection.ReplaceOne(o => o.Id!.Equals(obj.Id), obj, new ReplaceOptions { IsUpsert = true });
                 return result.ModifiedCount > 0;
             }
         }

@@ -59,7 +59,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private static bool _listeningToPropertyChanges = true;
 
-        public Channel Channel { get; set; }
+        public Channel? Channel { get; init; }
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
@@ -67,16 +67,16 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             ShowExcludedVideos = !ShowExcludedVideos;
         });
-        private ICommand _toggleShowExcludedVideosCommand;
+        private ICommand? _toggleShowExcludedVideosCommand;
 
         public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() =>
         {
-            Channel.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
+            Channel!.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
         });
-        private ICommand _toggleEnableDateRangeLimitCommand;
+        private ICommand? _toggleEnableDateRangeLimitCommand;
 
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
-        private ICommand _findVideosCommand;
+        private ICommand? _findVideosCommand;
 
         public void FindVideos()
         {
@@ -129,8 +129,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindVideos
                             if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                             {
-                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
-                                List<string> searchTerms = null;
+                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
+                                List<string>? searchTerms = null;
 
                                 //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                                 //{
@@ -156,11 +156,11 @@ namespace YouTubeHelper.Mobile.ViewModels
                                             }
 
                                             // Update the history
-                                            var searchTermHistory = Preferences.Default.Get<string>(nameof(ExactSearchTerm), null);
+                                            string? searchTermHistory = Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null);
                                             List<string> searchTermHistoryList;
                                             try
                                             {
-                                                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory) ?? new();
+                                                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
                                             }
                                             catch
                                             {
@@ -177,7 +177,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.AgeDesc, searchTerms, (progress, indeterminate) =>
                                     {
                                         // TODO: Update progress?
-                                    }, count, Page.AppShellViewModel.WatchTabSelected && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null);
+                                    }, count, Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null);
                                     var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 
@@ -187,7 +187,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindExclusions
                             else if (Page.AppShellViewModel.ExclusionsTabSelected)
                             {
-                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
+                                List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
 
                                 if (SelectedExclusionFilter.Value != ExclusionReason.None)
                                 {
@@ -238,7 +238,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         private bool _findInProgress;
 
         public ICommand ChannelOptionsCommand => _channelOptionsCommand ??= new RelayCommand(ChannelOptions);
-        private ICommand _channelOptionsCommand;
+        private ICommand? _channelOptionsCommand;
 
         private async void ChannelOptions()
         {
@@ -261,12 +261,12 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 if (Page.AppShellViewModel.SearchTabSelected)
                 {
-                    options.Add(Preferences.Default.Get<string>(nameof(ExactSearchTerm), null) is null 
+                    options.Add(Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null) is null 
                         ? Resources.Resources.SearchHistoryNone 
                         : Resources.Resources.SearchHistory);
                 }
                 
-                var action = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, null, options.ToArray());
+                var action = await Page.DisplayActionSheet(Channel?.VanityName, Resources.Resources.Cancel, null, options.ToArray());
 
                 if (action == Resources.Resources.SearchWithLimit)
                 {
@@ -289,22 +289,22 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.SearchHistory)
                 {
-                    var searchTermHistory = Preferences.Default.Get<string>(nameof(ExactSearchTerm), null);
+                    string? searchTermHistory = Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null);
                     List<string> searchTermHistoryList;
                     try
                     {
-                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory) ?? new();
+                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
                     }
                     catch
                     {
                         searchTermHistoryList = new();
                     }
 
-                    var res = await Page.DisplayActionSheet(Channel.VanityName, Resources.Resources.Cancel, Resources.Resources.Clear, searchTermHistoryList.ToArray());
+                    var res = await Page.DisplayActionSheet(Channel?.VanityName, Resources.Resources.Cancel, Resources.Resources.Clear, searchTermHistoryList.ToArray());
 
                     if (res == Resources.Resources.Clear)
                     {
-                        Preferences.Default.Set<string>(nameof(ExactSearchTerm), null);
+                        Preferences.Default.Set<string?>(nameof(ExactSearchTerm), null);
                     }
                     else if (res is not null && res != Resources.Resources.Cancel)
                     {
@@ -354,12 +354,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private int _selectedExclusionFilterIndex;
 
-        public string ExactSearchTerm
+        public string? ExactSearchTerm
         {
             get => _exactSearchTerm;
             set => SetProperty(ref _exactSearchTerm, value);
         }
-        private string _exactSearchTerm;
+        private string? _exactSearchTerm;
 
         public bool ShowExcludedVideos
         {
@@ -391,14 +391,14 @@ namespace YouTubeHelper.Mobile.ViewModels
             get => _showPlayer;
             set => SetProperty(ref _showPlayer, value);
         }
-        private bool _showPlayer = false;
+        private bool _showPlayer;
 
-        public string CurrentVideoUrl
+        public string? CurrentVideoUrl
         {
             get => _currentVideoUrl;
             set => SetProperty(ref _currentVideoUrl, value);
         }
 
-        private string _currentVideoUrl;
+        private string? _currentVideoUrl;
     }
 }

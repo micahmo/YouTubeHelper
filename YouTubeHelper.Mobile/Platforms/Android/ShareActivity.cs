@@ -11,7 +11,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
         {
             base.OnCreate(savedInstanceState);
 
-            string rawUrl = Intent?.Extras.GetString("android.intent.extra.TEXT");
+            string? rawUrl = Intent?.Extras?.GetString("android.intent.extra.TEXT");
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
@@ -19,20 +19,20 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string videoId)
                 {
-                    _ = AppShell.Instance.HandleSharedLink(videoId, null);
+                    _ = AppShell.Instance?.HandleSharedLink(videoId, null);
                 }
                 else if (url.Authority == "youtu.be")
                 {
-                    _ = AppShell.Instance.HandleSharedLink(url.PathSegments[0], null);
+                    _ = AppShell.Instance?.HandleSharedLink(url.PathSegments[0], null);
                 }
                 else if (url.Authority == "www.youtube.com" && url.PathSegments.Count >= 2 && url.PathSegments[0] == "live")
                 {
-                    _ = AppShell.Instance.HandleSharedLink(url.PathSegments[1], null);
+                    _ = AppShell.Instance?.HandleSharedLink(url.PathSegments[1], null);
                 }
 
                 if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
                 {
-                    _ = AppShell.Instance.HandleSharedLink(null, channelHandle);
+                    _ = AppShell.Instance?.HandleSharedLink(null, channelHandle);
                 }
             }
         }

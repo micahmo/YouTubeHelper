@@ -18,7 +18,7 @@ namespace YouTubeHelper.Shared.Utilities
     public class YouTubeApi
     {
         public static YouTubeApi Instance => _instance ??= new YouTubeApi();
-        private static YouTubeApi _instance;
+        private static YouTubeApi? _instance;
 
         private YouTubeApi()
         {
@@ -53,17 +53,17 @@ namespace YouTubeHelper.Shared.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string> searchTerms, Action<float, bool> progressCallback = null, int count = 10, DateTime? dateRangeLimit = null)
+        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(Channel? channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, List<string>? searchTerms, Action<float, bool>? progressCallback = null, int count = 10, DateTime? dateRangeLimit = null)
         {
             PlaylistItemsResource.ListRequest playlistRequest = _youTubeService.PlaylistItems.List("contentDetails");
             playlistRequest.Fields = "items/contentDetails/videoId,nextPageToken,pageInfo/totalResults";
-            playlistRequest.PlaylistId = channel.ChannelPlaylist;
+            playlistRequest.PlaylistId = channel?.ChannelPlaylist;
             playlistRequest.MaxResults = 50;
 
             List<string> videoIds = new List<string>();
 
             // Load known videos
-            IEnumerable<string> knownVideos = (await DatabaseEngine.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel.ChannelPlaylist)).Select(v => v.Id);
+            IEnumerable<string> knownVideos = (await DatabaseEngine.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
             videoIds.AddRange(knownVideos);
 
 #if DEBUG
@@ -78,7 +78,7 @@ namespace YouTubeHelper.Shared.Utilities
                 PlaylistItemListResponse response = await playlistRequest.ExecuteAsync();
 
                 // If any ID from the API is already in the list, we can stop after this
-                bool toBreak = videoIds.Contains(response.Items.LastOrDefault()?.ContentDetails.VideoId);
+                bool toBreak = response.Items.Any() && videoIds.Contains(response.Items.Last().ContentDetails.VideoId);
 
                 videoIds.AddRange(response.Items.Select(i => i.ContentDetails.VideoId));
                 nextPageToken = response.NextPageToken;
@@ -107,7 +107,7 @@ namespace YouTubeHelper.Shared.Utilities
             var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new Shared.Models.Video
             {
                 Id = v,
-                ChannelPlaylist = channel.ChannelPlaylist
+                ChannelPlaylist = channel?.ChannelPlaylist
             });
             if (knownVideosToAdd.Any())
             {
@@ -260,7 +260,7 @@ namespace YouTubeHelper.Shared.Utilities
             return results;
         }
 
-        public async Task<string> FindChannelId(string channelHandle, string defaultValue = default)
+        public async Task<string> FindChannelId(string channelHandle, string defaultValue = "")
         {
             SearchResource.ListRequest request = _youTubeService.Search.List("snippet");
             request.Q = channelHandle;
@@ -278,9 +278,9 @@ namespace YouTubeHelper.Shared.Utilities
             return response.Items.FirstOrDefault()?.Snippet.Title ?? defaultValue;
         }
 
-        public string ToChannelPlaylist(string channelId) => channelId?.Replace("UC", "UU");
+        public string? ToChannelPlaylist(string? channelId) => channelId?.Replace("UC", "UU");
 
-        public string ToChannelId(string channelPlaylist) => channelPlaylist?.Replace("UU", "UC");
+        public string? ToChannelId(string? channelPlaylist) => channelPlaylist?.Replace("UU", "UC");
 
         private double SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
         {
@@ -291,9 +291,9 @@ namespace YouTubeHelper.Shared.Utilities
                 case SortMode.DurationAsc:
                     return XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
                 case SortMode.AgeDesc:
-                    return -new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                    return -(video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue).Ticks;
                 case SortMode.AgeAsc:
-                    return new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue).Ticks;
+                    return (video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue).Ticks;
                 case SortMode.DurationDescPlusAgeDesc:
                     return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
                 case SortMode.DurationAscPlusAgeDesc:

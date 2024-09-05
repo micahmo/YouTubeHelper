@@ -28,9 +28,9 @@ namespace YouTubeHelper.Shared.Models
         public ObjectId Id
         {
             get => _objectId;
-            set => SetProperty(ref _objectId, value);
+            init => SetProperty(ref _objectId, value);
         }
-        private ObjectId _objectId;
+        private readonly ObjectId _objectId;
 
         public int Index
         {
@@ -39,7 +39,7 @@ namespace YouTubeHelper.Shared.Models
         }
         private int _index = int.MaxValue;
 
-        public string Identifier
+        public string? Identifier
         {
             get => _identifier;
             set
@@ -48,30 +48,30 @@ namespace YouTubeHelper.Shared.Models
                 VanityName = value;
             }
         }
-        private string _identifier;
+        private string? _identifier;
 
-        public string ChannelId
+        public string? ChannelId
         {
             get => _channelId;
             set => SetProperty(ref _channelId, value);
         }
-        private string _channelId;
+        private string? _channelId;
 
-        public string ChannelPlaylist
+        public string? ChannelPlaylist
         {
             get => _channelPlaylist;
             set => SetProperty(ref _channelPlaylist, value);
         }
-        private string _channelPlaylist;
+        private string? _channelPlaylist;
 
-        public string VanityName
+        public string? VanityName
         {
             get => _vanityName;
             set => SetProperty(ref _vanityName, value);
         }
-        private string _vanityName;
+        private string? _vanityName;
 
-        public string Description
+        public string? Description
         {
             get => _description;
             set
@@ -80,7 +80,7 @@ namespace YouTubeHelper.Shared.Models
                 OnPropertyChanged(nameof(ExtendedDescription));
             }
         }
-        private string _description;
+        private string? _description;
 
         [BsonIgnore]
         public string ExtendedDescription => $"{Description} ({ChannelPlaylist})";

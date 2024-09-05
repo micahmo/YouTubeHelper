@@ -59,7 +59,7 @@ namespace YouTubeHelper
             bool connected = false;
             try
             {
-                byte[] connectionStringUnencryptedBytes = ProtectedData.Unprotect(ApplicationSettings.Instance.ConnectionString, null, DataProtectionScope.CurrentUser);
+                byte[] connectionStringUnencryptedBytes = ProtectedData.Unprotect(ApplicationSettings.Instance.ConnectionString!, null, DataProtectionScope.CurrentUser);
                 string connectionString = Encoding.UTF8.GetString(connectionStringUnencryptedBytes);
                 DatabaseEngine.ConnectionString = connectionString;
                 if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
@@ -94,7 +94,7 @@ namespace YouTubeHelper
             }
 
             // We made it here, so we must have connected successfully. Save the connection string.
-            byte[] connectionStringBytes = Encoding.UTF8.GetBytes(DatabaseEngine.ConnectionString);
+            byte[] connectionStringBytes = Encoding.UTF8.GetBytes(DatabaseEngine.ConnectionString!);
             var connectionStringEncryptedBytes = ProtectedData.Protect(connectionStringBytes, null, DataProtectionScope.CurrentUser);
             ApplicationSettings.Instance.ConnectionString = connectionStringEncryptedBytes;
         }
@@ -108,19 +108,19 @@ namespace YouTubeHelper
         {
             if (name == Properties.Resources.Watch)
             {
-                MainControlViewModel.Mode = MainControlMode.Watch;
+                MainControlViewModel!.Mode = MainControlMode.Watch;
             }
             else if (name == Properties.Resources.Search)
             {
-                MainControlViewModel.Mode = MainControlMode.Search;
+                MainControlViewModel!.Mode = MainControlMode.Search;
             }
             else if (name == Properties.Resources.Exclusions)
             {
-                MainControlViewModel.Mode = MainControlMode.Exclusions;
+                MainControlViewModel!.Mode = MainControlMode.Exclusions;
             }
             else if (name == Properties.Resources.Queue)
             {
-                MainControlViewModel.Mode = MainControlMode.Queue;
+                MainControlViewModel!.Mode = MainControlMode.Queue;
                 MainControlViewModel.SelectedChannel?.LoadQueueCommand?.Execute(null);
             }
 
@@ -144,16 +144,20 @@ namespace YouTubeHelper
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
+            if (MainControlViewModel!.SelectedChannel != null)
+            {
+                ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
+            }
+
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
             ApplicationSettings.Instance.SelectedExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value;
         }
 
-        private static MainControlViewModel MainControlViewModel;
-        private static MainControl MainControl;
+        private static MainControlViewModel? MainControlViewModel;
+        private static MainControl? MainControl;
 
-        private static SettingsViewModel SettingsViewModel;
-        private static SettingsControl SettingsControl;
+        private static SettingsViewModel? SettingsViewModel;
+        private static SettingsControl? SettingsControl;
 
         private async void AddWatchedIds_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -161,10 +165,10 @@ namespace YouTubeHelper
             {
                 _dialogOpen = true;
                 
-                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddWatchedIdsMessage,
-                        MainControlViewModel.SelectedChannel.Channel.VanityName,
-                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                        MainControlViewModel!.SelectedChannel?.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist),
                     Properties.Resources.MarkAsWatched);
 
                 if (!string.IsNullOrWhiteSpace(input))
@@ -177,7 +181,7 @@ namespace YouTubeHelper
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
-                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
                         });
 
                         if (res)
@@ -200,10 +204,10 @@ namespace YouTubeHelper
             {
                 _dialogOpen = true;
                 
-                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddWontWatchIdsMessage,
-                        MainControlViewModel.SelectedChannel.Channel.VanityName,
-                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                        MainControlViewModel!.SelectedChannel?.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist),
                     Properties.Resources.MarkAsWontWatch);
 
                 if (!string.IsNullOrWhiteSpace(input))
@@ -216,7 +220,7 @@ namespace YouTubeHelper
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
-                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
                         });
 
                         if (res)
@@ -239,10 +243,10 @@ namespace YouTubeHelper
             {
                 _dialogOpen = true;
                 
-                string input = await MessageBoxHelper.ShowPastableText(string.Format(
+                string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddMightWatchIdsMessage,
-                        MainControlViewModel.SelectedChannel.Channel.VanityName,
-                        MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist),
+                        MainControlViewModel!.SelectedChannel?.Channel.VanityName,
+                        MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist),
                     Properties.Resources.MarkAsMightWatch);
 
                 if (!string.IsNullOrWhiteSpace(input))
@@ -255,7 +259,7 @@ namespace YouTubeHelper
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,
-                            ChannelPlaylist = MainControlViewModel.SelectedChannel.Channel.ChannelPlaylist
+                            ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
                         });
 
                         if (res)
@@ -278,22 +282,22 @@ namespace YouTubeHelper
         {
             if (Keyboard.IsKeyDown(Key.D1))
             {
-                MainControlViewModel.IsMainControlExpanded = true;
+                MainControlViewModel!.IsMainControlExpanded = true;
                 MainControlViewModel.IsPlayerExpanded = false;
             }
             else if (Keyboard.IsKeyDown(Key.D2))
             {
-                MainControlViewModel.IsMainControlExpanded = true;
+                MainControlViewModel!.IsMainControlExpanded = true;
                 MainControlViewModel.IsPlayerExpanded = true;
             }
             else if (Keyboard.IsKeyDown(Key.D3))
             {
-                MainControlViewModel.IsMainControlExpanded = false;
+                MainControlViewModel!.IsMainControlExpanded = false;
                 MainControlViewModel.IsPlayerExpanded = true;
             }
             else if (Keyboard.IsKeyDown(Key.Escape))
             {
-                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPauseVideo));
+                MainControlViewModel!.RaisePropertyChanged(nameof(MainControlViewModel.SignalPauseVideo));
 
                 if (!MainControlViewModel.IsMainControlExpanded)
                 {
@@ -304,7 +308,7 @@ namespace YouTubeHelper
                     MainControlViewModel.IsPlayerExpanded = false;
                 }
                 else if (MainControlViewModel.Channels.Count > 0
-                         && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) != 0)
+                         && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel!) != 0)
                 {
                     MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.FirstOrDefault();
                 }
@@ -319,7 +323,7 @@ namespace YouTubeHelper
             }
             else if (Keyboard.IsKeyDown(Key.PageUp) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                if (MainControlViewModel.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) - 1 >= 0)
+                if (MainControlViewModel!.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) - 1 >= 0)
                 {
                     MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.ElementAt(MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) - 1);
 
@@ -331,7 +335,7 @@ namespace YouTubeHelper
             }
             else if (Keyboard.IsKeyDown(Key.PageDown) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                if (MainControlViewModel.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) + 1 < MainControlViewModel.Channels.Count - 1)
+                if (MainControlViewModel!.SelectedChannel is not null && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) + 1 < MainControlViewModel.Channels.Count - 1)
                 {
                     MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.ElementAt(MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel) + 1);
 
@@ -345,7 +349,7 @@ namespace YouTubeHelper
 
         private static void ExecuteMainCommand()
         {
-            if (MainControlViewModel.ExclusionsMode)
+            if (MainControlViewModel!.ExclusionsMode)
             {
                 MainControlViewModel.SelectedChannel?.FindExclusionsCommand?.Execute(null);
             }
@@ -361,14 +365,14 @@ namespace YouTubeHelper
 
         private async void HandlePaste_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MainControlViewModel.IsBusy = true;
+            MainControlViewModel!.IsBusy = true;
 
             string rawUrl = Clipboard.GetText();
-            string videoId = default;
-            string channelHandle = default;
-            string channelId = default;
-            string channelPlaylist = default;
-            Video video = default;
+            string? videoId = default;
+            string? channelHandle = default;
+            string? channelId = default;
+            string? channelPlaylist = default;
+            Video? video = default;
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
@@ -425,8 +429,8 @@ namespace YouTubeHelper
                     HandleNavigationItemChanged(Properties.Resources.Watch, false);
                 }
 
-                ChannelViewModel foundChannelViewModel = default;
-                foreach (var channelViewModel in MainControlViewModel.Channels)
+                ChannelViewModel? foundChannelViewModel = default;
+                foreach (ChannelViewModel channelViewModel in MainControlViewModel.Channels)
                 {
                     if (channelViewModel.Channel.ChannelPlaylist == channelPlaylist)
                     {

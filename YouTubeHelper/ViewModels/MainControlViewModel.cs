@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -37,7 +38,7 @@ namespace YouTubeHelper.ViewModels
 
                 if (args.PropertyName == nameof(Mode))
                 {
-                    ChannelViewModel previouslySelectedChannel = SelectedChannel;
+                    ChannelViewModel? previouslySelectedChannel = SelectedChannel;
                     Channels.Clear();
                     RealChannels.ForEach(Channels.Add);
                     SelectedChannel = previouslySelectedChannel;
@@ -66,7 +67,7 @@ namespace YouTubeHelper.ViewModels
                             break;
                         case MainControlMode.Queue:
                             Channels.Clear();
-                            Channels.Add(_queueChannelTab);
+                            Channels.Add(_queueChannelTab!);
                             SelectedChannel = _queueChannelTab;
                             break;
                         default:
@@ -124,12 +125,12 @@ namespace YouTubeHelper.ViewModels
 
         public string ActiveDownloadsCountLabel => string.Format(Resources.ActiveDownloads, Channels.Select(c => c.Videos.Count(v => !string.IsNullOrEmpty(v.Video.Status))).Sum());
 
-        public ChannelViewModel SelectedChannel
+        public ChannelViewModel? SelectedChannel
         {
             get => _selectedChannel;
             set => SetProperty(ref _selectedChannel, value);
         }
-        private ChannelViewModel _selectedChannel;
+        private ChannelViewModel? _selectedChannel;
 
         private readonly ChannelViewModel _newChannelTab;
         private readonly ChannelViewModel _queueChannelTab;
@@ -159,25 +160,25 @@ namespace YouTubeHelper.ViewModels
         public GridLength ZeroGridLength { get; } = new(0, GridUnitType.Pixel);
 
 
-        public string ActiveVideo
+        public string? ActiveVideo
         {
             get => _activeVideo;
             set => SetProperty(ref _activeVideo, value);
         }
-        private string _activeVideo;
+        private string? _activeVideo;
 
-        public string ActiveVideoTitle
+        public string? ActiveVideoTitle
         {
             get => _activeVideoTitle;
             set => SetProperty(ref _activeVideoTitle, value);
         }
-        private string _activeVideoTitle;
+        private string? _activeVideoTitle;
 
         // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
-        public object SignalPlayVideo { get; set; }
+        public object? SignalPlayVideo { get; set; }
 
         // This property never has a value, but it can be used to signal the view to resume playback without changing the ActiveVideo
-        public object SignalPauseVideo { get; set; }
+        public object? SignalPauseVideo { get; set; }
 
         public TimeSpan ActiveVideoElapsedTimeSpan
         {
@@ -231,10 +232,10 @@ namespace YouTubeHelper.ViewModels
 
         public SortModeExtended SelectedSortMode
         {
-            get => _selectedSortMode ?? SortModeValues.FirstOrDefault();
+            get => _selectedSortMode ?? SortModeValues.First();
             set => SetProperty(ref _selectedSortMode, value);
         }
-        private SortModeExtended _selectedSortMode;
+        private SortModeExtended? _selectedSortMode;
 
         public int SelectedSortModeIndex
         {
@@ -254,10 +255,10 @@ namespace YouTubeHelper.ViewModels
 
         public ExclusionReasonExtended SelectedExclusionFilter
         {
-            get => _exclusionFilter ?? ExclusionReasonValues.FirstOrDefault();
+            get => _exclusionFilter ?? ExclusionReasonValues.First();
             set => SetProperty(ref _exclusionFilter, value);
         }
-        private ExclusionReasonExtended _exclusionFilter;
+        private ExclusionReasonExtended? _exclusionFilter;
 
         public int SelectedExclusionFilterIndex
         {
@@ -266,23 +267,23 @@ namespace YouTubeHelper.ViewModels
         }
         private int _selectedExclusionFilterIndex;
 
-        public string ExactSearchTerm
+        public string? ExactSearchTerm
         {
             get => _exactSearchTerm;
             set => SetProperty(ref _exactSearchTerm, value);
         }
-        private string _exactSearchTerm;
+        private string? _exactSearchTerm;
 
-        public string LookupSearchTerm
+        public string? LookupSearchTerm
         {
             get => _lookupSearchTerm;
             set
             {
                 // See if this is a URL and try to parse it
-                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri uri))
+                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri? uri))
                 {
-                    var queryString = HttpUtility.ParseQueryString(uri.Query);
-                    string videoId = queryString["v"];
+                    NameValueCollection queryString = HttpUtility.ParseQueryString(uri.Query);
+                    string? videoId = queryString["v"];
                     if (!string.IsNullOrEmpty(videoId))
                     {
                         SetProperty(ref _lookupSearchTerm, videoId);
@@ -294,7 +295,7 @@ namespace YouTubeHelper.ViewModels
             }
         }
 
-        private string _lookupSearchTerm;
+        private string? _lookupSearchTerm;
 
         #endregion
 
@@ -314,8 +315,8 @@ namespace YouTubeHelper.ViewModels
 
                 try
                 {
-                    SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
-                    SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.FirstOrDefault(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
+                    SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.First(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
+                    SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.First(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
                     if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
                     {
                         SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];

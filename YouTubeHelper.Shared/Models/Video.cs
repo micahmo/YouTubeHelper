@@ -10,17 +10,17 @@ namespace YouTubeHelper.Shared.Models
     public class Video : ObservableObject, IHasIdentifier<string>
     {
         [BsonIgnore]
-        public string ThumbnailUrl { get; set; }
+        public string? ThumbnailUrl { get; set; }
 
         [BsonIgnore]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [BsonId]
         [BsonIgnoreIfDefault]
-        public string Id { get; set; }
+        public required string Id { get; init; }
 
         [BsonIgnore]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [BsonIgnore]
         public DateTimeOffset ReleaseDate { get; set; }
@@ -67,12 +67,12 @@ namespace YouTubeHelper.Shared.Models
         public TimeSpan Duration { get; set; }
 
         [BsonIgnore]
-        public string RawUrl
+        public string? RawUrl
         {
             get => _rawUrl;
             set => SetProperty(ref _rawUrl, value);
         }
-        private string _rawUrl;
+        private string? _rawUrl;
 
         [BsonRepresentation(BsonType.String)]
         public ExclusionReason ExclusionReason
@@ -90,7 +90,7 @@ namespace YouTubeHelper.Shared.Models
         }
         private string? _status;
 
-        public string ChannelPlaylist { get; set; }
+        public string? ChannelPlaylist { get; set; }
 
         [BsonIgnore]
         public bool Excluded

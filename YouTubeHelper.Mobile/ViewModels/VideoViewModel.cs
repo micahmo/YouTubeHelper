@@ -51,19 +51,19 @@ namespace YouTubeHelper.Mobile.ViewModels
         private bool _isPlaying;
 
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
-        private ICommand _toggleDescriptionCommand;
+        private ICommand? _toggleDescriptionCommand;
 
         public void ToggleDescription()
         {
             IsDescriptionExpanded = !IsDescriptionExpanded;
         }
 
-        public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
+        public string? ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
-        private ICommand _videoTappedCommand;
+        private ICommand? _videoTappedCommand;
 
         public async void VideoTapped()
         {

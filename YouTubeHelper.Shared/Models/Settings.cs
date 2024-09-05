@@ -22,43 +22,43 @@ namespace YouTubeHelper.Shared.Models
         public int Id
         {
             get => InstanceObjectId;
-            set { }
+            init { }
         }
 
-        public string YouTubeApiKey
+        public string? YouTubeApiKey
         {
             get => _youTubeApiKey;
             set => SetProperty(ref _youTubeApiKey, value);
         }
-        private string _youTubeApiKey;
+        private string? _youTubeApiKey;
 
-        public string ChromePath
+        public string? ChromePath
         {
             get => _chromePath;
             set => SetProperty(ref _chromePath, value);
         }
-        private string _chromePath;
+        private string? _chromePath;
 
-        public string TelegramApiKey
+        public string? TelegramApiKey
         {
             get => _telegramApiKey;
             set => SetProperty(ref _telegramApiKey, value);
         }
-        private string _telegramApiKey;
+        private string? _telegramApiKey;
 
-        public string TelegramApiAddress
+        public string? TelegramApiAddress
         {
             get => _telegramApiAddress;
             set => SetProperty(ref _telegramApiAddress, value);
         }
-        private string _telegramApiAddress;
+        private string? _telegramApiAddress;
 
         public string DownloadDirectory
         {
             get => string.IsNullOrWhiteSpace(_downloadDirectory) ? "plex" : _downloadDirectory;
             set => SetProperty(ref _downloadDirectory, value);
         }
-        private string _downloadDirectory;
+        private string? _downloadDirectory;
 
         public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {
@@ -66,7 +66,7 @@ namespace YouTubeHelper.Shared.Models
             DatabaseEngine.SettingsCollection.InsertOne(settings);
             return settings;
         })();
-        private static Settings _instance;
+        private static Settings? _instance;
 
         private static int InstanceObjectId => 1;
     }

@@ -13,6 +13,6 @@ namespace YouTubeHelper.Shared
 
         public T Value { get; }
 
-        public string Description => typeof(T).GetMember(Value.ToString()).FirstOrDefault().GetCustomAttributes(typeof(DescriptionAttribute), true).OfType<DescriptionAttribute>().FirstOrDefault()?.Description;
+        public string? Description => typeof(T).GetMember(Value.ToString()).FirstOrDefault()?.GetCustomAttributes(typeof(DescriptionAttribute), true).OfType<DescriptionAttribute>().FirstOrDefault()?.Description;
     }
 }

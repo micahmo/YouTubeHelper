@@ -46,7 +46,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand DeleteCommand => _deleteChannelCommand ??= new RelayCommand(Delete);
-        private ICommand _deleteChannelCommand;
+        private ICommand? _deleteChannelCommand;
 
         private async void Delete()
         {
@@ -56,7 +56,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
-        private ICommand _searchCommand;
+        private ICommand? _searchCommand;
 
         private async void LookupChannel()
         {
@@ -75,7 +75,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
-        private ICommand _findVideosCommand;
+        private ICommand? _findVideosCommand;
 
         private async void FindVideos()
         {
@@ -104,7 +104,7 @@ namespace YouTubeHelper.ViewModels
                         MainControlViewModel.IsBusy = true;
 
                         List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
-                        List<string> searchTerms = null;
+                        List<string>? searchTerms = null;
 
                         if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                         {
@@ -157,7 +157,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand FindExclusionsCommand => _findExclusionsCommand ??= new RelayCommand(FindExclusions);
-        private ICommand _findExclusionsCommand;
+        private ICommand? _findExclusionsCommand;
 
         private async void FindExclusions()
         {
@@ -201,7 +201,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand LoadQueueCommand => _loadQueueCommand ??= new RelayCommand(LoadQueue);
-        private ICommand _loadQueueCommand;
+        private ICommand? _loadQueueCommand;
 
         private async void LoadQueue()
         {
@@ -246,7 +246,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
-        private ICommand _moveRightCommand;
+        private ICommand? _moveRightCommand;
 
         private async void MoveRight()
         {
@@ -265,7 +265,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand MoveLeftCommand => _moveLeftCommand ??= new RelayCommand(MoveLeft);
-        private ICommand _moveLeftCommand;
+        private ICommand? _moveLeftCommand;
 
         private async void MoveLeft()
         {

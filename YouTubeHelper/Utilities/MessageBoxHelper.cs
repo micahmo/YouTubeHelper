@@ -83,7 +83,7 @@ namespace YouTubeHelper.Utilities
         /// <summary>
         /// Show a message box into which the user can paste text and save
         /// </summary>
-        public static async Task<string> ShowPastableText(string message, string title, bool monospace = false, bool standalone = false)
+        public static async Task<string?> ShowPastableText(string message, string title, bool monospace = false, bool standalone = false)
         {
             var stackPanel = GetTextBlockContent(message, string.Empty, monospace, readOnly: false, out var flowDocument);
 
@@ -113,7 +113,7 @@ namespace YouTubeHelper.Utilities
         /// <summary>
         /// Show a message box into which the user can enter a single line of input
         /// </summary>
-        public static async Task<(string Text, ContentDialogResult Result)> ShowInputBox(string message, string title, string initialInput = default)
+        public static async Task<(string Text, ContentDialogResult Result)> ShowInputBox(string message, string title, string? initialInput = default)
         {
             var stackPanel = GetTextBoxContent(message, initialInput, out var textBox);
 
@@ -171,7 +171,7 @@ namespace YouTubeHelper.Utilities
             return stackPanel;
         }
 
-        private static FrameworkElement GetTextBoxContent(string message, string initialInput, out TextBox textBox)
+        private static FrameworkElement GetTextBoxContent(string message, string? initialInput, out TextBox textBox)
         {
             StackPanel stackPanel = new StackPanel();
             stackPanel.Children.Add(new TextBlock

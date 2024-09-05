@@ -40,7 +40,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand PlayVideoCommand => _playVideoCommand ??= new RelayCommand(PlayVideo);
-        private ICommand _playVideoCommand;
+        private ICommand? _playVideoCommand;
 
         private async void PlayVideo()
         {
@@ -63,20 +63,23 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand PlayVideoInBrowserCommand => _playVideoInBrowserCommand ??= new RelayCommand(PlayVideoInBrowser);
-        private ICommand _playVideoInBrowserCommand;
+        private ICommand? _playVideoInBrowserCommand;
 
         private async void PlayVideoInBrowser()
         {
-            await Cli.Wrap(Settings.Instance.ChromePath)
-                .WithArguments($"-incognito https://www.youtube.com/watch?v={Video.Id}")
-                .ExecuteBufferedAsync();
+            if (!string.IsNullOrWhiteSpace(Settings.Instance.ChromePath))
+            {
+                await Cli.Wrap(Settings.Instance.ChromePath)
+                    .WithArguments($"-incognito https://www.youtube.com/watch?v={Video.Id}")
+                    .ExecuteBufferedAsync();
+            }
         }
 
         public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(() => DownloadVideo(false));
-        private ICommand _downloadVideoCommand;
+        private ICommand? _downloadVideoCommand;
 
         public ICommand DownloadVideoCommandRightClick => _downloadVideoCommandRightClick ??= new RelayCommand(() => DownloadVideo(true));
-        private ICommand _downloadVideoCommandRightClick;
+        private ICommand? _downloadVideoCommandRightClick;
 
         private async void DownloadVideo(bool rightClick)
         {
@@ -231,9 +234,9 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand ExcludeVideoCommand => _excludeVideoCommand ??= new RelayCommand<object>(ExcludeVideo);
-        private ICommand _excludeVideoCommand;
+        private ICommand? _excludeVideoCommand;
 
-        private async void ExcludeVideo(object sender)
+        private async void ExcludeVideo(object? sender)
         {
             MainControl.OpenFlyouts.ForEach(f => f.Hide());
             MainControl.OpenFlyouts.Clear();
@@ -264,7 +267,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         public ICommand UnexcludeVideoCommand => _enexcludeVideoCommand ??= new RelayCommand(UnexcludeVideo);
-        private ICommand _enexcludeVideoCommand;
+        private ICommand? _enexcludeVideoCommand;
 
         private async void UnexcludeVideo()
         {

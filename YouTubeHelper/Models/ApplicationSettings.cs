@@ -70,12 +70,12 @@ namespace YouTubeHelper.Models
         }
         private ExclusionReason _selectedExclusionReason;
 
-        public byte[] ConnectionString
+        public byte[]? ConnectionString
         {
             get => _connectionString;
             set => SetProperty(ref _connectionString, value);
         }
-        private byte[] _connectionString;
+        private byte[]? _connectionString;
 
         #region Tracker instance
 

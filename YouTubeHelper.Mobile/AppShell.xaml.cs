@@ -8,8 +8,8 @@ namespace YouTubeHelper.Mobile
 {
     public partial class AppShell : Shell
     {
-        public static AppShell Instance { get; private set; }
-        private Tab _currentTab;
+        public static AppShell? Instance { get; private set; }
+        private Tab? _currentTab;
 
         public AppShell()
         {
@@ -119,7 +119,7 @@ namespace YouTubeHelper.Mobile
 
             try
             {
-                string connectionString = await SecureStorage.Default.GetAsync("connection_string");
+                string? connectionString = await SecureStorage.Default.GetAsync("connection_string");
                 DatabaseEngine.ConnectionString = connectionString;
                 if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
                 {
@@ -156,10 +156,10 @@ namespace YouTubeHelper.Mobile
             }
 
             // We made it here, so we must have connected successfully. Save the connection string.
-            await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString);
+            await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString!);
         }
 
-        public AppShellViewModel AppShellViewModel => BindingContext as AppShellViewModel;
+        public AppShellViewModel AppShellViewModel => (AppShellViewModel)BindingContext;
 
         private void Shell_Navigated(object _, ShellNavigatedEventArgs __)
         {
@@ -182,12 +182,12 @@ namespace YouTubeHelper.Mobile
 
                 if (AppShellViewModel.QueueTabSelected)
                 {
-                    AppShellViewModel.QueueChannelViewModel.FindVideos();
+                    AppShellViewModel.QueueChannelViewModel!.FindVideos();
                 }
             }
         }
 
-        public async Task HandleSharedLink(string videoId, string channelHandle)
+        public async Task HandleSharedLink(string? videoId, string? channelHandle)
         {
             if (_loaded)
             {
@@ -202,9 +202,9 @@ namespace YouTubeHelper.Mobile
             }
 
 
-            Video video = default;
-            string channelId = default;
-            string channelPlaylist = default;
+            Video? video = default;
+            string? channelId = default;
+            string? channelPlaylist = default;
 
             if (!string.IsNullOrEmpty(videoId))
             {
@@ -232,11 +232,11 @@ namespace YouTubeHelper.Mobile
 
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
             {
-                ChannelViewModel foundChannelViewModel = default;
+                ChannelViewModel? foundChannelViewModel = default;
                 foreach (var content in WatchTab.Items)
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
-                        && channelViewModel.Channel.ChannelPlaylist == channelPlaylist)
+                        && channelViewModel.Channel?.ChannelPlaylist == channelPlaylist)
                     {
                         foundChannelViewModel = channelViewModel;
 

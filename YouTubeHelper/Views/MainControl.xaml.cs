@@ -85,9 +85,9 @@ namespace YouTubeHelper.Views
             Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(1/4f));
-                if (!_doubleClickCancellationToken.IsCancellationRequested)
+                if (_doubleClickCancellationToken?.IsCancellationRequested == false)
                 {
-                    _doubleClickCancellationToken.Cancel();
+                    await _doubleClickCancellationToken.CancelAsync();
                     Dispatcher.Invoke(TogglePlayState);
                 }
             }, (_doubleClickCancellationToken = new CancellationTokenSource()).Token);
@@ -106,11 +106,11 @@ namespace YouTubeHelper.Views
             Dispatcher.BeginInvoke(() => MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
         }
 
-        private CancellationTokenSource _doubleClickCancellationToken;
+        private CancellationTokenSource? _doubleClickCancellationToken;
 
         private void TogglePlayState()
         {
-            MediaState state = (MediaState)StateField.GetValue(HelperObject);
+            MediaState? state = (MediaState?)StateField.GetValue(HelperObject);
 
             if (state == MediaState.Play)
             {
@@ -122,10 +122,10 @@ namespace YouTubeHelper.Views
             }
         }
 
-        private object HelperObject => _helperObject ??= typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MediaElement);
-        private object _helperObject;
-        private FieldInfo StateField => _stateField ??= HelperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-        private FieldInfo _stateField;
+        private object HelperObject => _helperObject ??= typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(MediaElement)!;
+        private object? _helperObject;
+        private FieldInfo StateField => _stateField ??= HelperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        private FieldInfo? _stateField;
 
         private void Flyout_Opened(object sender, object e)
         {

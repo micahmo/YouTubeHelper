@@ -21,7 +21,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public List<ChannelViewModel> ChannelViewModels { get; } = new();
 
-        public ChannelViewModel QueueChannelViewModel { get; set; }
+        public ChannelViewModel? QueueChannelViewModel { get; set; }
 
         public void RaisePropertyChanged(string propertyName)
         {
@@ -30,7 +30,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public async Task UpdateNotification()
         {
-            int activeDownloads = (QueueTabSelected ? new List<ChannelViewModel> { QueueChannelViewModel } : ChannelViewModels)
+            int activeDownloads = (QueueTabSelected && QueueChannelViewModel != null ? new List<ChannelViewModel> { QueueChannelViewModel } : ChannelViewModels)
                 .Select(c => c.Videos.Count(v => v.HasStatus)).Sum();
 
             if (activeDownloads > 0)
@@ -60,6 +60,6 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
 
-        private string _currentNotificationText;
+        private string? _currentNotificationText;
     }
 }
