@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- This is what sets the status bar color -->
     <color name="colorPrimary">#b22222</color>
     <color name="colorPrimaryDark">#b22222</color>
     <color name="colorAccent">#b22222</color>

@@ -11,8 +11,13 @@
 
     <Shell.Resources>
         <Style TargetType="TabBar">
+            <!--  This is what sets the color for the bottom tab background  -->
             <Setter Property="Shell.TabBarBackgroundColor" Value="FireBrick" />
+            <!--  This is what sets the color of the selected text on top of the bottom tab bar  -->
             <Setter Property="Shell.TabBarTitleColor" Value="WhiteSmoke" />
+            <!--  This is what sets the color of the selected icon on top of the bottom tab bar  -->
+            <Setter Property="Shell.TabBarForegroundColor" Value="WhiteSmoke" />
+            <!--  This is what sets the color of the deselected icon and text on top of the bottom tab bar  -->
             <Setter Property="Shell.TabBarUnselectedColor" Value="DarkGray" />
         </Style>
     </Shell.Resources>
