@@ -263,6 +263,10 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.SelectedChannel = this;
             MainControlViewModel.AllowCreateNewChannel = true;
 
+            // Fix up the "real" channels list
+            MainControlViewModel.RealChannels.Clear();
+            MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
+
             foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
@@ -281,6 +285,10 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
             MainControlViewModel.SelectedChannel = this;
             MainControlViewModel.AllowCreateNewChannel = true;
+
+            // Fix up the "real" channels list
+            MainControlViewModel.RealChannels.Clear();
+            MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
 
             foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
