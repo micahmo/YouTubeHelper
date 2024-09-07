@@ -101,5 +101,26 @@ namespace YouTubeHelper.Shared.Models
             set => SetProperty(ref _enableDateRangeLimit, value);
         }
         private bool _enableDateRangeLimit;
+
+        [BsonIgnore]
+        public double? VideoLengthMinimumInSeconds
+        {
+            get => _videoLengthMinimum?.TotalSeconds;
+            set => VideoLengthMinimum = value.HasValue ? TimeSpan.FromSeconds(value.Value) : null;
+        }
+
+        public TimeSpan? VideoLengthMinimum
+        {
+            get => _videoLengthMinimum;
+            set => SetProperty(ref _videoLengthMinimum, value);
+        }
+        private TimeSpan? _videoLengthMinimum;
+
+        public bool EnableVideoLengthMinimum
+        {
+            get => _enableVideoLengthMinimum;
+            set => SetProperty(ref _enableVideoLengthMinimum, value);
+        }
+        private bool _enableVideoLengthMinimum;
     }
 }

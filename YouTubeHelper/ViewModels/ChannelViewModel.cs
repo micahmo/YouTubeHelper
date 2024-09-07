@@ -134,16 +134,22 @@ namespace YouTubeHelper.ViewModels
                                 }
                             }
 
-                            var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, searchTerms, (progress, indeterminate) =>
-                            {
-                                MainControlViewModel.Progress = progress;
-                                MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
-                            }, noLimit ? int.MaxValue : 10, MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null);
-                            var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                Videos.AddRange(videoViewModels);
-                            });
+                            IEnumerable<Video> videos = await YouTubeApi.Instance.FindVideos(
+                                Channel, exclusions,
+                                MainControlViewModel.ShowExcludedVideos,
+                                MainControlViewModel.SelectedSortMode.Value,
+                                searchTerms,
+                                (progress, indeterminate) =>
+                                {
+                                    MainControlViewModel.Progress = progress;
+                                    MainControlViewModel.ProgressState = indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal;
+                                },
+                                noLimit ? int.MaxValue : 10,
+                                MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
+                                MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null);
+
+                            List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                            Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
 
                             MainControlViewModel.Progress = 0;
                             MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;

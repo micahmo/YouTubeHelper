@@ -174,11 +174,19 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         }
                                     }
 
-                                    var videos = await YouTubeApi.Instance.FindVideos(Channel, exclusions, ShowExcludedVideos, SelectedSortMode?.Value ?? SortMode.AgeDesc, searchTerms, (progress, indeterminate) =>
-                                    {
-                                        // TODO: Update progress?
-                                    }, count, Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null);
-                                    var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                    IEnumerable<Video> videos = await YouTubeApi.Instance.FindVideos(
+                                        Channel,
+                                        exclusions,
+                                        ShowExcludedVideos,
+                                        SelectedSortMode.Value, searchTerms, (_, _) =>
+                                        {
+                                            // TODO: Update progress?
+                                        },
+                                        count,
+                                        Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
+                                        Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null);
+                                    
+                                    List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 
                                     // TODO: Reset progress?
@@ -334,10 +342,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                 _selectedSortModeIndex = value;
                 
                 // Have to do an explicit raise here since setting to 0 doesn't.
-                OnPropertyChanged(nameof(SelectedSortModeIndex));
+                OnPropertyChanged();
             }
         }
-        private int _selectedSortModeIndex;
+        private int _selectedSortModeIndex = 4;
 
         public ExclusionReasonExtended SelectedExclusionFilter => ExclusionReasonValues.ElementAt(SelectedExclusionFilterIndex);
 

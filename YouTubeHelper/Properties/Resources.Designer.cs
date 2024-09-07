@@ -196,6 +196,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do not show videos shorter than.
+        /// </summary>
+        public static string DoNotShowVideosShorterThan {
+            get {
+                return ResourceManager.GetString("DoNotShowVideosShorterThan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Download (hold Shift to download silently, right-click to specify download directory).
         /// </summary>
         public static string DownloadButtonToolTip {
@@ -532,6 +541,15 @@ namespace YouTubeHelper.Properties {
         public static string VideoDownloadSucceeded {
             get {
                 return ResourceManager.GetString("VideoDownloadSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Video length minimum (in seconds).
+        /// </summary>
+        public static string VideoLengthMinimum {
+            get {
+                return ResourceManager.GetString("VideoLengthMinimum", resourceCulture);
             }
         }
         
