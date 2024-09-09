@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shell;
-using Flurl;
-using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Bson;
@@ -151,6 +149,23 @@ namespace YouTubeHelper.ViewModels
                             List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                             Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
 
+                            try
+                            {
+                                List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
+                                videoViewModels.ForEach(videoViewModel =>
+                                {
+                                    Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
+                                    if (requestId != null)
+                                    {
+                                        videoViewModel.StartUpdateCheck(requestId.ToString(), showInAppNotifications: false);
+                                    }
+                                });
+                            }
+                            catch
+                            {
+                                // Ignore this, because getting the queue isn't a big deal, and we don't want it to trip the outer retry.
+                            }
+
                             MainControlViewModel.Progress = 0;
                             MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
                         }
@@ -192,8 +207,8 @@ namespace YouTubeHelper.ViewModels
                             exclusions = exclusions.Where(v => MainControlViewModel.SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                         }
 
-                        var videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue);
-                        var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                        IEnumerable<Video> videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue);
+                        List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             Videos.AddRange(videoViewModels);
@@ -218,16 +233,7 @@ namespace YouTubeHelper.ViewModels
                 MainControlViewModel.IsBusy = true;
 
                 // Get the queue from the server
-                List<RequestData> queue = await (await Settings.Instance.TelegramApiAddress
-                    .AppendPathSegment("queue")
-                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
-                    .GetAsync()).GetJsonAsync<List<RequestData>>();
-
-                // De-duplicate by videoId, keeping the item with the highest dateAdded
-                List<RequestData> distinctQueue = queue
-                    .GroupBy(item => item.VideoId!)
-                    .Select(group => group.OrderByDescending(item => item.DateAdded).First())
-                    .ToList();
+                List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
 
                 // Get all excluded videos
                 List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();

@@ -267,7 +267,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             .AppendPathSegment("progress")
                             .AppendPathSegment(requestId)
                             .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
-                            .GetAsync(_progressCancellationToken.Token);
+                            .GetAsync(HttpCompletionOption.ResponseContentRead, _progressCancellationToken.Token);
                     }
                     catch (Exception ex)
                     {

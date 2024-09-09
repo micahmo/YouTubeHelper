@@ -189,6 +189,23 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 
+                                    try
+                                    {
+                                        List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
+                                        videoViewModels.ForEach(videoViewModel =>
+                                        {
+                                            Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
+                                            if (requestId != null)
+                                            {
+                                                videoViewModel.StartUpdateCheck(requestId!.ToString()!, showInAppNotifications: false);
+                                            }
+                                        });
+                                    }
+                                    catch
+                                    {
+                                        // Ignore this, because getting the queue isn't a big deal, and we don't want it to trip the outer retry.
+                                    }
+
                                     // TODO: Reset progress?
                                 }
                             }
@@ -209,16 +226,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
                                 // Get the queue from the server
-                                List<RequestData> queue = await (await Settings.Instance.TelegramApiAddress
-                                    .AppendPathSegment("queue")
-                                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
-                                    .GetAsync()).GetJsonAsync<List<RequestData>>();
-
-                                // De-duplicate by videoId, keeping the item with the highest dateAdded
-                                List<RequestData> distinctQueue = queue
-                                    .GroupBy(item => item.VideoId)
-                                    .Select(group => group.OrderByDescending(item => item.DateAdded).First())
-                                    .ToList();
+                                List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
 
                                 // Get all excluded videos
                                 List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();
