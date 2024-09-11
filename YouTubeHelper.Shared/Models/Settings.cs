@@ -32,6 +32,11 @@ namespace YouTubeHelper.Shared.Models
         }
         private string? _youTubeApiKey;
 
+        /// <summary>
+        /// This is kept for backwards compatibility (to deserialize the settings)
+        /// but it should no longer be used.
+        /// </summary>
+        [Obsolete("Chrome path is no longer stored in settings")]
         public string? ChromePath
         {
             get => _chromePath;

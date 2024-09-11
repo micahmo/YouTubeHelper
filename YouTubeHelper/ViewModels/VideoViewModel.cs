@@ -67,12 +67,9 @@ namespace YouTubeHelper.ViewModels
 
         private async void PlayVideoInBrowser()
         {
-            if (!string.IsNullOrWhiteSpace(Settings.Instance.ChromePath))
-            {
-                await Cli.Wrap(Settings.Instance.ChromePath)
-                    .WithArguments($"-incognito https://www.youtube.com/watch?v={Video.Id}")
-                    .ExecuteBufferedAsync();
-            }
+            await Cli.Wrap("freetube.exe")
+                .WithArguments($"--url https://www.youtube.com/watch?v={Video.Id}")
+                .ExecuteBufferedAsync();
         }
 
         public ICommand DownloadVideoCommand => _downloadVideoCommand ??= new RelayCommand(() => DownloadVideo(false));
