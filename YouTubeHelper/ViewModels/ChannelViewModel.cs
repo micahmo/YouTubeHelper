@@ -157,7 +157,7 @@ namespace YouTubeHelper.ViewModels
                                     Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
                                     if (requestId != null)
                                     {
-                                        videoViewModel.StartUpdateCheck(requestId.ToString(), showInAppNotifications: false);
+                                        videoViewModel.StartUpdateCheck(requestId!.ToString()!, showInAppNotifications: false);
                                     }
                                 });
                             }
