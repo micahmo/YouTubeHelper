@@ -84,7 +84,12 @@ namespace YouTubeHelper.Mobile
             {
                 Title = Mobile.Resources.Resources.Queue, Content = new ChannelView
                 {
-                    BindingContext = AppShellViewModel.QueueChannelViewModel = new ChannelViewModel(this) { Loading = false }
+                    BindingContext = AppShellViewModel.QueueChannelViewModel = new ChannelViewModel(this)
+                    {
+                        Loading = false,
+                        SelectedSortModeIndex = selectedSortModeIndex,
+                        SelectedExclusionFilterIndex = selectedExclusionFilterIndex
+                    }
                 }
             });
 
