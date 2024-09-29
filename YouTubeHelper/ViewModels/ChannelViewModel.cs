@@ -241,7 +241,8 @@ namespace YouTubeHelper.ViewModels
                 List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
                     distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
                     excludedVideos: excludedVideos,
-                    customSort: videos => videos.OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue).ToList()
+                    customSort: videos => videos.OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue).ToList(),
+                    count: int.MaxValue
                 )).ToList();
 
                 queuedVideos.ForEach(video =>
