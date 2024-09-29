@@ -81,6 +81,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
                         Resources.Resources.Watch,
+                        Resources.Resources.WatchExternal,
                         Resources.Resources.Unexclude,
                         Resources.Resources.DownloadCustom,
                         string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
@@ -89,6 +90,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
                         Resources.Resources.Watch,
+                        Resources.Resources.WatchExternal,
                         Resources.Resources.ExcludeWatched,
                         Resources.Resources.ExcludeWontWatch,
                         Resources.Resources.ExcludeMightWatch,
@@ -121,6 +123,19 @@ namespace YouTubeHelper.Mobile.ViewModels
                             TitleMode = BrowserTitleMode.Hide,
                             PreferredToolbarColor = Color.FromArgb("b22222")
                         });
+                    }
+                }
+                else if (action == Resources.Resources.WatchExternal)
+                {
+                    try
+                    {
+                        // Open the URI in the system default app
+                        Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
+                        await Launcher.OpenAsync(videoUri);
+                    }
+                    catch
+                    {
+                        // Ignore
                     }
                 }
                 else if (action == Resources.Resources.ExcludeWatched)

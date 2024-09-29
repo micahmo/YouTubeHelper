@@ -405,5 +405,14 @@ namespace YouTubeHelper.Mobile.Resources {
                 return ResourceManager.GetString("Watch", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Watch (external).
+        /// </summary>
+        internal static string WatchExternal {
+            get {
+                return ResourceManager.GetString("WatchExternal", resourceCulture);
+            }
+        }
     }
 }
