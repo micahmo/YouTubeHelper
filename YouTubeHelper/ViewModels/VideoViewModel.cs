@@ -257,7 +257,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = true;
             await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
-            if (!MainControlViewModel.ShowExcludedVideos)
+            if (MainControlViewModel is { ShowExcludedVideos: false, QueueMode: false })
             {
                 _channelViewModel.Videos.Remove(this);
             }
