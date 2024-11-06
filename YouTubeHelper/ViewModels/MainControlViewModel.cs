@@ -74,6 +74,17 @@ namespace YouTubeHelper.ViewModels
                             break;
                     }
                 }
+
+                if (args.PropertyName == nameof(CumulativeDownloadProgress))
+                {
+                    IEnumerable<VideoViewModel> videosBeingDownloaded = Channels.SelectMany(c => c.Videos.Where(v => !string.IsNullOrEmpty(v.Video.Status))).ToList();
+                    int totalProgress = 100 * videosBeingDownloaded.Count();
+                    double currentProgress = videosBeingDownloaded.Where(v => v.Video.Progress is not null).Select(v => v.Video.Progress!.Value).Sum();
+                    double? cumulativeProgress = currentProgress / totalProgress;
+
+                    Progress = (float)cumulativeProgress;
+                    ProgressState = TaskbarItemProgressState.Normal;
+                }
             };
 
             _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
@@ -124,6 +135,11 @@ namespace YouTubeHelper.ViewModels
         public string CurrentDownloadDirectoryLabel => string.Format(Resources.CurrentDownloadDirectory, Settings.Instance.DownloadDirectory);
 
         public string ActiveDownloadsCountLabel => string.Format(Resources.ActiveDownloads, Channels.Select(c => c.Videos.Count(v => !string.IsNullOrEmpty(v.Video.Status))).Sum());
+
+        /// <summary>
+        /// This object exists purely for a RaisePropertyChanged signal and should never be accessed directly.
+        /// </summary>
+        public object? CumulativeDownloadProgress;
 
         public ChannelViewModel? SelectedChannel
         {

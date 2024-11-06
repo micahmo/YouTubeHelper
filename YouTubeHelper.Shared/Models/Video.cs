@@ -90,6 +90,14 @@ namespace YouTubeHelper.Shared.Models
         }
         private string? _status;
 
+        [BsonIgnore]
+        public double? Progress
+        {
+            get => _progress;
+            set => SetProperty(ref _progress, value);
+        }
+        private double? _progress;
+
         public string? ChannelPlaylist { get; set; }
 
         [BsonIgnore]

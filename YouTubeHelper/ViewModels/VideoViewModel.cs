@@ -142,7 +142,9 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.Status = Resources.Downloading;
             Video.ExclusionReason = ExclusionReason.None;
+            Video.Progress = 1;
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
         }
 
         private CancellationTokenSource? _progressCancellationToken;
@@ -182,7 +184,9 @@ namespace YouTubeHelper.ViewModels
                     {
                         RequestData result = await progressResponse.GetJsonAsync<RequestData>();
                         Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress}%");
+                        Video.Progress = result.Progress == 0 ? 1 : result.Progress;
                         MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+                        MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
 
                         if (result.Status == DownloadStatus.InProgress)
                         {
@@ -193,6 +197,7 @@ namespace YouTubeHelper.ViewModels
                         {
                             // Mark as downloaded (only if succeeded)
                             Video.Status = null;
+                            Video.Progress = 100;
 
                             if (statusWasEverNotDone)
                             {
@@ -202,6 +207,7 @@ namespace YouTubeHelper.ViewModels
                             }
 
                             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+                            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
 
                             if (showInAppNotifications)
                             {
