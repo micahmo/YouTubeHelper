@@ -107,7 +107,7 @@ namespace YouTubeHelper.Mobile
                         await AppShellViewModel.UpdateNotification();
                     });
 
-                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
             });
 

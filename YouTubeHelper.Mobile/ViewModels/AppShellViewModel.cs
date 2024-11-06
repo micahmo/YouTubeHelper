@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Plugin.LocalNotification;
+using Plugin.LocalNotification.AndroidOption;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -30,8 +31,10 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public async Task UpdateNotification()
         {
-            int activeDownloads = (QueueTabSelected && QueueChannelViewModel != null ? new List<ChannelViewModel> { QueueChannelViewModel } : ChannelViewModels)
-                .Select(c => c.Videos.Count(v => v.HasStatus)).Sum();
+            List<VideoViewModel> videosBeingDownloaded = (QueueTabSelected && QueueChannelViewModel != null ? new List<ChannelViewModel> { QueueChannelViewModel } : ChannelViewModels)
+                .SelectMany(c => c.Videos.Where(v => v.HasStatus)).ToList();
+
+            int activeDownloads = videosBeingDownloaded.Count;
 
             if (activeDownloads > 0)
             {
@@ -40,15 +43,31 @@ namespace YouTubeHelper.Mobile.ViewModels
                     await LocalNotificationCenter.Current.RequestNotificationPermission();
                 }
 
+                int totalProgress = 100 * videosBeingDownloaded.Count;
+                double currentProgress = videosBeingDownloaded.Where(v => v.Video.Progress is not null).Select(v => v.Video.Progress!.Value).Sum();
+                int cumulativeProgress = (int)((currentProgress / totalProgress) * 100);
+                
                 string newNotificationText = string.Format(Resources.Resources.ActiveDownloadsText, activeDownloads);
-                if (_currentNotificationText != newNotificationText)
+                
+                if (_currentNotificationText != newNotificationText || _currentProgress != cumulativeProgress)
                 {
                     var notification = new NotificationRequest
                     {
                         NotificationId = 100,
                         Title = Resources.Resources.ActiveDownloads,
                         Description = _currentNotificationText = newNotificationText,
-                        Android = { Ongoing = true, IconLargeName = { ResourceName = "splash" }, IconSmallName = { ResourceName = "notification_icon" } }
+                        Android =
+                        {
+                            Ongoing = true, 
+                            IconLargeName = { ResourceName = "splash" }, 
+                            IconSmallName = { ResourceName = "notification_icon" },
+                            ProgressBar = new AndroidProgressBar
+                            {
+                                Max = 100,
+                                Progress = (_currentProgress = cumulativeProgress).Value
+                            },
+                            Priority = AndroidPriority.Low
+                        }
                     };
                     await LocalNotificationCenter.Current.Show(notification);
                 }
@@ -56,10 +75,12 @@ namespace YouTubeHelper.Mobile.ViewModels
             else
             {
                 _currentNotificationText = default;
+                _currentProgress = default;
                 LocalNotificationCenter.Current.Clear(100);
             }
         }
 
         private string? _currentNotificationText;
+        private int? _currentProgress;
     }
 }

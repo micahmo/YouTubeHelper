@@ -259,6 +259,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Excluded = false;
             Video.Status = Resources.Resources.Downloading;
             Video.ExclusionReason = ExclusionReason.None;
+            Video.Progress = 0;
         }
 
         private CancellationTokenSource? _progressCancellationToken;
@@ -301,6 +302,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     {
                         RequestData result = await progressResponse.GetJsonAsync<RequestData>();
                         Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
+                        Video.Progress = result.Progress;
 
                         if (result.Status == DownloadStatus.InProgress)
                         {
@@ -311,6 +313,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         {
                             // Mark as downloaded (only if succeeded)
                             Video.Status = null;
+                            Video.Progress = 100;
 
                             if (statusWasEverNotDone)
                             {
