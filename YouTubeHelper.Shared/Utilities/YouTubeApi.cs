@@ -291,7 +291,7 @@ namespace YouTubeHelper.Shared.Utilities
             request.Id = channelId;
             ChannelListResponse response = await request.ExecuteAsync();
 
-            return response.Items.FirstOrDefault()?.Snippet.Title ?? defaultValue;
+            return response.Items?.FirstOrDefault()?.Snippet.Title ?? defaultValue;
         }
 
         public string? ToChannelPlaylist(string? channelId) => channelId?.Replace("UC", "UU");
