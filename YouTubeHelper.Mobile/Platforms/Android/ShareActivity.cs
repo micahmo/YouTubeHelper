@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.OS;
 using Flurl;
+using Color = Android.Graphics.Color;
 
 namespace YouTubeHelper.Mobile.Platforms.Android
 {
@@ -10,6 +11,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            {
+                // Set the nav bar color
+                Window?.SetNavigationBarColor(Color.Firebrick);
+            }
 
             string? rawUrl = Intent?.Extras?.GetString("android.intent.extra.TEXT");
 
