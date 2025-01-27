@@ -219,6 +219,8 @@ namespace YouTubeHelper.ViewModels
 
                         if (result.Status == DownloadStatus.Failed)
                         {
+                            Video.Status = Resources.FailedToDownload;
+
                             if (showInAppNotifications)
                             {
                                 App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.Status), NotificationType.Error, "NotificationArea");

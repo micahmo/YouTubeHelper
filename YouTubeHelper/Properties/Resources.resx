@@ -282,4 +282,7 @@ Updated the status of {1} video(s).</value>
   <data name="Load" xml:space="preserve">
     <value>Load</value>
   </data>
+  <data name="FailedToDownload" xml:space="preserve">
+    <value>Failed to Download</value>
+  </data>
 </root>

@@ -315,6 +315,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to Download.
+        /// </summary>
+        public static string FailedToDownload {
+            get {
+                return ResourceManager.GetString("FailedToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load.
         /// </summary>
         public static string Load {

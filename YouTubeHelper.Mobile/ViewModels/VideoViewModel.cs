@@ -335,6 +335,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                         if (result.Status == DownloadStatus.Failed)
                         {
+                            Video.Status = Resources.Resources.FailedToDownload;
+
                             if (showInAppNotifications)
                             {
                                 MainThread.BeginInvokeOnMainThread(async () =>

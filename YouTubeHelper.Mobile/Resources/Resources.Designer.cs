@@ -270,6 +270,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to Download.
+        /// </summary>
+        internal static string FailedToDownload {
+            get {
+                return ResourceManager.GetString("FailedToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         internal static string OK {
