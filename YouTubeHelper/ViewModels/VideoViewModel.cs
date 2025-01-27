@@ -223,7 +223,14 @@ namespace YouTubeHelper.ViewModels
 
                             if (showInAppNotifications)
                             {
-                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, result.Status), NotificationType.Error, "NotificationArea");
+                                string status = result.Status.ToString();
+
+                                if (!string.IsNullOrEmpty(result.Reason))
+                                {
+                                    status += $" - {result.Reason}";
+                                }
+
+                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, status), NotificationType.Error, "NotificationArea");
                             }
 
                             return;

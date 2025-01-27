@@ -339,9 +339,18 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                             if (showInAppNotifications)
                             {
+                                string status = result.Status.ToString();
+
+                                if (!string.IsNullOrEmpty(result.Reason))
+                                {
+                                    status += $" - {result.Reason}";
+                                }
+
                                 MainThread.BeginInvokeOnMainThread(async () =>
                                 {
-                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, result.Status), ToastDuration.Long).Show();
+                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, string.Empty), ToastDuration.Long).Show();
+                                    await Task.Delay(TimeSpan.FromSeconds(5));
+                                    await Toast.Make(status, ToastDuration.Long).Show();
                                 });
                             }
 
