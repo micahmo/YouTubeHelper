@@ -10,13 +10,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label
-            Grid.Row="0"
-            Padding="0,50,0,0"
-            HorizontalOptions="Center"
-            IsVisible="{Binding Loading}"
-            Text="Loading..." />
-
         <Grid Grid.Row="1" IsVisible="False">
             <Grid.Triggers>
                 <DataTrigger

@@ -4,6 +4,16 @@ namespace YouTubeHelper.Mobile.Views
 {
     public partial class BusyIndicatorPopup : Popup
     {
+        public static readonly BindableProperty TextProperty =
+            BindableProperty.Create(nameof(Text), typeof(string), typeof(BusyIndicatorPopup), "Loading...");
+
+        public string Text
+        {
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
+        }
+
+
         public BusyIndicatorPopup()
         {
             InitializeComponent();
@@ -15,9 +25,14 @@ namespace YouTubeHelper.Mobile.Views
     {
         private readonly BusyIndicatorPopup _busyIndicatorPopup;
         
-        public BusyIndicator(Page page)
+        public string Text { set => _busyIndicatorPopup.Text = value; }
+
+        public BusyIndicator(Page page, string text = "Loading...")
         {
-            _busyIndicatorPopup = new();
+            _busyIndicatorPopup = new()
+            {
+                Text = text
+            };
             page.ShowPopup(_busyIndicatorPopup);
         }
         

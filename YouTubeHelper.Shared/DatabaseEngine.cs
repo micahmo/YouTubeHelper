@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using YouTubeHelper.Shared.Models;
 
@@ -35,6 +36,30 @@ namespace YouTubeHelper.Shared
                 _databaseInstance = null;
                 return ex.Message;
             }
+        }
+
+        public static async Task<string?> TestConnectionAsync()
+        {
+            string? result = default;
+            
+            await Task.Run(() =>
+            {
+                try
+                {
+                    DatabaseInstance.ListCollectionNames();
+                }
+                catch (Exception ex)
+                {
+                    result = ex.Message;
+                }
+            });
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                _databaseInstance = null;
+            }
+
+            return result;
         }
 
         public static void Reset()

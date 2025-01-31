@@ -49,7 +49,19 @@ namespace YouTubeHelper.Mobile
                 return;
             }
 
-            await ConnectToDatabase();
+            BusyIndicator busyIndicator = new BusyIndicator(this, "Connecting to database...");
+
+            bool connectedToDatabase = await ConnectToDatabase(withPrompt: false);
+
+            // If we didn't connect successfully, we need to hide the busy indicator, then connect again with a prompt and a separate busy indicator.
+            if (!connectedToDatabase)
+            {
+                busyIndicator.Dispose();
+                await ConnectToDatabase(withPrompt: true);
+                busyIndicator = new BusyIndicator(this, "Loading channels...");
+            }
+
+            busyIndicator.Text = "Loading channels...";
 
             WatchTab.Items.Clear();
             SearchTab.Items.Clear();
@@ -64,7 +76,7 @@ namespace YouTubeHelper.Mobile
             {
                 ChannelViewModel channelViewModel = new(this)
                 {
-                    Channel = channel, 
+                    Channel = channel,
                     SelectedSortModeIndex = selectedSortModeIndex,
                     SelectedExclusionFilterIndex = selectedExclusionFilterIndex
                 };
@@ -109,10 +121,12 @@ namespace YouTubeHelper.Mobile
                 }
             });
 
+            busyIndicator.Dispose();
+            
             _loaded = true;
         }
 
-        private async Task ConnectToDatabase()
+        private async Task<bool> ConnectToDatabase(bool withPrompt = true)
         {
             bool connected = false;
 
@@ -120,7 +134,7 @@ namespace YouTubeHelper.Mobile
             {
                 string? connectionString = await SecureStorage.Default.GetAsync("connection_string");
                 DatabaseEngine.ConnectionString = connectionString;
-                if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
+                if (string.IsNullOrEmpty(await DatabaseEngine.TestConnectionAsync()))
                 {
                     connected = true;
                 }
@@ -128,6 +142,11 @@ namespace YouTubeHelper.Mobile
             catch
             {
                 // We'll fall into the next block which prompts the user to re-enter
+            }
+
+            if (!withPrompt)
+            {
+                return connected;
             }
 
             while (!connected)
@@ -141,9 +160,9 @@ namespace YouTubeHelper.Mobile
 
                 DatabaseEngine.ConnectionString = res;
 
-                using (new BusyIndicator(this))
+                using (new BusyIndicator(this, "Connecting to database..."))
                 {
-                    if (DatabaseEngine.TestConnection() is { } err)
+                    if (await DatabaseEngine.TestConnectionAsync() is { } err)
                     {
                         await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.ErrorConnectingToDatabase, err), Mobile.Resources.Resources.OK);
                     }
@@ -156,6 +175,8 @@ namespace YouTubeHelper.Mobile
 
             // We made it here, so we must have connected successfully. Save the connection string.
             await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString!);
+
+            return connected;
         }
 
         public AppShellViewModel AppShellViewModel => (AppShellViewModel)BindingContext;
