@@ -1,8 +1,11 @@
-﻿using YouTubeHelper.Mobile.ViewModels;
+﻿using Android.Content;
+using Android.OS;
+using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
+using Environment = System.Environment;
 
 namespace YouTubeHelper.Mobile
 {
@@ -122,8 +125,61 @@ namespace YouTubeHelper.Mobile
             });
 
             busyIndicator.Dispose();
+
+            // Check for battery restrictions
+            await CheckBatteryOptimizations();
             
             _loaded = true;
+        }
+
+        private async Task CheckBatteryOptimizations()
+        {
+            PermissionStatus status = await Permissions.CheckStatusAsync<Permissions.Battery>();
+
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.Battery>();
+            }
+
+            if (status == PermissionStatus.Granted)
+            {
+                // Check if battery optimization is enabled
+                if (DeviceInfo.Platform == DevicePlatform.Android)
+                {
+                    bool isIgnoringBatteryOptimizations = CheckIfIgnoringBatteryOptimizations();
+                    if (!isIgnoringBatteryOptimizations)
+                    {
+                        PromptForBatteryOptimizationSettings();
+                    }
+                }
+            }
+            else
+            {
+                // Ignore if user did not grant
+            }
+        }
+
+        private bool CheckIfIgnoringBatteryOptimizations()
+        {
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                Context context = Android.App.Application.Context;
+                PowerManager? powerManager = (PowerManager?)context.GetSystemService(Context.PowerService);
+                string? packageName = context.PackageName;
+                return powerManager?.IsIgnoringBatteryOptimizations(packageName) == true;
+            }
+            
+            return true;
+        }
+
+        private void PromptForBatteryOptimizationSettings()
+        {
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                intent.SetFlags(ActivityFlags.NewTask);
+                Android.App.Application.Context.StartActivity(intent);
+            }
         }
 
         private async Task<bool> ConnectToDatabase(bool withPrompt = true)
