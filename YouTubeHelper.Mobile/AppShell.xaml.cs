@@ -56,7 +56,7 @@ namespace YouTubeHelper.Mobile
             ExclusionsTab.Items.Clear();
             QueueTab.Items.Clear();
 
-            int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0);
+            int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4);
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
 
             IOrderedEnumerable<Channel> channels = (await DatabaseEngine.ChannelCollection.FindAllAsync()).OrderByDescending(c => c.Index);
