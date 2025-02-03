@@ -27,7 +27,7 @@ namespace YouTubeHelper.Mobile.Views
         
         public string Text { set => _busyIndicatorPopup.Text = value; }
 
-        public BusyIndicator(Page page, string? text)
+        public BusyIndicator(Page page, string? text = null)
         {
             text ??= Resources.Resources.Loading;
 

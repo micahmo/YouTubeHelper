@@ -231,4 +231,10 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
+  <data name="HandlingSharedLink" xml:space="preserve">
+    <value>Handling shared link...</value>
+  </data>
+  <data name="FindingSharedVideo" xml:space="preserve">
+    <value>Finding shared video...</value>
+  </data>
 </root>

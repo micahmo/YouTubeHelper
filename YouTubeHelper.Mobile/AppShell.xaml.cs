@@ -265,17 +265,12 @@ namespace YouTubeHelper.Mobile
 
         public async Task HandleSharedLink(string? videoId, string? channelHandle)
         {
-            if (_loaded)
-            {
-                await DisplayAlert(string.Empty, Mobile.Resources.Resources.CloseAppBeforeShare, Mobile.Resources.Resources.OK);
-                return;
-            }
-            
             while (!_loaded)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
+            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.HandlingSharedLink);
 
             Video? video = default;
             string? channelId = default;
@@ -283,6 +278,8 @@ namespace YouTubeHelper.Mobile
 
             if (!string.IsNullOrEmpty(videoId))
             {
+                busyIndicator.Text = Mobile.Resources.Resources.FindingSharedVideo;
+                
                 video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
                 if (video is not null)
                 {
@@ -361,6 +358,8 @@ namespace YouTubeHelper.Mobile
                     foundChannelViewModel.Videos.Add(new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true });
                 }
             }
+
+            busyIndicator.Dispose();
         }
     }
 }

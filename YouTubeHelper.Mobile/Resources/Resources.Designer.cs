@@ -288,6 +288,24 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finding shared video....
+        /// </summary>
+        internal static string FindingSharedVideo {
+            get {
+                return ResourceManager.GetString("FindingSharedVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Handling shared link....
+        /// </summary>
+        internal static string HandlingSharedLink {
+            get {
+                return ResourceManager.GetString("HandlingSharedLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         internal static string Loading {
