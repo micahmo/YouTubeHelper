@@ -52,7 +52,7 @@ namespace YouTubeHelper.Mobile
                 return;
             }
 
-            BusyIndicator busyIndicator = new BusyIndicator(this, "Connecting to database...");
+            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase);
 
             bool connectedToDatabase = await ConnectToDatabase(withPrompt: false);
 
@@ -61,10 +61,10 @@ namespace YouTubeHelper.Mobile
             {
                 busyIndicator.Dispose();
                 await ConnectToDatabase(withPrompt: true);
-                busyIndicator = new BusyIndicator(this, "Loading channels...");
+                busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.LoadingChannels);
             }
 
-            busyIndicator.Text = "Loading channels...";
+            busyIndicator.Text = Mobile.Resources.Resources.LoadingChannels;
 
             WatchTab.Items.Clear();
             SearchTab.Items.Clear();
@@ -216,7 +216,7 @@ namespace YouTubeHelper.Mobile
 
                 DatabaseEngine.ConnectionString = res;
 
-                using (new BusyIndicator(this, "Connecting to database..."))
+                using (new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase))
                 {
                     if (await DatabaseEngine.TestConnectionAsync() is { } err)
                     {
@@ -267,7 +267,6 @@ namespace YouTubeHelper.Mobile
         {
             if (_loaded)
             {
-                //Toast.Make("Please close the app before sharing.", ToastDuration.Long);
                 await DisplayAlert(string.Empty, Mobile.Resources.Resources.CloseAppBeforeShare, Mobile.Resources.Resources.OK);
                 return;
             }

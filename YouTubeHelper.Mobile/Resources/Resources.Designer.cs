@@ -106,6 +106,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connecting to database....
+        /// </summary>
+        internal static string ConnectingToDatabase {
+            get {
+                return ResourceManager.GetString("ConnectingToDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Database.
         /// </summary>
         internal static string Database {
@@ -275,6 +284,24 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string FailedToDownload {
             get {
                 return ResourceManager.GetString("FailedToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        internal static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading channels....
+        /// </summary>
+        internal static string LoadingChannels {
+            get {
+                return ResourceManager.GetString("LoadingChannels", resourceCulture);
             }
         }
         
