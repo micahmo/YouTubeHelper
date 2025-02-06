@@ -41,7 +41,7 @@ namespace YouTubeHelper.ViewModels
                     ChannelViewModel? previouslySelectedChannel = SelectedChannel;
                     Channels.Clear();
                     RealChannels.ForEach(Channels.Add);
-                    SelectedChannel = previouslySelectedChannel;
+                    SelectedChannel = previouslySelectedChannel == _queueChannelTab ? RealChannels.FirstOrDefault() : previouslySelectedChannel ?? RealChannels.FirstOrDefault();
 
                     switch (Mode)
                     {
