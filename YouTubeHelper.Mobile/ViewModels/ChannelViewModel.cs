@@ -126,6 +126,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                             Videos.Clear();
 
+                            _hasSearchedAtLeastOnce = true;
+
                             // FindVideos
                             if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                             {
@@ -253,6 +255,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
 
         private bool _findInProgress;
+        private bool _hasSearchedAtLeastOnce;
 
         public ICommand ChannelOptionsCommand => _channelOptionsCommand ??= new RelayCommand(ChannelOptions);
         private ICommand? _channelOptionsCommand;
@@ -394,7 +397,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public AppShell Page { get; }
 
-        public string SearchCount => Videos.Any() ? string.Format(Resources.Resources.SearchCount, Videos.Count) : Resources.Resources.Search;
+        public string SearchCount => _hasSearchedAtLeastOnce ? string.Format(Resources.Resources.SearchCount, Videos.Count) : Resources.Resources.Search;
 
         public bool Loading
         {
@@ -415,7 +418,6 @@ namespace YouTubeHelper.Mobile.ViewModels
             get => _currentVideoUrl;
             set => SetProperty(ref _currentVideoUrl, value);
         }
-
         private string? _currentVideoUrl;
     }
 }
