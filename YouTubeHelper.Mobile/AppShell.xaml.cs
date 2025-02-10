@@ -173,8 +173,8 @@ namespace YouTubeHelper.Mobile
             busyIndicator.Dispose();
 
             // Check for battery restrictions
-            await CheckBatteryOptimizations();
-            
+            _ = CheckBatteryOptimizations();
+
             _loaded = true;
         }
 
@@ -195,7 +195,7 @@ namespace YouTubeHelper.Mobile
                     bool isIgnoringBatteryOptimizations = CheckIfIgnoringBatteryOptimizations();
                     if (!isIgnoringBatteryOptimizations)
                     {
-                        PromptForBatteryOptimizationSettings();
+                        await PromptForBatteryOptimizationSettings();
                     }
                 }
             }
@@ -218,13 +218,21 @@ namespace YouTubeHelper.Mobile
             return true;
         }
 
-        private void PromptForBatteryOptimizationSettings()
+        private async Task PromptForBatteryOptimizationSettings()
         {
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
-                Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
-                intent.SetFlags(ActivityFlags.NewTask);
-                Android.App.Application.Context.StartActivity(intent);
+                bool res = await DisplayAlert(Mobile.Resources.Resources.BatteryOptimizations, 
+                    Mobile.Resources.Resources.BatteryOptimizationsPrompt,
+                    Mobile.Resources.Resources.Yes, 
+                    Mobile.Resources.Resources.No);
+
+                if (res)
+                {
+                    Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    intent.SetFlags(ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
+                }
             }
         }
 

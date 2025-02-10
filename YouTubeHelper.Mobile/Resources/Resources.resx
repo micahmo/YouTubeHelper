@@ -240,4 +240,16 @@
   <data name="PressBackAgainToClose" xml:space="preserve">
     <value>Press back again to close</value>
   </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="BatteryOptimizations" xml:space="preserve">
+    <value>Battery Optimizations</value>
+  </data>
+  <data name="BatteryOptimizationsPrompt" xml:space="preserve">
+    <value>YouTubeHelper is currently being optimized. Would you like to open the battery settings?</value>
+  </data>
 </root>
