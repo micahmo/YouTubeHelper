@@ -333,6 +333,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Press back again to close.
+        /// </summary>
+        internal static string PressBackAgainToClose {
+            get {
+                return ResourceManager.GetString("PressBackAgainToClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Queue.
         /// </summary>
         internal static string Queue {

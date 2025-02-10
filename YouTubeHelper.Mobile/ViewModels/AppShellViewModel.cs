@@ -80,6 +80,11 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
 
+        public void SelectWatchTab()
+        {
+            _appShell.CurrentItem.CurrentItem = _appShell.WatchTab;
+        }
+
         private string? _currentNotificationText;
         private int? _currentProgress;
     }

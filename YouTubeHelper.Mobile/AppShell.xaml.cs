@@ -1,5 +1,7 @@
 ﻿using Android.Content;
 using Android.OS;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
@@ -24,8 +26,14 @@ namespace YouTubeHelper.Mobile
 
         protected override bool OnBackButtonPressed()
         {
+            if (_canClose)
+            {
+                Application.Current?.Quit();
+            }
+            
             bool anyPlayerOpen = false;
 
+            // First, close any open players
             AppShellViewModel.ChannelViewModels.ForEach(c =>
             {
                 anyPlayerOpen |= c.ShowPlayer;
@@ -34,15 +42,50 @@ namespace YouTubeHelper.Mobile
                 c.CurrentVideoUrl = null;
             });
 
-            if (!anyPlayerOpen)
+            if (anyPlayerOpen)
+            {
+                return true;
+            }
+
+            // Next, re-select the main/watch tab
+            if (!AppShellViewModel.WatchTabSelected)
+            {
+                AppShellViewModel.SelectWatchTab();
+                return true;
+            }
+
+            // Or, select the first channel
+            if (TabBar.CurrentItem.CurrentItem != TabBar.CurrentItem.Items.FirstOrDefault())
             {
                 TabBar.CurrentItem.CurrentItem = null;
                 TabBar.CurrentItem.CurrentItem = TabBar.CurrentItem.Items.FirstOrDefault();
+                return true;
             }
+
+            // Finally, prompt the user to close
+            Snackbar.Make(
+                Mobile.Resources.Resources.PressBackAgainToClose,
+                duration: TimeSpan.FromSeconds(3),
+                action: null,
+                visualOptions: new SnackbarOptions
+                {
+                    BackgroundColor = Colors.Black,
+                    TextColor = Colors.White
+                }
+            ).Show();
+
+            _canClose = true;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(3));
+                _canClose = false;
+            });
 
             return true;
         }
 
+        private bool _canClose;
         private bool _loaded;
 
         private async void Shell_Loaded(object sender, EventArgs e)
@@ -105,6 +148,9 @@ namespace YouTubeHelper.Mobile
                     }
                 }
             });
+
+            // Make sure we know the first channel is actually selected
+            TabBar.CurrentItem.CurrentItem = TabBar.CurrentItem.Items.FirstOrDefault();
 
             AppShellViewModel.ChannelViewModels.ForEach(c =>
             {

@@ -237,4 +237,7 @@
   <data name="FindingSharedVideo" xml:space="preserve">
     <value>Finding shared video...</value>
   </data>
+  <data name="PressBackAgainToClose" xml:space="preserve">
+    <value>Press back again to close</value>
+  </data>
 </root>
