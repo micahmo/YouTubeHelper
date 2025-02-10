@@ -65,11 +65,11 @@
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.8.5" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.8.5" />
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Ktx" Version="2.8.5" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.4.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" Version="2.8.4.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.8.4.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel.Ktx" Version="2.8.4.1" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="2.8.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.8.5" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime.Ktx" Version="2.8.5" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel" Version="2.8.5" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModel.Ktx" Version="2.8.5" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="2.8.5" />
     <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.9.2" />
   </ItemGroup>
 

@@ -17,7 +17,9 @@ namespace YouTubeHelper.Shared.Models
                 {
                     if (args.PropertyName is not nameof(Id))
                     {
+#pragma warning disable CS0618
                         DatabaseEngine.ChannelCollection.Upsert<Channel, ObjectId>(this);
+#pragma warning restore CS0618
                     }
                 };
             }

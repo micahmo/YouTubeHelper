@@ -224,7 +224,7 @@ namespace YouTubeHelper.Shared.Utilities
             // Filter by date range
             if (dateRangeLimit.HasValue)
             {
-                videos = videos.Except(videos.Where(v => v.Snippet.PublishedAt < dateRangeLimit.Value)).ToList();
+                videos = videos.Except(videos.Where(v => v.Snippet.PublishedAtDateTimeOffset < dateRangeLimit.Value)).ToList();
             }
 
             // Filter by video length
@@ -243,7 +243,7 @@ namespace YouTubeHelper.Shared.Utilities
             var videosSortedByDuration = videos.OrderByDescending(v => XmlConvert.ToTimeSpan(v.ContentDetails.Duration)).ToList();
 
             // Then sort by age
-            var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAt).ToList();
+            var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAtDateTimeOffset).ToList();
 
             List<Video> rankedVideos = videos;
             
@@ -268,7 +268,7 @@ namespace YouTubeHelper.Shared.Utilities
                     ChannelPlaylist = channel?.ChannelPlaylist ?? video.Snippet.ChannelId.Replace("UC", "UU"),
                     Description = video.Snippet.Description,
                     Duration = XmlConvert.ToTimeSpan(video.ContentDetails.Duration),
-                    ReleaseDate = new DateTimeOffset(video.Snippet.PublishedAt ?? DateTime.MinValue),
+                    ReleaseDate = video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue,
                     ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */video.Snippet.Thumbnails.Medium?.Url ?? video.Snippet.Thumbnails.Standard?.Url ?? video.Snippet.Thumbnails.High?.Url ?? video.Snippet.Thumbnails.Default__?.Url ?? string.Empty
                 });
             }
