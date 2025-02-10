@@ -148,6 +148,24 @@
                     IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
             </Grid>
 
+            <!--  This is defined "above" row 4 of the grid so that the refresh indicator appears BELOW the button(s)  -->
+            <RefreshView
+                Grid.Row="5"
+                Command="{Binding FindVideosCommand}"
+                HorizontalOptions="CenterAndExpand"
+                IsRefreshing="{Binding IsRefreshing}"
+                VerticalOptions="StartAndExpand">
+                <Grid>
+                    <CollectionView ItemsSource="{Binding Videos}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <views:VideoView BindingContext="{Binding}" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </RefreshView>
+
             <Grid Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -186,18 +204,6 @@
                     </Button.ImageSource>
                 </Button>
             </Grid>
-
-            <!--<RefreshView Grid.Row="5" Command="{Binding FindVideosCommand}" IsRefreshing="{Binding IsRefreshing}" HorizontalOptions="CenterAndExpand" VerticalOptions="StartAndExpand">-->
-            <Grid Grid.Row="5">
-                <CollectionView ItemsSource="{Binding Videos}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <views:VideoView BindingContext="{Binding}" />
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
-            <!--</RefreshView>-->
         </Grid>
 
         <WebView
