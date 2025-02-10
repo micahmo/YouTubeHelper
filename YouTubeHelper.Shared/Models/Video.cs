@@ -107,6 +107,14 @@ namespace YouTubeHelper.Shared.Models
             set => SetProperty(ref _excluded, value);
         }
         private bool _excluded;
+
+        [BsonIgnore]
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            set => SetProperty(ref _isPlaying, value);
+        }
+        private bool _isPlaying;
     }
 
     [Flags]

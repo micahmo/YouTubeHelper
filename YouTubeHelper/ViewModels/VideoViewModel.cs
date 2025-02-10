@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -49,6 +50,8 @@ namespace YouTubeHelper.ViewModels
             {
                 MainControlViewModel.ActiveVideo = Video.RawUrl ??= await GetRawUrl(Video.Id);
                 MainControlViewModel.ActiveVideoTitle = Video.Title;
+                _channelViewModel.Videos.ToList().ForEach(v => v.Video.IsPlaying = false);
+                Video.IsPlaying = true;
 
                 // In case the video didn't change, we want to start playing anyway, so always raise the property changed.
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.SignalPlayVideo));
@@ -67,6 +70,9 @@ namespace YouTubeHelper.ViewModels
 
         private async void PlayVideoInBrowser()
         {
+            _channelViewModel.Videos.ToList().ForEach(v => v.Video.IsPlaying = false);
+            Video.IsPlaying = true;
+
             await Cli.Wrap("freetube.exe")
                 .WithArguments($"--url https://www.youtube.com/watch?v={Video.Id}")
                 .ExecuteBufferedAsync();
