@@ -433,7 +433,14 @@
                                                                 Margin="0,0,10,10"
                                                                 HorizontalAlignment="Left"
                                                                 VerticalAlignment="Top"
-                                                                Source="{Binding Video.ThumbnailUrl}" />
+                                                                Source="{Binding Video.ThumbnailUrl}">
+                                                                <Image.Clip>
+                                                                    <RectangleGeometry
+                                                                        RadiusX="8"
+                                                                        RadiusY="8"
+                                                                        Rect="0,0,150,85" />
+                                                                </Image.Clip>
+                                                            </Image>
 
                                                             <Grid
                                                                 Grid.Row="0"
