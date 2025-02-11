@@ -40,12 +40,19 @@
                     Text="{Binding Video.Title}" />
 
                 <Grid Grid.Row="1" Grid.Column="0">
-                    <BoxView HeightRequest="112.5" Color="LightGray" />
+                    <BoxView HeightRequest="112.5" Color="LightGray">
+                        <BoxView.Clip>
+                            <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
+                        </BoxView.Clip>
+                    </BoxView>
 
                     <Image HeightRequest="112.5">
                         <Image.Source>
                             <UriImageSource CachingEnabled="False" Uri="{Binding Video.ThumbnailUrl}" />
                         </Image.Source>
+                        <Image.Clip>
+                            <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
+                        </Image.Clip>
                     </Image>
                 </Grid>
 
