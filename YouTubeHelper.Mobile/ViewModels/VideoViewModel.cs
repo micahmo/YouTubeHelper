@@ -65,6 +65,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
         private ICommand? _videoTappedCommand;
 
+        public ICommand MightWatchVideoCommand => _mightWatchVideoCommand ??= new AsyncRelayCommand(async () => await PerformVideoAction(Resources.Resources.ExcludeMightWatch));
+        private ICommand? _mightWatchVideoCommand;
+
+        public ICommand WontWatchVideoCommand => _wontWatchVideoCommand ??= new AsyncRelayCommand(async () => await PerformVideoAction(Resources.Resources.ExcludeWontWatch));
+        private ICommand? _wontWatchVideoCommand;
+
         public async void VideoTapped()
         {
             if (_isPopupOpen)
@@ -98,110 +104,104 @@ namespace YouTubeHelper.Mobile.ViewModels
                         string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
                 }
 
-                bool excluded = false;
-
-                if (action == Resources.Resources.Watch)
-                {
-                    using (new BusyIndicator(_page))
-                    {
-                        //_channelViewModel.ShowPlayer = true;
-                        //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
-
-                    _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
-                    {
-                        c.Videos.ToList().ForEach(v =>
-                        {
-                            v.IsPlaying = false;
-                        });
-                    });
-
-                        IsPlaying = true;
-
-                        await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
-                        {
-                            LaunchMode = BrowserLaunchMode.SystemPreferred,
-                            TitleMode = BrowserTitleMode.Hide,
-                            PreferredToolbarColor = Color.FromArgb("b22222")
-                        });
-                    }
-                }
-                else if (action == Resources.Resources.WatchExternal)
-                {
-                    try
-                    {
-                        _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
-                        {
-                            c.Videos.ToList().ForEach(v =>
-                            {
-                                v.IsPlaying = false;
-                            });
-                        });
-
-                        IsPlaying = true;
-
-                        // Open the URI in the system default app
-                        Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
-                        await Launcher.OpenAsync(videoUri);
-                    }
-                    catch
-                    {
-                        // Ignore
-                    }
-                }
-                else if (action == Resources.Resources.ExcludeWatched)
-                {
-                    Video.ExclusionReason = ExclusionReason.Watched;
-                    excluded = true;
-                }
-                else if (action == Resources.Resources.ExcludeWontWatch)
-                {
-                    Video.ExclusionReason = ExclusionReason.WontWatch;
-                    excluded = true;
-                }
-                else if (action == Resources.Resources.ExcludeMightWatch)
-                {
-                    Video.ExclusionReason = ExclusionReason.MightWatch;
-                    excluded = true;
-                }
-                else if (action == Resources.Resources.Unexclude)
-                {
-                    Video.Excluded = false;
-                    Video.ExclusionReason = ExclusionReason.None;
-                    await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
-                }
-                else if (action == Resources.Resources.DownloadCustom)
-                {
-                    string res = await _page.DisplayPromptAsync(Resources.Resources.DownloadDirectoryTitle, Resources.Resources.DownloadDirectoryMessage, initialValue: Settings.Instance.DownloadDirectory);
-
-                    if (string.IsNullOrWhiteSpace(res))
-                    {
-                        // Cancel or entered nothing
-                        return;
-                    }
-
-                    await DownloadVideo(Settings.Instance.DownloadDirectory = res);
-                }
-                else if (action?.StartsWith(Resources.Resources.Download) == true)
-                {
-                    await DownloadVideo(Settings.Instance.DownloadDirectory);
-                }
-
-                if (excluded)
-                {
-                    Video.Excluded = true;
-                    await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
-
-                    if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
-                    {
-                        _channelViewModel.Videos.Remove(this);
-                    }
-                }
+                await PerformVideoAction(action);
             }
             finally
             {
                 _isPopupOpen = false;
             }
         }
+
+        private async Task PerformVideoAction(string action)
+        {
+            bool excluded = false;
+
+            if (action == Resources.Resources.Watch)
+            {
+                using (new BusyIndicator(_page))
+                {
+                    //_channelViewModel.ShowPlayer = true;
+                    //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
+
+                    _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c => { c.Videos.ToList().ForEach(v => { v.IsPlaying = false; }); });
+
+                    IsPlaying = true;
+
+                    await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                    {
+                        LaunchMode = BrowserLaunchMode.SystemPreferred,
+                        TitleMode = BrowserTitleMode.Hide,
+                        PreferredToolbarColor = Color.FromArgb("b22222")
+                    });
+                }
+            }
+            else if (action == Resources.Resources.WatchExternal)
+            {
+                try
+                {
+                    _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c => { c.Videos.ToList().ForEach(v => { v.IsPlaying = false; }); });
+
+                    IsPlaying = true;
+
+                    // Open the URI in the system default app
+                    Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
+                    await Launcher.OpenAsync(videoUri);
+                }
+                catch
+                {
+                    // Ignore
+                }
+            }
+            else if (action == Resources.Resources.ExcludeWatched)
+            {
+                Video.ExclusionReason = ExclusionReason.Watched;
+                excluded = true;
+            }
+            else if (action == Resources.Resources.ExcludeWontWatch)
+            {
+                Video.ExclusionReason = ExclusionReason.WontWatch;
+                excluded = true;
+            }
+            else if (action == Resources.Resources.ExcludeMightWatch)
+            {
+                Video.ExclusionReason = ExclusionReason.MightWatch;
+                excluded = true;
+            }
+            else if (action == Resources.Resources.Unexclude)
+            {
+                Video.Excluded = false;
+                Video.ExclusionReason = ExclusionReason.None;
+                await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+            }
+            else if (action == Resources.Resources.DownloadCustom)
+            {
+                string res = await _page.DisplayPromptAsync(Resources.Resources.DownloadDirectoryTitle, Resources.Resources.DownloadDirectoryMessage, initialValue: Settings.Instance.DownloadDirectory);
+
+                if (string.IsNullOrWhiteSpace(res))
+                {
+                    // Cancel or entered nothing
+                    return;
+                }
+
+                await DownloadVideo(Settings.Instance.DownloadDirectory = res);
+            }
+            else if (action?.StartsWith(Resources.Resources.Download) == true)
+            {
+                await DownloadVideo(Settings.Instance.DownloadDirectory);
+            }
+
+            if (excluded)
+            {
+                Video.Excluded = true;
+                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+
+                if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
+                {
+                    _channelViewModel.Videos.Remove(this);
+                }
+            }
+        }
+
         private static bool _isPopupOpen;
 
         public static async Task<string> GetRawUrl(string videoId)

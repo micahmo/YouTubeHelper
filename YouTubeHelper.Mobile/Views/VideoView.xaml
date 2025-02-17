@@ -5,128 +5,153 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
     <VerticalStackLayout>
-        <StackLayout>
-            <StackLayout.Behaviors>
-                <toolkit:AnimationBehavior>
-                    <toolkit:AnimationBehavior.AnimationType>
-                        <toolkit:FadeAnimation Opacity="0.5" />
-                    </toolkit:AnimationBehavior.AnimationType>
-                </toolkit:AnimationBehavior>
-            </StackLayout.Behaviors>
+        <SwipeView>
+            <SwipeView.RightItems>
+                <SwipeItems Mode="Reveal">
+                    <SwipeItemView Command="{Binding WontWatchVideoCommand}">
+                        <Grid Padding="30,10,30,10" BackgroundColor="#b22222">
+                            <Label
+                                Text="Won't Watch"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </SwipeItemView>
+                    <SwipeItemView Command="{Binding MightWatchVideoCommand}">
+                        <Grid Padding="30,10,30,10" BackgroundColor="#cc3333">
+                            <Label
+                                Text="Might Watch"
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </SwipeItemView>
+                </SwipeItems>
+            </SwipeView.RightItems>
 
-            <StackLayout.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding VideoTappedCommand}" />
-            </StackLayout.GestureRecognizers>
+            <!--  Video Content & Description inside SwipeView  -->
+            <VerticalStackLayout BackgroundColor="White">
+                <StackLayout>
+                    <StackLayout.Behaviors>
+                        <toolkit:AnimationBehavior>
+                            <toolkit:AnimationBehavior.AnimationType>
+                                <toolkit:FadeAnimation Opacity="0.5" />
+                            </toolkit:AnimationBehavior.AnimationType>
+                        </toolkit:AnimationBehavior>
+                    </StackLayout.Behaviors>
 
-            <Grid x:Name="VideoGrid" Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding VideoTappedCommand}" />
+                    </StackLayout.GestureRecognizers>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+                    <Grid x:Name="VideoGrid" Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Margin="0,0,0,10"
-                    FontAttributes="Bold"
-                    LineBreakMode="TailTruncation"
-                    MaxLines="5"
-                    Text="{Binding Video.Title}" />
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                <Grid Grid.Row="1" Grid.Column="0">
-                    <BoxView HeightRequest="112.5" Color="LightGray">
-                        <BoxView.Clip>
-                            <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
-                        </BoxView.Clip>
-                    </BoxView>
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,0,0,10"
+                            FontAttributes="Bold"
+                            LineBreakMode="TailTruncation"
+                            MaxLines="5"
+                            Text="{Binding Video.Title}" />
 
-                    <Image HeightRequest="112.5">
-                        <Image.Source>
-                            <UriImageSource CachingEnabled="False" Uri="{Binding Video.ThumbnailUrl}" />
-                        </Image.Source>
-                        <Image.Clip>
-                            <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
-                        </Image.Clip>
-                    </Image>
-                </Grid>
+                        <Grid Grid.Row="1" Grid.Column="0">
+                            <BoxView HeightRequest="112.5" Color="LightGray">
+                                <BoxView.Clip>
+                                    <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
+                                </BoxView.Clip>
+                            </BoxView>
 
-                <StackLayout Grid.Row="1" Grid.Column="1">
-                    <Label Margin="10,0,10,0" Text="{Binding Video.TimeStringNewLine}" />
-                    <Label
-                        Margin="10,0,10,0"
-                        FontAttributes="Bold"
-                        IsVisible="{Binding Video.Excluded}"
-                        Text="{Binding ExcludedString}"
-                        TextColor="FireBrick" />
-                    <Label
-                        Margin="10,0,10,0"
-                        FontAttributes="Bold"
-                        IsVisible="{Binding HasStatus}"
-                        Text="{Binding Video.Status}"
-                        TextColor="Green" />
-                    <Label
-                        Margin="10,0,10,0"
-                        FontAttributes="Bold"
-                        IsVisible="{Binding IsPlaying}"
-                        Text="▶" />
+                            <Image HeightRequest="112.5">
+                                <Image.Source>
+                                    <UriImageSource CachingEnabled="False" Uri="{Binding Video.ThumbnailUrl}" />
+                                </Image.Source>
+                                <Image.Clip>
+                                    <RoundRectangleGeometry CornerRadius="8" Rect="0, 0, 200, 112.5" />
+                                </Image.Clip>
+                            </Image>
+                        </Grid>
+
+                        <StackLayout Grid.Row="1" Grid.Column="1">
+                            <Label Margin="10,0,10,0" Text="{Binding Video.TimeStringNewLine}" />
+                            <Label
+                                Margin="10,0,10,0"
+                                FontAttributes="Bold"
+                                IsVisible="{Binding Video.Excluded}"
+                                Text="{Binding ExcludedString}"
+                                TextColor="FireBrick" />
+                            <Label
+                                Margin="10,0,10,0"
+                                FontAttributes="Bold"
+                                IsVisible="{Binding HasStatus}"
+                                Text="{Binding Video.Status}"
+                                TextColor="Green" />
+                            <Label
+                                Margin="10,0,10,0"
+                                FontAttributes="Bold"
+                                IsVisible="{Binding IsPlaying}"
+                                Text="▶" />
+                        </StackLayout>
+                    </Grid>
                 </StackLayout>
-            </Grid>
-        </StackLayout>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="10" />
-            </Grid.RowDefinitions>
+                <Grid Margin="0,0,0,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-            <Label
-                Grid.Row="0"
-                Padding="10,0,10,0"
-                LineBreakMode="TailTruncation"
-                MaxLines="1"
-                Text="{Binding Video.Description}">
-                <Label.Behaviors>
-                    <toolkit:AnimationBehavior>
-                        <toolkit:AnimationBehavior.AnimationType>
-                            <toolkit:FadeAnimation Opacity="0.5" />
-                        </toolkit:AnimationBehavior.AnimationType>
-                    </toolkit:AnimationBehavior>
-                </Label.Behaviors>
+                    <Label
+                        Grid.Row="0"
+                        Padding="10,0,10,0"
+                        LineBreakMode="TailTruncation"
+                        MaxLines="1"
+                        Text="{Binding Video.Description}">
+                        <Label.Behaviors>
+                            <toolkit:AnimationBehavior>
+                                <toolkit:AnimationBehavior.AnimationType>
+                                    <toolkit:FadeAnimation Opacity="0.5" />
+                                </toolkit:AnimationBehavior.AnimationType>
+                            </toolkit:AnimationBehavior>
+                        </Label.Behaviors>
 
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
-                </Label.GestureRecognizers>
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
+                        </Label.GestureRecognizers>
 
-                <Label.Triggers>
-                    <DataTrigger
-                        Binding="{Binding IsDescriptionExpanded}"
-                        TargetType="Label"
-                        Value="True">
-                        <Setter Property="LineBreakMode" Value="WordWrap" />
-                        <Setter Property="MaxLines" Value="-1" />
-                    </DataTrigger>
-                    <DataTrigger
-                        Binding="{Binding IsDescriptionExpanded}"
-                        TargetType="Label"
-                        Value="False">
-                        <Setter Property="LineBreakMode" Value="TailTruncation" />
-                        <Setter Property="MaxLines" Value="1" />
-                    </DataTrigger>
-                </Label.Triggers>
-            </Label>
+                        <Label.Triggers>
+                            <DataTrigger
+                                Binding="{Binding IsDescriptionExpanded}"
+                                TargetType="Label"
+                                Value="True">
+                                <Setter Property="LineBreakMode" Value="WordWrap" />
+                                <Setter Property="MaxLines" Value="-1" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding IsDescriptionExpanded}"
+                                TargetType="Label"
+                                Value="False">
+                                <Setter Property="LineBreakMode" Value="TailTruncation" />
+                                <Setter Property="MaxLines" Value="1" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </VerticalStackLayout>
+        </SwipeView>
 
-            <Grid
-                Grid.Row="1"
-                Margin="10,5,10,0"
-                BackgroundColor="LightGray"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-        </Grid>
+        <Grid
+            Margin="10,0,10,0"
+            BackgroundColor="LightGray"
+            HeightRequest="5"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill" />
     </VerticalStackLayout>
 </ContentView>
