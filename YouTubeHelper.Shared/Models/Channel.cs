@@ -87,9 +87,6 @@ namespace YouTubeHelper.Shared.Models
         [BsonIgnore]
         public string ExtendedDescription => $"{Description} ({ChannelPlaylist})";
 
-        [BsonIgnore]
-        public int ResultIndex { get; set; } = -1;
-
         public DateTime? DateRangeLimit
         {
             get => _dateRangeLimit;

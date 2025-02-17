@@ -36,17 +36,22 @@ namespace YouTubeHelper.Shared.Utilities
             SearchListResponse channelSearchResult = await channelSearchRequest.ExecuteAsync();
             List<SearchResult> items = channelSearchResult.Items.Where(r => r.Id.Kind == "youtube#channel").ToList();
 
-            if (channel.ResultIndex >= items.Count)
-            {
-                channel.ResultIndex = -1;
-            }
-
-            if (channelSearchResult.Items.Skip(channel.ResultIndex++).FirstOrDefault() is { } r)
+            if (items.FirstOrDefault() is { } r)
             {
                 channel.VanityName = r.Snippet.Title;
                 channel.ChannelId = r.Snippet.ChannelId;
                 channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
                 channel.Description = r.Snippet.Description;
+                return true;
+            }
+            
+            // This is a backup. Sometimes we don't get the channel itself as a result,
+            // but we might get a video on the channel. That can work too.
+            if (channelSearchResult.Items.FirstOrDefault() is { } r2)
+            {
+                channel.VanityName = r2.Snippet.ChannelTitle;
+                channel.ChannelId = r2.Snippet.ChannelId;
+                channel.ChannelPlaylist = r2.Snippet.ChannelId.Replace("UC", "UU");
                 return true;
             }
 
