@@ -10,9 +10,9 @@ using System.Windows.Input;
 using Flurl;
 using ModernWpf.Controls;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
-using YouTubeHelper.Shared;
-using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
@@ -178,7 +178,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
@@ -217,7 +217,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
@@ -256,7 +256,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,
@@ -404,7 +404,7 @@ namespace YouTubeHelper
                 if (video is not null)
                 {
                     // See if this video is excluded
-                    if (await DatabaseCollections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    if (await Collections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
                     {
                         video.Excluded = true;
                         video.ExclusionReason = excludedVideo.ExclusionReason;

@@ -10,9 +10,12 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using MongoDBHelpers;
-using YouTubeHelper.Shared.Models;
-using Channel = YouTubeHelper.Shared.Models.Channel;
+using ServerStatusBot.Definitions;
+using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Database.Models;
+using Channel = ServerStatusBot.Definitions.Database.Models.Channel;
 using Video = Google.Apis.YouTube.v3.Data.Video;
+using ModelVideo = ServerStatusBot.Definitions.Database.Models.Video;
 
 namespace YouTubeHelper.Shared.Utilities
 {
@@ -59,9 +62,9 @@ namespace YouTubeHelper.Shared.Utilities
             return false;
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideos(
+        public async Task<IEnumerable<ModelVideo>> FindVideos(
             Channel? channel, 
-            List<Models.Video> excludedVideos,
+            List<ModelVideo> excludedVideos,
             bool showExclusions,
             SortMode sortMode,
             List<string>? searchTerms,
@@ -78,7 +81,7 @@ namespace YouTubeHelper.Shared.Utilities
             List<string> videoIds = new List<string>();
 
             // Load known videos
-            IEnumerable<string> knownVideos = (await DatabaseCollections.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
+            IEnumerable<string> knownVideos = (await Collections.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
             videoIds.AddRange(knownVideos);
 
 #if DEBUG
@@ -119,14 +122,14 @@ namespace YouTubeHelper.Shared.Utilities
             videoIds = videoIds.Distinct().ToList();
 
             // Save the newly loaded known videos
-            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new Shared.Models.Video
+            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new ModelVideo
             {
                 Id = v,
                 ChannelPlaylist = channel?.ChannelPlaylist
             });
             if (knownVideosToAdd.Any())
             {
-                await DatabaseCollections.KnownVideosCollection.InsertManyAsync(knownVideosToAdd);
+                await Collections.KnownVideosCollection.InsertManyAsync(knownVideosToAdd);
             }
 
             if (!showExclusions)
@@ -137,7 +140,7 @@ namespace YouTubeHelper.Shared.Utilities
             return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms, count, dateRangeLimit, videoLengthMinimum);
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> SearchVideos(Channel channel, List<Shared.Models.Video> excludedVideos, bool showExclusions, SortMode sortMode, string lookup, int count = 10)
+        public async Task<IEnumerable<ModelVideo>> SearchVideos(Channel channel, List<ModelVideo> excludedVideos, bool showExclusions, SortMode sortMode, string lookup, int count = 10)
         {
             SearchResource.ListRequest videoSearchRequest = _youTubeService.Search.List("snippet");
             videoSearchRequest.Q = lookup;
@@ -153,9 +156,9 @@ namespace YouTubeHelper.Shared.Utilities
             return await FindVideoDetails(items, excludedVideos, channel, sortMode, count: count);
         }
 
-        public async Task<IEnumerable<Shared.Models.Video>> FindVideoDetails(
+        public async Task<IEnumerable<ModelVideo>> FindVideoDetails(
             List<string> videoIds,
-            List<Models.Video>? excludedVideos = null, 
+            List<ModelVideo>? excludedVideos = null, 
             Channel? channel = null,
             SortMode? sortMode = null,
             List<string>? searchTerms = null,
@@ -164,7 +167,7 @@ namespace YouTubeHelper.Shared.Utilities
             TimeSpan? videoLengthMinimum = null,
             Func<List<Video>, List<Video>>? customSort = null)
         {
-            List<Shared.Models.Video> results = new();
+            List<ModelVideo> results = new();
             List<string>? excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
 
             // Use the videoIds to look up real info
@@ -265,7 +268,7 @@ namespace YouTubeHelper.Shared.Utilities
 
             foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : count))
             {
-                results.Add(new Shared.Models.Video
+                results.Add(new ModelVideo
                 {
                     Excluded = (excludedVideoIds ?? new List<string>()).Contains(video.Id),
                     ExclusionReason = excludedVideos?.FirstOrDefault(v => v.Id == video.Id)?.ExclusionReason ?? ExclusionReason.None,

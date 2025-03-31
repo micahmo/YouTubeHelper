@@ -6,10 +6,10 @@ using MongoDB.Driver;
 using MongoDBHelpers;
 using Newtonsoft.Json;
 using Polly;
+using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Mobile.Views;
-using YouTubeHelper.Shared;
-using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
 
 namespace YouTubeHelper.Mobile.ViewModels
@@ -130,7 +130,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindVideos
                             if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                             {
-                                List<Video> exclusions = await DatabaseCollections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
+                                List<Video> exclusions = await Collections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
                                 List<string>? searchTerms = null;
 
                                 //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
@@ -213,7 +213,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindExclusions
                             else if (Page.AppShellViewModel.ExclusionsTabSelected)
                             {
-                                List<Video> exclusions = await DatabaseCollections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
+                                List<Video> exclusions = await Collections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel!.ChannelPlaylist);
 
                                 if (SelectedExclusionFilter.Value != ExclusionReason.None)
                                 {
@@ -230,7 +230,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
 
                                 // Get all excluded videos
-                                List<Video> excludedVideos = await DatabaseCollections.ExcludedVideosCollection.FindAllAsync();
+                                List<Video> excludedVideos = await Collections.ExcludedVideosCollection.FindAllAsync();
 
                                 List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
                                     distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),

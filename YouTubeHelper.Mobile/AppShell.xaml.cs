@@ -3,10 +3,10 @@ using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
-using YouTubeHelper.Shared;
-using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
 using Environment = System.Environment;
 
@@ -118,7 +118,7 @@ namespace YouTubeHelper.Mobile
             int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4);
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
 
-            IOrderedEnumerable<Channel> channels = (await DatabaseCollections.ChannelCollection.FindAllAsync()).OrderByDescending(c => c.Index);
+            IOrderedEnumerable<Channel> channels = (await Collections.ChannelCollection.FindAllAsync()).OrderByDescending(c => c.Index);
             foreach (Channel channel in channels)
             {
                 ChannelViewModel channelViewModel = new(this)
@@ -339,7 +339,7 @@ namespace YouTubeHelper.Mobile
                 if (video is not null)
                 {
                     // See if this video is excluded
-                    if (await DatabaseCollections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    if (await Collections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
                     {
                         video.Excluded = true;
                         video.ExclusionReason = excludedVideo.ExclusionReason;

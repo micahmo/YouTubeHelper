@@ -10,10 +10,10 @@ using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
-using YouTubeHelper.Shared;
-using YouTubeHelper.Shared.Models;
 using YouTubeHelper.Shared.Utilities;
 
 namespace YouTubeHelper.ViewModels
@@ -322,7 +322,7 @@ namespace YouTubeHelper.ViewModels
         {
             if (!_loaded)
             {
-                var channels = (await DatabaseCollections.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
+                var channels = (await Collections.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
                 foreach (var c in channels)
                 {
                     Channels.Add(new ChannelViewModel(c, this));

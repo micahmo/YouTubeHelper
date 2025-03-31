@@ -1,5 +1,4 @@
-﻿using YouTubeHelper.Models;
-using YouTubeHelper.Shared.Models;
+﻿using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.ViewModels
 {

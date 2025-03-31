@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
-using YouTubeHelper.Shared.Models;
+using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.Shared.Utilities;
 

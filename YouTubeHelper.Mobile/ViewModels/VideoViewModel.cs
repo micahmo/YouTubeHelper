@@ -6,11 +6,11 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Net;
 using System.Windows.Input;
-using YouTubeHelper.Mobile.Views;
-using YouTubeHelper.Shared;
-using YouTubeHelper.Shared.Models;
-using ServerStatusBot.Definitions.Models;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Database;
+using YouTubeHelper.Mobile.Views;
+using ServerStatusBot.Definitions.Models;
+using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -168,7 +168,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
-                    await DatabaseCollections.ExcludedVideosCollection.DeleteAsync(Video.Id);
+                    await Collections.ExcludedVideosCollection.DeleteAsync(Video.Id);
                 }
                 else if (action == Resources.Resources.DownloadCustom)
                 {
@@ -190,7 +190,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 if (excluded)
                 {
                     Video.Excluded = true;
-                    await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                    await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
                     if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
                     {
@@ -241,7 +241,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             // Unexclude the video before downloading again
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
-            await DatabaseCollections.ExcludedVideosCollection.DeleteAsync(Video.Id);
+            await Collections.ExcludedVideosCollection.DeleteAsync(Video.Id);
 
             try
             {
@@ -330,7 +330,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 Video.Excluded = true;
                                 Video.ExclusionReason = ExclusionReason.Watched;
-                                await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                                await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
                             }
 
                             if (showInAppNotifications)
