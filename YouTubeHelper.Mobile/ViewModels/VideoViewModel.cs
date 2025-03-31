@@ -252,6 +252,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                     .SetQueryParam("silent", false)
                     .SetQueryParam("requestId", requestId)
                     .SetQueryParam("dataDirectorySubpath", dataDirectorySubpath)
+                    .SetQueryParam("videoId", Video.Id)
+                    .SetQueryParam("channelPlaylist", Video.ChannelPlaylist)
                     .SetQueryParam("idInChannelFolder", dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
                     .GetAsync();
             }
@@ -330,7 +332,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 Video.Excluded = true;
                                 Video.ExclusionReason = ExclusionReason.Watched;
-                                await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                                // NOTE: We no longer need to update the db here because the server does it,
+                                // so the above is purely a UI update.
                             }
 
                             if (showInAppNotifications)

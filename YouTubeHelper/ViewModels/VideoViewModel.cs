@@ -131,6 +131,8 @@ namespace YouTubeHelper.ViewModels
                     .SetQueryParam("silent", silent)
                     .SetQueryParam("requestId", requestId)
                     .SetQueryParam("dataDirectorySubpath", Settings.Instance.DownloadDirectory)
+                    .SetQueryParam("videoId", Video.Id)
+                    .SetQueryParam("channelPlaylist", Video.ChannelPlaylist)
                     .SetQueryParam("idInChannelFolder", Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
                     .GetAsync();
             }
@@ -210,7 +212,8 @@ namespace YouTubeHelper.ViewModels
                             {
                                 Video.Excluded = true;
                                 Video.ExclusionReason = ExclusionReason.Watched;
-                                await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                                // NOTE: We no longer need to update the db here because the server does it,
+                                // so the above is purely a UI update.
                             }
 
                             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
