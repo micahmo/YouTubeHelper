@@ -16,8 +16,8 @@
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3513" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
     <PackageReference Include="mdm.ServerStatusBot.Definitions" Version="1.0.9" />
+    <PackageReference Include="mdm.MongoDBHelpers" Version="1.0.6" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-    <PackageReference Include="MongoDB.Driver" Version="2.28.0" />
   </ItemGroup>
 
 </Project>

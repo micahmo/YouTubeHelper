@@ -10,6 +10,7 @@ using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
 using ServerStatusBot.Definitions.Models;
+using MongoDBHelpers;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -167,7 +168,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
-                    await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+                    await DatabaseCollections.ExcludedVideosCollection.DeleteAsync(Video.Id);
                 }
                 else if (action == Resources.Resources.DownloadCustom)
                 {
@@ -189,7 +190,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 if (excluded)
                 {
                     Video.Excluded = true;
-                    await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                    await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
                     if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
                     {
@@ -240,7 +241,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             // Unexclude the video before downloading again
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
-            await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+            await DatabaseCollections.ExcludedVideosCollection.DeleteAsync(Video.Id);
 
             try
             {
@@ -329,7 +330,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 Video.Excluded = true;
                                 Video.ExclusionReason = ExclusionReason.Watched;
-                                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                                await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
                             }
 
                             if (showInAppNotifications)

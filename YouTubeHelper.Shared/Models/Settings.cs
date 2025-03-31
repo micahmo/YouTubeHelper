@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDBHelpers;
 
 namespace YouTubeHelper.Shared.Models
 {
@@ -13,7 +14,7 @@ namespace YouTubeHelper.Shared.Models
                 if (args.PropertyName is not nameof(Id))
                 {
 #pragma warning disable CS0618
-                    DatabaseEngine.SettingsCollection.Upsert<Settings, int>(this);
+                    DatabaseCollections.SettingsCollection.Upsert<Settings, int>(this);
 #pragma warning restore CS0618
                 }
             };
@@ -67,10 +68,10 @@ namespace YouTubeHelper.Shared.Models
         }
         private string? _downloadDirectory;
 
-        public static Settings Instance => _instance ??= DatabaseEngine.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
+        public static Settings Instance => _instance ??= DatabaseCollections.SettingsCollection.FindById(InstanceObjectId) ?? new Func<Settings>(() =>
         {
             Settings settings = new Settings();
-            DatabaseEngine.SettingsCollection.InsertOne(settings);
+            DatabaseCollections.SettingsCollection.InsertOne(settings);
             return settings;
         })();
         private static Settings? _instance;

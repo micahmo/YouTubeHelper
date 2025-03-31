@@ -4,6 +4,7 @@ using Humanizer;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDBHelpers;
 
 namespace YouTubeHelper.Shared.Models
 {

@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using MongoDBHelpers;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
@@ -321,7 +322,7 @@ namespace YouTubeHelper.ViewModels
         {
             if (!_loaded)
             {
-                var channels = (await DatabaseEngine.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
+                var channels = (await DatabaseCollections.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
                 foreach (var c in channels)
                 {
                     Channels.Add(new ChannelViewModel(c, this));

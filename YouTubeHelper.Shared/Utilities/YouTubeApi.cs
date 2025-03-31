@@ -9,6 +9,7 @@ using System.Xml;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
+using MongoDBHelpers;
 using YouTubeHelper.Shared.Models;
 using Channel = YouTubeHelper.Shared.Models.Channel;
 using Video = Google.Apis.YouTube.v3.Data.Video;
@@ -77,7 +78,7 @@ namespace YouTubeHelper.Shared.Utilities
             List<string> videoIds = new List<string>();
 
             // Load known videos
-            IEnumerable<string> knownVideos = (await DatabaseEngine.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
+            IEnumerable<string> knownVideos = (await DatabaseCollections.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
             videoIds.AddRange(knownVideos);
 
 #if DEBUG
@@ -125,7 +126,7 @@ namespace YouTubeHelper.Shared.Utilities
             });
             if (knownVideosToAdd.Any())
             {
-                await DatabaseEngine.KnownVideosCollection.InsertManyAsync(knownVideosToAdd);
+                await DatabaseCollections.KnownVideosCollection.InsertManyAsync(knownVideosToAdd);
             }
 
             if (!showExclusions)

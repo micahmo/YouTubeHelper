@@ -9,6 +9,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDBHelpers;
 using Polly;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Properties;
@@ -50,7 +51,7 @@ namespace YouTubeHelper.ViewModels
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
             MainControlViewModel.Channels.Remove(this);
-            await DatabaseEngine.ChannelCollection.DeleteAsync(Channel.Id);
+            await DatabaseCollections.ChannelCollection.DeleteAsync(Channel.Id);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
@@ -101,7 +102,7 @@ namespace YouTubeHelper.ViewModels
                     {
                         MainControlViewModel.IsBusy = true;
 
-                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
+                        List<Video> exclusions = await DatabaseCollections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
                         List<string>? searchTerms = null;
 
                         if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
@@ -200,7 +201,7 @@ namespace YouTubeHelper.ViewModels
                     try
                     {
                         MainControlViewModel.IsBusy = true;
-                        List<Video> exclusions = await DatabaseEngine.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
+                        List<Video> exclusions = await DatabaseCollections.ExcludedVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == Channel.ChannelPlaylist);
 
                         if (MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None)
                         {
@@ -236,7 +237,7 @@ namespace YouTubeHelper.ViewModels
                 List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
 
                 // Get all excluded videos
-                List<Video> excludedVideos = await DatabaseEngine.ExcludedVideosCollection.FindAllAsync();
+                List<Video> excludedVideos = await DatabaseCollections.ExcludedVideosCollection.FindAllAsync();
 
                 List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
                     distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
@@ -277,7 +278,7 @@ namespace YouTubeHelper.ViewModels
             foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await DatabaseEngine.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+                await DatabaseCollections.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
             }
         }
 
@@ -300,7 +301,7 @@ namespace YouTubeHelper.ViewModels
             foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await DatabaseEngine.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+                await DatabaseCollections.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
             }
         }
 

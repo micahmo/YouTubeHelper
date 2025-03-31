@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Flurl;
 using ModernWpf.Controls;
+using MongoDBHelpers;
 using YouTubeHelper.Models;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Shared.Models;
@@ -177,7 +178,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
@@ -216,7 +217,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
@@ -255,7 +256,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,
@@ -403,7 +404,7 @@ namespace YouTubeHelper
                 if (video is not null)
                 {
                     // See if this video is excluded
-                    if (await DatabaseEngine.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    if (await DatabaseCollections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
                     {
                         video.Excluded = true;
                         video.ExclusionReason = excludedVideo.ExclusionReason;

@@ -13,6 +13,7 @@ using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
+using MongoDBHelpers;
 using Notification.Wpf;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Properties;
@@ -209,7 +210,7 @@ namespace YouTubeHelper.ViewModels
                             {
                                 Video.Excluded = true;
                                 Video.ExclusionReason = ExclusionReason.Watched;
-                                await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+                                await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
                             }
 
                             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
@@ -276,7 +277,7 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            await DatabaseEngine.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+            await DatabaseCollections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
 
             if (MainControlViewModel is { WatchMode: true, ShowExcludedVideos: false })
             {
@@ -291,7 +292,7 @@ namespace YouTubeHelper.ViewModels
         {
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
-            await DatabaseEngine.ExcludedVideosCollection.DeleteAsync(Video.Id);
+            await DatabaseCollections.ExcludedVideosCollection.DeleteAsync(Video.Id);
         }
 
         public string ExcludedString => $"{Resources.Excluded} - {new ExclusionReasonExtended(Video.ExclusionReason).Description}";

@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
+using MongoDBHelpers;
 
 namespace YouTubeHelper.Shared.Models
 {
@@ -18,7 +19,7 @@ namespace YouTubeHelper.Shared.Models
                     if (args.PropertyName is not nameof(Id))
                     {
 #pragma warning disable CS0618
-                        DatabaseEngine.ChannelCollection.Upsert<Channel, ObjectId>(this);
+                        DatabaseCollections.ChannelCollection.Upsert<Channel, ObjectId>(this);
 #pragma warning restore CS0618
                     }
                 };
