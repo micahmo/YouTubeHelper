@@ -536,6 +536,17 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to download with 5 exceptions &apos;{0}&apos;.
+        ///
+        ///{1}.
+        /// </summary>
+        public static string VideoDownloadFailedException {
+            get {
+                return ResourceManager.GetString("VideoDownloadFailedException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sent request to download &apos;{0}&apos;..
         /// </summary>
         public static string VideoDownloadRequested {

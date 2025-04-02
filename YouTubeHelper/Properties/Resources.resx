@@ -223,6 +223,11 @@ Updated the status of {1} video(s).</value>
 
 {1}</value>
   </data>
+  <data name="VideoDownloadFailedException" xml:space="preserve">
+    <value>Failed to download with 5 exceptions '{0}'.
+
+{1}</value>
+  </data>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading...</value>
   </data>

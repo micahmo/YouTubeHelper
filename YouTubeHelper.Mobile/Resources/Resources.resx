@@ -148,6 +148,11 @@
 
 {1}</value>
   </data>
+  <data name="VideoDownloadFailedException" xml:space="preserve">
+    <value>Failed to download with 5 exceptions '{0}'.
+
+{1}</value>
+  </data>
   <data name="DownloadingProgress" xml:space="preserve">
     <value>Downloading...  {0}</value>
   </data>

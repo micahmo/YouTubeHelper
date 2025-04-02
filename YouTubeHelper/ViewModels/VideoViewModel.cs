@@ -166,7 +166,8 @@ namespace YouTubeHelper.ViewModels
             _ = Task.Run(async () =>
             {
                 bool statusWasEverNotDone = false;
-                
+                int errorCount = 0;
+
                 while (_progressCancellationToken?.IsCancellationRequested == false)
                 {
                     IFlurlResponse progressResponse;
@@ -178,15 +179,20 @@ namespace YouTubeHelper.ViewModels
                             .AppendPathSegment(requestId)
                             .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
                             .GetAsync(HttpCompletionOption.ResponseContentRead, _progressCancellationToken.Token);
+
+                        // If we make a successful call, error count resets.
+                        errorCount = 0;
                     }
                     catch (Exception ex)
                     {
-                        if (showInAppNotifications)
+                        if (++errorCount == 5)
                         {
-                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailedException, Video.Title, ex.Message), NotificationType.Error, "NotificationArea");
+
+                            return;
                         }
 
-                        return;
+                        continue;
                     }
 
                     if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
@@ -247,7 +253,7 @@ namespace YouTubeHelper.ViewModels
                         }
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(.5));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
             }).ContinueWith(_ =>
             {

@@ -285,6 +285,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             _ = Task.Run(async () =>
             {
                 bool statusWasEverNotDone = false;
+                int errorCount = 0;
 
                 while (_progressCancellationToken?.IsCancellationRequested == false)
                 {
@@ -297,18 +298,23 @@ namespace YouTubeHelper.Mobile.ViewModels
                             .AppendPathSegment(requestId)
                             .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
                             .GetAsync(HttpCompletionOption.ResponseContentRead, _progressCancellationToken.Token);
+
+                        // If we make a successful call, error count resets.
+                        errorCount = 0;
                     }
                     catch (Exception ex)
                     {
-                        if (showInAppNotifications)
+                        if (++errorCount == 5)
                         {
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
-                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), ToastDuration.Long).Show();
+                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailedException, Video.Title, ex.Message), ToastDuration.Long).Show();
                             });
+
+                            return;
                         }
 
-                        return;
+                        continue;
                     }
 
                     if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
@@ -372,7 +378,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         }
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(.5));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
             }).ContinueWith(_ =>
             {
