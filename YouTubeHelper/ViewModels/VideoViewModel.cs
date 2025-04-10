@@ -15,6 +15,7 @@ using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
 using MongoDBHelpers;
 using Notification.Wpf;
+using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -124,17 +125,14 @@ namespace YouTubeHelper.ViewModels
 
             try
             {
-                await Settings.Instance.ServerAddress
-                    .AppendPathSegment("youtube")
-                    .AppendPathSegment(url, fullyEncode: true)
-                    .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
-                    .SetQueryParam("silent", silent)
-                    .SetQueryParam("requestId", requestId)
-                    .SetQueryParam("dataDirectorySubpath", Settings.Instance.DownloadDirectory)
-                    .SetQueryParam("videoId", Video.Id)
-                    .SetQueryParam("channelPlaylist", Video.ChannelPlaylist)
-                    .SetQueryParam("idInChannelFolder", Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
-                    .GetAsync();
+                await ServerApiClient.Instance.DownloadVideo(
+                    url: url,
+                    silent: silent,
+                    requestId: requestId,
+                    dataDirectorySubpath: Settings.Instance.DownloadDirectory,
+                    videoId: Video.Id,
+                    channelPlaylist: Video.ChannelPlaylist,
+                    idInChannelFolder: Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }
             catch (Exception ex)
             {

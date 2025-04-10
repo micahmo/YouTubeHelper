@@ -11,6 +11,7 @@ using ServerStatusBot.Definitions.Database;
 using YouTubeHelper.Mobile.Views;
 using ServerStatusBot.Definitions.Models;
 using ServerStatusBot.Definitions.Database.Models;
+using ServerStatusBot.Definitions.Api;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
@@ -245,17 +246,14 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                await Settings.Instance.ServerAddress
-                    .AppendPathSegment("youtube")
-                    .AppendPathSegment(url, fullyEncode: true)
-                    .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
-                    .SetQueryParam("silent", false)
-                    .SetQueryParam("requestId", requestId)
-                    .SetQueryParam("dataDirectorySubpath", dataDirectorySubpath)
-                    .SetQueryParam("videoId", Video.Id)
-                    .SetQueryParam("channelPlaylist", Video.ChannelPlaylist)
-                    .SetQueryParam("idInChannelFolder", dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true)
-                    .GetAsync();
+                await ServerApiClient.Instance.DownloadVideo(
+                    url: url,
+                    silent: false,
+                    requestId: requestId,
+                    dataDirectorySubpath: dataDirectorySubpath,
+                    videoId: Video.Id,
+                    channelPlaylist: Video.ChannelPlaylist,
+                    idInChannelFolder: dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }
             catch (Exception ex)
             {
