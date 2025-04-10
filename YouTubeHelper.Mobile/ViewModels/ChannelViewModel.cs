@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using MongoDBHelpers;
 using Newtonsoft.Json;
 using Polly;
+using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -192,7 +193,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                                     try
                                     {
-                                        List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
+                                        List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
                                         videoViewModels.ForEach(videoViewModel =>
                                         {
                                             Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
@@ -227,7 +228,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
                                 // Get the queue from the server
-                                List<RequestData> distinctQueue = await ServerStatusBotApi.Instance.GetQueue();
+                                List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
                                 // Get all excluded videos
                                 List<Video> excludedVideos = await Collections.ExcludedVideosCollection.FindAllAsync();
