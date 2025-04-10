@@ -171,12 +171,7 @@ namespace YouTubeHelper.ViewModels
                     IFlurlResponse progressResponse;
                     try
                     {
-                        progressResponse = await Settings.Instance.ServerAddress
-                            .AppendPathSegment("v2")
-                            .AppendPathSegment("progress")
-                            .AppendPathSegment(requestId)
-                            .AllowAnyHttpStatus() // This will return 400 before the request starts, so ignore it.
-                            .GetAsync(HttpCompletionOption.ResponseContentRead, _progressCancellationToken.Token);
+                        progressResponse = await ServerApiClient.Instance.Progress(requestId: requestId, cancellationTokenSource: _progressCancellationToken);
 
                         // If we make a successful call, error count resets.
                         errorCount = 0;
@@ -317,19 +312,15 @@ namespace YouTubeHelper.ViewModels
         
         private readonly ChannelViewModel _channelViewModel;
 
-        public static async Task<string> GetRawUrl(string videoId)
+        public static Task<string> GetRawUrl(string videoId)
         {
             try
             {
-                return await (await Settings.Instance.ServerAddress
-                    .AppendPathSegment("youtubelink")
-                    .AppendPathSegment(videoId)
-                    .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
-                    .GetAsync()).GetStringAsync();
+                return ServerApiClient.Instance.YouTubeLink(videoId: videoId);
             }
             catch
             {
-                return "https://google.com";
+                return Task.FromResult("https://google.com");
             }
         }
     }
