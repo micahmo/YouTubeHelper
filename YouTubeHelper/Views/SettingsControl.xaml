@@ -36,16 +36,16 @@
             Grid.Column="0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
-            ui:ControlHelper.Header="Telegram API Address"
-            Text="{Binding Settings.TelegramApiAddress, UpdateSourceTrigger=PropertyChanged, Delay=10}"
-            ToolTip="{Binding Settings.TelegramApiAddress}" />
+            ui:ControlHelper.Header="Server Address"
+            Text="{Binding Settings.ServerAddress, UpdateSourceTrigger=PropertyChanged, Delay=10}"
+            ToolTip="{Binding Settings.ServerAddress}" />
         <TextBox
             Grid.Row="4"
             Grid.Column="0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
-            ui:ControlHelper.Header="Telegram API Key"
-            Text="{Binding Settings.TelegramApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}"
-            ToolTip="{Binding Settings.TelegramApiKey}" />
+            ui:ControlHelper.Header="Server API Key"
+            Text="{Binding Settings.ServerApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}"
+            ToolTip="{Binding Settings.ServerApiKey}" />
     </Grid>
 </UserControl>

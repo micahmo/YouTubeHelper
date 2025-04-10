@@ -16,9 +16,9 @@ public class ServerStatusBotApi
     public async Task<List<RequestData>> GetQueue()
     {
         // Get the queue from the server
-        List<RequestData> queue = await(await Settings.Instance.TelegramApiAddress
+        List<RequestData> queue = await(await Settings.Instance.ServerAddress
             .AppendPathSegment("queue")
-            .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+            .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
             .GetAsync()).GetJsonAsync<List<RequestData>>();
 
         // De-duplicate by videoId, keeping the item with the highest dateAdded

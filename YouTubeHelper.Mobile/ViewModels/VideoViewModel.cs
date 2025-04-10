@@ -209,10 +209,10 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             try
             {
-                return await (await Settings.Instance.TelegramApiAddress
+                return await (await Settings.Instance.ServerAddress
                     .AppendPathSegment("youtubelink")
                     .AppendPathSegment(videoId)
-                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
                     .GetAsync()).GetStringAsync();
             }
             catch
@@ -245,10 +245,10 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                await Settings.Instance.TelegramApiAddress
+                await Settings.Instance.ServerAddress
                     .AppendPathSegment("youtube")
                     .AppendPathSegment(url, fullyEncode: true)
-                    .SetQueryParam("apiKey", Settings.Instance.TelegramApiKey)
+                    .SetQueryParam("apiKey", Settings.Instance.ServerApiKey)
                     .SetQueryParam("silent", false)
                     .SetQueryParam("requestId", requestId)
                     .SetQueryParam("dataDirectorySubpath", dataDirectorySubpath)
@@ -292,7 +292,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     IFlurlResponse progressResponse;
                     try
                     {
-                        progressResponse = await Settings.Instance.TelegramApiAddress
+                        progressResponse = await Settings.Instance.ServerAddress
                             .AppendPathSegment("v2")
                             .AppendPathSegment("progress")
                             .AppendPathSegment(requestId)
