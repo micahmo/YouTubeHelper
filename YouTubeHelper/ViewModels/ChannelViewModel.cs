@@ -154,14 +154,14 @@ namespace YouTubeHelper.ViewModels
                             try
                             {
                                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
-                                videoViewModels.ForEach(videoViewModel =>
+                                foreach (VideoViewModel videoViewModel in videoViewModels)
                                 {
                                     Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
                                     if (requestId != null)
                                     {
-                                        videoViewModel.StartUpdateCheck(requestId!.ToString()!, showInAppNotifications: false);
+                                        await ServerApiClient.Instance.JoinDownloadGroup(requestId!.ToString()!, requestData => videoViewModel.UpdateCheck(requestId!.ToString()!, requestData, showInAppNotifications: false));
                                     }
-                                });
+                                }
                             }
                             catch
                             {
@@ -247,12 +247,13 @@ namespace YouTubeHelper.ViewModels
                     count: int.MaxValue
                 )).ToList();
 
-                queuedVideos.ForEach(video =>
+                foreach (Video video in queuedVideos)
                 {
                     VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
                     Videos.Add(videoViewModel);
-                    videoViewModel.StartUpdateCheck(distinctQueue.First(v => v.VideoId! == video.Id).RequestGuid.ToString(), showInAppNotifications: false);
-                });
+                    string requestId = distinctQueue.First(v => v.VideoId! == video.Id).RequestGuid.ToString();
+                    await ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
+                }
             }
             finally
             {

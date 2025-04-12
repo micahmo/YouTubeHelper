@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CliWrap;
 using CliWrap.Buffered;
-using Flurl;
-using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
@@ -88,14 +83,11 @@ namespace YouTubeHelper.ViewModels
 
         private async void DownloadVideo(bool rightClick)
         {
-            if (_progressCancellationToken is not null)
+            if (_previousRequestId != null)
             {
-                // There is a download in progress and we've been told to cancel it.
-                _progressCancellationToken.Cancel();
-                return;
+                await ServerApiClient.Instance.LeaveDownloadGroup(_previousRequestId);
+                _previousRequestId = null;
             }
-
-            _progressCancellationToken = new();
 
             // Use silent mode when shift key is down. Grab this value is as soon as possible.
             bool silent = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
@@ -113,7 +105,11 @@ namespace YouTubeHelper.ViewModels
                 if (res.Result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(res.Text))
                 {
                     // Canceled or entered nothing
-                    _progressCancellationToken = null;
+                    if (_previousRequestId != null)
+                    {
+                        await ServerApiClient.Instance.LeaveDownloadGroup(_previousRequestId);
+                        _previousRequestId = null;
+                    }
                     return;
                 }
 
@@ -137,11 +133,18 @@ namespace YouTubeHelper.ViewModels
             catch (Exception ex)
             {
                 App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
-                _progressCancellationToken = null;
                 return;
             }
 
-            StartUpdateCheck(requestId);
+            try
+            {
+                // Try to hook up for progress updates
+                await ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => UpdateCheck(requestId, requestData));
+            }
+            catch (Exception ex)
+            {
+                App.NotificationManager.Show(string.Empty, string.Format(Resources.ProgressUpdateFailed, Video.Title, ex.Message), NotificationType.Error, "NotificationArea");
+            }
 
             App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadRequested, Video.Title), NotificationType.Information, "NotificationArea", icon: null);
 
@@ -154,104 +157,61 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
         }
 
-        private CancellationTokenSource? _progressCancellationToken;
+        private string? _previousRequestId;
 
-        internal void StartUpdateCheck(string requestId, bool showInAppNotifications = true)
+        internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
-            _progressCancellationToken ??= new();
-            
-            // Spin up a task to check for progress
-            _ = Task.Run(async () =>
+            if (!result.RequestGuid.ToString().Equals(requestId, StringComparison.OrdinalIgnoreCase))
             {
-                bool statusWasEverNotDone = false;
-                int errorCount = 0;
+                // We got an update for a different request
+                return;
+            }
 
-                while (_progressCancellationToken?.IsCancellationRequested == false)
+            _previousRequestId = requestId;
+
+            Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress}%");
+            Video.Progress = result.Progress == 0 ? 1 : result.Progress;
+            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
+
+            if (result.Status == DownloadStatus.Completed)
+            {
+                // Mark as downloaded (only if succeeded)
+                Video.Status = null;
+                Video.Progress = 100;
+
+                Video.Excluded = true;
+                Video.ExclusionReason = ExclusionReason.Watched;
+                // NOTE: We no longer need to update the db here because the server does it,
+                // so the above is purely a UI update.
+
+                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
+                MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
+
+                if (showInAppNotifications)
                 {
-                    IFlurlResponse progressResponse;
-                    try
-                    {
-                        progressResponse = await ServerApiClient.Instance.Progress(requestId: requestId, cancellationTokenSource: _progressCancellationToken);
-
-                        // If we make a successful call, error count resets.
-                        errorCount = 0;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (++errorCount == 5)
-                        {
-                            App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailedException, Video.Title, ex.Message), NotificationType.Error, "NotificationArea");
-
-                            return;
-                        }
-
-                        continue;
-                    }
-
-                    if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
-                    {
-                        RequestData result = await progressResponse.GetJsonAsync<RequestData>();
-                        Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress}%");
-                        Video.Progress = result.Progress == 0 ? 1 : result.Progress;
-                        MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
-                        MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
-
-                        if (result.Status == DownloadStatus.InProgress)
-                        {
-                            statusWasEverNotDone = true;
-                        }
-                        
-                        if (result.Status == DownloadStatus.Completed)
-                        {
-                            // Mark as downloaded (only if succeeded)
-                            Video.Status = null;
-                            Video.Progress = 100;
-
-                            if (statusWasEverNotDone)
-                            {
-                                Video.Excluded = true;
-                                Video.ExclusionReason = ExclusionReason.Watched;
-                                // NOTE: We no longer need to update the db here because the server does it,
-                                // so the above is purely a UI update.
-                            }
-
-                            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
-                            MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
-
-                            if (showInAppNotifications)
-                            {
-                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
-                            }
-
-                            return;
-                        }
-
-                        if (result.Status == DownloadStatus.Failed)
-                        {
-                            Video.Status = Resources.FailedToDownload;
-
-                            if (showInAppNotifications)
-                            {
-                                string status = result.Status.ToString();
-
-                                if (!string.IsNullOrEmpty(result.Reason))
-                                {
-                                    status += $" - {result.Reason}";
-                                }
-
-                                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, status), NotificationType.Error, "NotificationArea");
-                            }
-
-                            return;
-                        }
-                    }
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                 }
-            }).ContinueWith(_ =>
+
+                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+            }
+
+            if (result.Status == DownloadStatus.Failed)
             {
-                _progressCancellationToken = null;
-            });
+                Video.Status = Resources.FailedToDownload;
+
+                if (showInAppNotifications)
+                {
+                    string status = result.Status.ToString();
+
+                    if (!string.IsNullOrEmpty(result.Reason))
+                    {
+                        status += $" - {result.Reason}";
+                    }
+
+                    App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, status), NotificationType.Error, "NotificationArea");
+                }
+            }
         }
 
         public ICommand ExcludeVideoCommand => _excludeVideoCommand ??= new RelayCommand<object>(ExcludeVideo);

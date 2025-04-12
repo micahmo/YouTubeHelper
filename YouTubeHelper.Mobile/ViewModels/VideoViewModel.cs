@@ -1,10 +1,7 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
-using Flurl;
-using Flurl.Http;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using System.Net;
 using System.Windows.Input;
 using MongoDBHelpers;
 using ServerStatusBot.Definitions.Database;
@@ -220,14 +217,11 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private async Task DownloadVideo(string dataDirectorySubpath)
         {
-            if (_progressCancellationToken is not null)
+            if (_previousRequestId != null)
             {
-                // There is a download in progress and we've been told to cancel it.
-                _progressCancellationToken.Cancel();
-                return;
+                await ServerApiClient.Instance.LeaveDownloadGroup(_previousRequestId);
+                _previousRequestId = null;
             }
-
-            _progressCancellationToken = new();
 
             // Initiate the download
             string url = $"https://www.youtube.com/watch?v={Video.Id}";
@@ -254,11 +248,18 @@ namespace YouTubeHelper.Mobile.ViewModels
             catch (Exception ex)
             {
                 await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), ToastDuration.Long).Show();
-                _progressCancellationToken = null;
                 return;
             }
 
-            StartUpdateCheck(requestId);
+            try
+            {
+                // Try to hook up for progress updates
+                await ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => UpdateCheck(requestId, requestData));
+            }
+            catch (Exception ex)
+            {
+                await Toast.Make(string.Format(Resources.Resources.ProgressUpdateFailed, Video.Title, ex.Message), ToastDuration.Long).Show();
+            }
 
             await Toast.Make(string.Format(Resources.Resources.VideoDownloadRequested, Video.Title), ToastDuration.Long).Show();
 
@@ -269,110 +270,61 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Progress = 0;
         }
 
-        private CancellationTokenSource? _progressCancellationToken;
+        private string? _previousRequestId;
 
-        internal void StartUpdateCheck(string requestId, bool showInAppNotifications = true)
+        internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
-            _progressCancellationToken ??= new();
-
-            // Spin up a task to check for progress
-            _ = Task.Run(async () =>
+            if (!result.RequestGuid.ToString().Equals(requestId, StringComparison.OrdinalIgnoreCase))
             {
-                bool statusWasEverNotDone = false;
-                int errorCount = 0;
+                // We got an update for a different request
+                return;
+            }
 
-                while (_progressCancellationToken?.IsCancellationRequested == false)
+            _previousRequestId = requestId;
+
+            Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
+            Video.Progress = result.Progress;
+
+            if (result.Status == DownloadStatus.Completed)
+            {
+                // Mark as downloaded (only if succeeded)
+                Video.Status = null;
+                Video.Progress = 100;
+
+                Video.Excluded = true;
+                Video.ExclusionReason = ExclusionReason.Watched;
+                // NOTE: We no longer need to update the db here because the server does it,
+                // so the above is purely a UI update.
+
+                if (showInAppNotifications)
                 {
-                    IFlurlResponse progressResponse;
-                    try
-                    {
-                        progressResponse = await ServerApiClient.Instance.Progress(requestId: requestId, cancellationTokenSource: _progressCancellationToken);
-
-                        // If we make a successful call, error count resets.
-                        errorCount = 0;
-                    }
-                    catch (Exception ex)
-                    {
-                        if (++errorCount == 5)
-                        {
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailedException, Video.Title, ex.Message), ToastDuration.Long).Show();
-                            });
-
-                            return;
-                        }
-
-                        continue;
-                    }
-
-                    if (progressResponse.StatusCode == (int)HttpStatusCode.OK)
-                    {
-                        RequestData result = await progressResponse.GetJsonAsync<RequestData>();
-                        Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
-                        Video.Progress = result.Progress;
-
-                        if (result.Status == DownloadStatus.InProgress)
-                        {
-                            statusWasEverNotDone = true;
-                        }
-
-                        if (result.Status == DownloadStatus.Completed)
-                        {
-                            // Mark as downloaded (only if succeeded)
-                            Video.Status = null;
-                            Video.Progress = 100;
-
-                            if (statusWasEverNotDone)
-                            {
-                                Video.Excluded = true;
-                                Video.ExclusionReason = ExclusionReason.Watched;
-                                // NOTE: We no longer need to update the db here because the server does it,
-                                // so the above is purely a UI update.
-                            }
-
-                            if (showInAppNotifications)
-                            {
-                                MainThread.BeginInvokeOnMainThread(async () =>
-                                {
-                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show();
-                                });
-                            }
-
-                            return;
-                        }
-
-                        if (result.Status == DownloadStatus.Failed)
-                        {
-                            Video.Status = Resources.Resources.FailedToDownload;
-
-                            if (showInAppNotifications)
-                            {
-                                string status = result.Status.ToString();
-
-                                if (!string.IsNullOrEmpty(result.Reason))
-                                {
-                                    status += $" - {result.Reason}";
-                                }
-
-                                MainThread.BeginInvokeOnMainThread(async () =>
-                                {
-                                    await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, string.Empty), ToastDuration.Long).Show();
-                                    await Task.Delay(TimeSpan.FromSeconds(5));
-                                    await Toast.Make(status, ToastDuration.Long).Show();
-                                });
-                            }
-
-                            return;
-                        }
-                    }
-
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    MainThread.BeginInvokeOnMainThread(async () => { await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show(); });
                 }
-            }).ContinueWith(_ =>
+
+                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+            }
+
+            if (result.Status == DownloadStatus.Failed)
             {
-                _progressCancellationToken = null;
-            });
+                Video.Status = Resources.Resources.FailedToDownload;
+
+                if (showInAppNotifications)
+                {
+                    string status = result.Status.ToString();
+
+                    if (!string.IsNullOrEmpty(result.Reason))
+                    {
+                        status += $" - {result.Reason}";
+                    }
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, string.Empty), ToastDuration.Long).Show();
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        await Toast.Make(status, ToastDuration.Long).Show();
+                    });
+                }
+            }
         }
     }
 }

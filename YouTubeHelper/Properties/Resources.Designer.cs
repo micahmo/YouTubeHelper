@@ -444,6 +444,17 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to register for progress updates &apos;{0}&apos;.
+        ///
+        ///{1}.
+        /// </summary>
+        public static string ProgressUpdateFailed {
+            get {
+                return ResourceManager.GetString("ProgressUpdateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Queue.
         /// </summary>
         public static string Queue {
