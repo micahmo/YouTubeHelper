@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Maui.Handlers;
+using Microsoft.Maui.LifecycleEvents;
+using MongoDBHelpers;
 using Plugin.LocalNotification;
+using ServerStatusBot.Definitions.Api;
 
 namespace YouTubeHelper.Mobile
 {
@@ -18,7 +21,23 @@ namespace YouTubeHelper.Mobile
                     fonts.AddFont("ionicons.ttf");
                 })
                 .UseMauiCommunityToolkit()
-                .UseLocalNotification();
+                .UseLocalNotification()
+                .ConfigureLifecycleEvents(events =>
+                {
+#if ANDROID
+                    events.AddAndroid(android =>
+                    {
+                        android
+                            .OnResume((activity) =>
+                            {
+                                if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
+                                {
+                                    ServerApiClient.Instance.ReconnectAllGroups();
+                                }
+                            });
+                    });
+#endif
+                });
 
             AllowMultiLineTruncationOnAndroid();
 
