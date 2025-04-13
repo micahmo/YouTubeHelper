@@ -265,12 +265,13 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             // Mark as downloading
             Video.Excluded = false;
-            Video.Status = Resources.Resources.Downloading;
+            Video.Status = string.Format(Resources.Resources.DownloadingProgress, "0%");
             Video.ExclusionReason = ExclusionReason.None;
             Video.Progress = 0;
         }
 
         private string? _previousRequestId;
+        private bool _statusWasEverNotDone;
 
         internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
@@ -285,16 +286,24 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
             Video.Progress = result.Progress;
 
+            if (result.Status == DownloadStatus.InProgress)
+            {
+                _statusWasEverNotDone = true;
+            }
+
             if (result.Status == DownloadStatus.Completed)
             {
                 // Mark as downloaded (only if succeeded)
                 Video.Status = null;
                 Video.Progress = 100;
 
-                Video.Excluded = true;
-                Video.ExclusionReason = ExclusionReason.Watched;
-                // NOTE: We no longer need to update the db here because the server does it,
-                // so the above is purely a UI update.
+                if (_statusWasEverNotDone)
+                {
+                    Video.Excluded = true;
+                    Video.ExclusionReason = ExclusionReason.Watched;
+                    // NOTE: We no longer need to update the db here because the server does it,
+                    // so the above is purely a UI update.
+                }
 
                 if (showInAppNotifications)
                 {
@@ -324,6 +333,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                         await Toast.Make(status, ToastDuration.Long).Show();
                     });
                 }
+
+                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
             }
         }
     }

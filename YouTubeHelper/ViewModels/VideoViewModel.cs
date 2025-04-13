@@ -150,7 +150,7 @@ namespace YouTubeHelper.ViewModels
 
             // Mark as downloading
             Video.Excluded = false;
-            Video.Status = Resources.Downloading;
+            Video.Status = string.Format(Resources.DownloadingProgress, "0%");
             Video.ExclusionReason = ExclusionReason.None;
             Video.Progress = 1;
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
@@ -158,6 +158,7 @@ namespace YouTubeHelper.ViewModels
         }
 
         private string? _previousRequestId;
+        private bool _statusWasEverNotDone;
 
         internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
@@ -174,16 +175,24 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
 
+            if (result.Status == DownloadStatus.InProgress)
+            {
+                _statusWasEverNotDone = true;
+            }
+
             if (result.Status == DownloadStatus.Completed)
             {
                 // Mark as downloaded (only if succeeded)
                 Video.Status = null;
                 Video.Progress = 100;
 
-                Video.Excluded = true;
-                Video.ExclusionReason = ExclusionReason.Watched;
-                // NOTE: We no longer need to update the db here because the server does it,
-                // so the above is purely a UI update.
+                if (_statusWasEverNotDone)
+                {
+                    Video.Excluded = true;
+                    Video.ExclusionReason = ExclusionReason.Watched;
+                    // NOTE: We no longer need to update the db here because the server does it,
+                    // so the above is purely a UI update.
+                }
 
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
@@ -211,6 +220,8 @@ namespace YouTubeHelper.ViewModels
 
                     App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, status), NotificationType.Error, "NotificationArea");
                 }
+
+                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
             }
         }
 
