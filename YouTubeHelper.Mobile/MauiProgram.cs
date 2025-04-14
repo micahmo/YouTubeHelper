@@ -28,11 +28,28 @@ namespace YouTubeHelper.Mobile
                     events.AddAndroid(android =>
                     {
                         android
-                            .OnResume((activity) =>
+                            .OnResume(async (activity) =>
                             {
-                                if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
+                                for (int i = 0; i < 10; ++i)
                                 {
-                                    ServerApiClient.Instance.ReconnectAllGroups();
+                                    if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
+                                    {
+                                        try
+                                        {
+                                            await ServerApiClient.Instance.ReconnectAllGroups();
+                                            break;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Ignore or log for testing
+                                        }
+
+                                        await Task.Delay(TimeSpan.FromSeconds(1));
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
                                 }
                             });
                     });
