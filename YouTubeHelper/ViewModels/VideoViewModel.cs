@@ -197,19 +197,20 @@ namespace YouTubeHelper.ViewModels
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
 
-                if (showInAppNotifications)
+                if (showInAppNotifications && _statusWasEverNotDone)
                 {
                     App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                 }
 
                 ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _statusWasEverNotDone = false;
             }
 
             if (result.Status == DownloadStatus.Failed)
             {
                 Video.Status = Resources.FailedToDownload;
 
-                if (showInAppNotifications)
+                if (showInAppNotifications && _statusWasEverNotDone)
                 {
                     string status = result.Status.ToString();
 
@@ -222,6 +223,7 @@ namespace YouTubeHelper.ViewModels
                 }
 
                 ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _statusWasEverNotDone = false;
             }
         }
 

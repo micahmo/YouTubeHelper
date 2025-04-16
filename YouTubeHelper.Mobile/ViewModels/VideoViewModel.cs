@@ -305,19 +305,20 @@ namespace YouTubeHelper.Mobile.ViewModels
                     // so the above is purely a UI update.
                 }
 
-                if (showInAppNotifications)
+                if (showInAppNotifications && _statusWasEverNotDone)
                 {
                     MainThread.BeginInvokeOnMainThread(async () => { await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show(); });
                 }
 
                 ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _statusWasEverNotDone = false;
             }
 
             if (result.Status == DownloadStatus.Failed)
             {
                 Video.Status = Resources.Resources.FailedToDownload;
 
-                if (showInAppNotifications)
+                if (showInAppNotifications && _statusWasEverNotDone)
                 {
                     string status = result.Status.ToString();
 
@@ -335,6 +336,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
 
                 ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _statusWasEverNotDone = false;
             }
         }
     }
