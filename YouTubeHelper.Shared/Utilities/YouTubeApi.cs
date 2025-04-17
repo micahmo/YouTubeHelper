@@ -35,28 +35,27 @@ namespace YouTubeHelper.Shared.Utilities
 
         public async Task<bool> PopulateChannel(Channel channel)
         {
-            SearchResource.ListRequest channelSearchRequest = _youTubeService.Search.List("snippet");
-            channelSearchRequest.Q = channel.Identifier;
-            SearchListResponse channelSearchResult = await channelSearchRequest.ExecuteAsync();
-            List<SearchResult> items = channelSearchResult.Items.Where(r => r.Id.Kind == "youtube#channel").ToList();
+            string? channelId = GetChannelIdFromUrl(channel.Identifier);
 
-            if (items.FirstOrDefault() is { } r)
+            if (channelId != null)
             {
-                channel.VanityName = r.Snippet.Title;
-                channel.ChannelId = r.Snippet.ChannelId;
-                channel.ChannelPlaylist = r.Snippet.ChannelId.Replace("UC", "UU");
-                channel.Description = r.Snippet.Description;
-                return true;
+                ChannelsResource.ListRequest? channelsListRequest = _youTubeService.Channels.List("snippet,contentDetails");
+                channelsListRequest.Id = channelId;
+
+                ChannelListResponse? channelsListResponse = await channelsListRequest.ExecuteAsync();
+
+                if (channelsListResponse.Items.FirstOrDefault() is { } c)
+                {
+                    channel.VanityName = c.Snippet.Title;
+                    channel.ChannelId = c.Id;
+                    channel.ChannelPlaylist = c.ContentDetails.RelatedPlaylists.Uploads;
+                    channel.Description = c.Snippet.Description;
+                    return true;
+                }
             }
-            
-            // This is a backup. Sometimes we don't get the channel itself as a result,
-            // but we might get a video on the channel. That can work too.
-            if (channelSearchResult.Items.FirstOrDefault() is { } r2)
+            else
             {
-                channel.VanityName = r2.Snippet.ChannelTitle;
-                channel.ChannelId = r2.Snippet.ChannelId;
-                channel.ChannelPlaylist = r2.Snippet.ChannelId.Replace("UC", "UU");
-                return true;
+                throw new Exception($"Unable to extract Channel ID from given identifier: {channel.Identifier}. Try providing the whole URL to the channel.");
             }
 
             return false;
@@ -328,6 +327,16 @@ namespace YouTubeHelper.Shared.Utilities
                 default:
                     return 0;
             }
+        }
+
+        private static string? GetChannelIdFromUrl(string? url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            {
+                return uri.Segments.Select(s => s.Trim('/')).FirstOrDefault(s => s.StartsWith("UC"));
+            }
+
+            return null;
         }
 
         private readonly YouTubeService _youTubeService;
