@@ -120,7 +120,7 @@ namespace YouTubeHelper.Mobile
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
 
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
-            foreach (Channel channel in channels)
+            foreach (Channel channel in channels.Reverse<Channel>())
             {
                 ChannelViewModel channelViewModel = new(this)
                 {
