@@ -3,6 +3,7 @@ using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Mobile.ViewModels;
@@ -118,7 +119,7 @@ namespace YouTubeHelper.Mobile
             int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4);
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
 
-            IOrderedEnumerable<Channel> channels = (await Collections.ChannelCollection.FindAllAsync()).OrderByDescending(c => c.Index);
+            List<Channel> channels = await ServerApiClient.Instance.GetChannels();
             foreach (Channel channel in channels)
             {
                 ChannelViewModel channelViewModel = new(this)

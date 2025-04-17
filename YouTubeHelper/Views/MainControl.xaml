@@ -19,7 +19,7 @@
     <Grid>
         <busyIndicator:BusyMask
             x:Name="BusyIndicator"
-            BusyContent="{x:Static properties:Resources.Searching}"
+            BusyContent="{x:Static properties:Resources.Loading}"
             IndicatorType="ThreeDots"
             IsBusy="{Binding IsBusy}">
             <Grid>

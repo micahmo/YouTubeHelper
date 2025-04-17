@@ -9,8 +9,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using MongoDBHelpers;
-using ServerStatusBot.Definitions.Database;
+using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
@@ -131,7 +130,7 @@ namespace YouTubeHelper.ViewModels
             get => _isBusy;
             set => SetProperty(ref _isBusy, value);
         }
-        private bool _isBusy;
+        private bool _isBusy = true;
 
         public string CurrentDownloadDirectoryLabel => string.Format(Resources.CurrentDownloadDirectory, Settings.Instance.DownloadDirectory);
 
@@ -322,8 +321,8 @@ namespace YouTubeHelper.ViewModels
         {
             if (!_loaded)
             {
-                var channels = (await Collections.ChannelCollection.FindAllAsync()).OrderBy(c => c.Index);
-                foreach (var c in channels)
+                List<Channel> channels = await ServerApiClient.Instance.GetChannels();
+                foreach (Channel c in channels)
                 {
                     Channels.Add(new ChannelViewModel(c, this));
                 }
@@ -346,6 +345,8 @@ namespace YouTubeHelper.ViewModels
 
                 RealChannels.Clear();
                 RealChannels.AddRange(Channels);
+
+                IsBusy = false;
 
                 _loaded = true;
             }
