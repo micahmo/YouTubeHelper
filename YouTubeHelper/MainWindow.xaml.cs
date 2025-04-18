@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Flurl;
 using ModernWpf.Controls;
 using MongoDBHelpers;
@@ -49,9 +50,13 @@ namespace YouTubeHelper
 
             DataContext = MainControlViewModel;
 
-            await MainControlViewModel.Load();
             NavigationView.SelectedItem = NavigationView.MenuItems.OfType<NavigationViewItem>().First();
             NavigationView.Content = MainControl;
+
+            // Let the UI render before loading
+            await Dispatcher.Yield(DispatcherPriority.Background);
+
+            await MainControlViewModel.Load();
         }
 
         private static async Task ConnectToDatabase()

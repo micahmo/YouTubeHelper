@@ -319,39 +319,52 @@ namespace YouTubeHelper.ViewModels
 
         public async Task Load()
         {
-            if (!_loaded)
+            if (_loaded)
             {
-                List<Channel> channels = await ServerApiClient.Instance.GetChannels();
-                foreach (Channel c in channels)
-                {
-                    Channels.Add(new ChannelViewModel(c, this));
-                }
-
-                Channels.Add(_newChannelTab);
-
-                try
-                {
-                    SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.First(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
-                    SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.First(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
-                    if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
-                    {
-                        SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                RealChannels.Clear();
-                RealChannels.AddRange(Channels);
-
-                IsBusy = false;
-
-                _loaded = true;
+                return;
             }
-        }
 
+            IsBusy = true;
+
+            List<Channel>? channels = null;
+
+            // Load channels in the background
+            await Task.Run(() =>
+            {
+                channels = ServerApiClient.Instance.GetChannels().GetAwaiter().GetResult();
+            });
+
+            // Populate the UI with the channels we retrieved
+            foreach (Channel c in channels ?? Enumerable.Empty<Channel>())
+            {
+                Channels.Add(new ChannelViewModel(c, this));
+                await Task.Yield(); // allow UI to breathe
+            }
+
+            Channels.Add(_newChannelTab);
+
+            try
+            {
+                SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.First(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
+                SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.First(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
+                if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
+                {
+                    SelectedChannel = Channels[ApplicationSettings.Instance.SelectedTabIndex];
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            RealChannels.Clear();
+            RealChannels.AddRange(Channels);
+
+            IsBusy = false;
+
+            _loaded = true;
+        }
+        
         // Helps to prevent double-loading when using the app through RDP sessions.
         private bool _loaded;
     }
