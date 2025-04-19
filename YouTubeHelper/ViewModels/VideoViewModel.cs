@@ -123,10 +123,11 @@ namespace YouTubeHelper.ViewModels
             {
                 await ServerApiClient.Instance.DownloadVideo(
                     url: url,
-                    silent: silent,
+                    silent: true,
                     requestId: requestId,
                     dataDirectorySubpath: Settings.Instance.DownloadDirectory,
                     videoId: Video.Id,
+                    videoName: Video.Title ?? string.Empty,
                     channelPlaylist: Video.ChannelPlaylist,
                     idInChannelFolder: Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }
