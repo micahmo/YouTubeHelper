@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "748855335210",
+    "project_id": "helper-7107b",
+    "storage_bucket": "helper-7107b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748855335210:android:cbe9cf0b39fedf1490e653",
+        "android_client_info": {
+          "package_name": "com.micahmo.youtubehelper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7Fixm05soY9GWBbAZ5ZjYXbzN2U2tV5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

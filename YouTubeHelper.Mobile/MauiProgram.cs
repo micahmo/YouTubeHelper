@@ -5,6 +5,10 @@ using MongoDBHelpers;
 using Plugin.LocalNotification;
 using ServerStatusBot.Definitions.Api;
 
+#if ANDROID
+using Plugin.Firebase.Core.Platforms.Android;
+#endif
+
 namespace YouTubeHelper.Mobile
 {
     public static class MauiProgram
@@ -27,31 +31,50 @@ namespace YouTubeHelper.Mobile
 #if ANDROID
                     events.AddAndroid(android =>
                     {
-                        android
-                            .OnResume(async (activity) =>
-                            {
-                                for (int i = 0; i < 10; ++i)
-                                {
-                                    if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
-                                    {
-                                        try
-                                        {
-                                            await ServerApiClient.Instance.ReconnectAllGroups();
-                                            break;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            // Ignore or log for testing
-                                        }
+                        android.OnPause(_ =>
+                        {
+                            LocalNotificationCenter.Current.CancelAll();
+                        });
 
-                                        await Task.Delay(TimeSpan.FromSeconds(1));
-                                    }
-                                    else
+                        android.OnStop(_ =>
+                        {
+                            LocalNotificationCenter.Current.CancelAll();
+                        });
+
+                        android.OnStart(_ =>
+                        {
+                            LocalNotificationCenter.Current.CancelAll();
+                        });
+
+                        android.OnResume(async _ =>
+                        {
+                            LocalNotificationCenter.Current.CancelAll();
+
+                            for (int i = 0; i < 10; ++i)
+                            {
+                                if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
+                                {
+                                    try
                                     {
+                                        await ServerApiClient.Instance.ReconnectAllGroups();
                                         break;
                                     }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Error reconnecting to SignalR group: {ex}");
+                                    }
+
+                                    await Task.Delay(TimeSpan.FromSeconds(1));
                                 }
-                            });
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        });
+
+                        android.OnCreate((activity, _) =>
+                            CrossFirebase.Initialize(activity));
                     });
 #endif
                 });

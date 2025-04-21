@@ -59,7 +59,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                         Android =
                         {
                             Ongoing = true, 
-                            IconLargeName = { ResourceName = "splash" }, 
                             IconSmallName = { ResourceName = "notification_icon" },
                             ProgressBar = new AndroidProgressBar
                             {

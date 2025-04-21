@@ -238,10 +238,11 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 await ServerApiClient.Instance.DownloadVideo(
                     url: url,
-                    silent: false,
+                    silent: true,
                     requestId: requestId,
                     dataDirectorySubpath: dataDirectorySubpath,
                     videoId: Video.Id,
+                    videoName: Video.Title ?? string.Empty,
                     channelPlaylist: Video.ChannelPlaylist,
                     idInChannelFolder: dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }

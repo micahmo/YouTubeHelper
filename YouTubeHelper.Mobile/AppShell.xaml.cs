@@ -6,6 +6,7 @@ using MongoDBHelpers;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
+using YouTubeHelper.Mobile.Notifications;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared.Utilities;
@@ -159,18 +160,22 @@ namespace YouTubeHelper.Mobile
                 c.Loading = false;
             });
 
-            _ = Task.Run(async () =>
+            // Don't do any local notifications while we experiment with FCM
+            if (false)
             {
-                while (true)
+                _ = Task.Run(async () =>
                 {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    while (true)
                     {
-                        await AppShellViewModel.UpdateNotification();
-                    });
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await AppShellViewModel.UpdateNotification();
+                        });
 
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-                }
-            });
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
+                });
+            }
 
             busyIndicator.Dispose();
 
@@ -256,37 +261,40 @@ namespace YouTubeHelper.Mobile
                 // We'll fall into the next block which prompts the user to re-enter
             }
 
-            if (!withPrompt)
+            if (withPrompt)
             {
-                return connected;
-            }
-
-            while (!connected)
-            {
-                var res = await DisplayPromptAsync(Mobile.Resources.Resources.Database, Mobile.Resources.Resources.EnterConnectionString);
-
-                if (string.IsNullOrEmpty(res))
+                while (!connected)
                 {
-                    Environment.Exit(1);
-                }
+                    var res = await DisplayPromptAsync(Mobile.Resources.Resources.Database, Mobile.Resources.Resources.EnterConnectionString);
 
-                DatabaseEngine.ConnectionString = res;
-
-                using (new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase))
-                {
-                    if (await DatabaseEngine.TestConnectionAsync() is { } err)
+                    if (string.IsNullOrEmpty(res))
                     {
-                        await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.ErrorConnectingToDatabase, err), Mobile.Resources.Resources.OK);
+                        Environment.Exit(1);
                     }
-                    else
+
+                    DatabaseEngine.ConnectionString = res;
+
+                    using (new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase))
                     {
-                        connected = true;
+                        if (await DatabaseEngine.TestConnectionAsync() is { } err)
+                        {
+                            await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.ErrorConnectingToDatabase, err), Mobile.Resources.Resources.OK);
+                        }
+                        else
+                        {
+                            connected = true;
+                        }
                     }
                 }
+
+                // We made it here, so we must have connected successfully. Save the connection string.
+                await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString!);
             }
 
-            // We made it here, so we must have connected successfully. Save the connection string.
-            await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString!);
+            if (connected)
+            {
+                await FirebaseService.InitializeAsync();
+            }
 
             return connected;
         }
