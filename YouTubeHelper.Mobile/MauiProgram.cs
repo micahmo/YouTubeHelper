@@ -31,25 +31,8 @@ namespace YouTubeHelper.Mobile
 #if ANDROID
                     events.AddAndroid(android =>
                     {
-                        android.OnPause(_ =>
-                        {
-                            LocalNotificationCenter.Current.CancelAll();
-                        });
-
-                        android.OnStop(_ =>
-                        {
-                            LocalNotificationCenter.Current.CancelAll();
-                        });
-
-                        android.OnStart(_ =>
-                        {
-                            LocalNotificationCenter.Current.CancelAll();
-                        });
-
                         android.OnResume(async _ =>
                         {
-                            LocalNotificationCenter.Current.CancelAll();
-
                             for (int i = 0; i < 10; ++i)
                             {
                                 if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
