@@ -161,6 +161,7 @@ namespace YouTubeHelper.Mobile
             });
 
             // Don't do any local notifications while we experiment with FCM
+#pragma warning disable CS0162
             if (false)
             {
                 _ = Task.Run(async () =>
@@ -176,6 +177,7 @@ namespace YouTubeHelper.Mobile
                     }
                 });
             }
+#pragma warning restore CS0162
 
             busyIndicator.Dispose();
 
