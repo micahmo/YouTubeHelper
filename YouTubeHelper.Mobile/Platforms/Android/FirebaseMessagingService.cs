@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Firebase.Messaging;
 using Plugin.LocalNotification;
-using Plugin.LocalNotification.AndroidOption;
 
 namespace YouTubeHelper.Mobile.Platforms.Android
 {
@@ -25,6 +24,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool hasProgress = double.TryParse(progressStr, out double progress);
             data.TryGetValue("done", out string? doneStr);
             bool isDone = bool.TryParse(doneStr, out bool done) && done;
+            data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
 
             if (title is not null && body is not null && tag is not null)
             {
@@ -36,26 +36,19 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     }
                 });
 
-                NotificationRequest notification = new NotificationRequest
-                {
-                    NotificationId = int.Parse(tag),
-                    Title = title,
-                    Description = body,
-                    Android =
-                    {
-                        Ongoing = false,
-                        AutoCancel = false,
-                        IconSmallName = { ResourceName = "notification_icon" },
-                        ProgressBar = !hasProgress ? null : new AndroidProgressBar
-                        {
-                            Max = 100,
-                            Progress = (int)progress
-                        },
-                        ChannelId = isDone ? "completion" : "progress"
-                    }
-                };
+#if ANDROID
+                AndroidNotificationHelper.Show(
+                    title: title,
+                    body: body,
+                    thumbnailPath: await Utilities.GetCachedImagePath(thumbnailUrl),
+                    channelId: isDone ? "completion" : "progress",
+                    notificationId: int.Parse(tag),
+                    isDone: isDone,
+                    hasProgress: hasProgress,
+                    progress: progress
+                );
+#endif
 
-                await LocalNotificationCenter.Current.Show(notification);
             }
         }
     }

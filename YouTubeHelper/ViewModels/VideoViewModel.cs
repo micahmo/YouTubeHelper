@@ -128,6 +128,7 @@ namespace YouTubeHelper.ViewModels
                     dataDirectorySubpath: Settings.Instance.DownloadDirectory,
                     videoId: Video.Id,
                     videoName: Video.Title ?? string.Empty,
+                    thumbnailUrl: Video.ThumbnailUrl ?? string.Empty,
                     channelPlaylist: Video.ChannelPlaylist,
                     idInChannelFolder: Settings.Instance.DownloadDirectory.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }

@@ -243,6 +243,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     dataDirectorySubpath: dataDirectorySubpath,
                     videoId: Video.Id,
                     videoName: Video.Title ?? string.Empty,
+                    thumbnailUrl: Video.ThumbnailUrl ?? string.Empty,
                     channelPlaylist: Video.ChannelPlaylist,
                     idInChannelFolder: dataDirectorySubpath.Equals("jellyfin", StringComparison.OrdinalIgnoreCase) ? false : true);
             }
