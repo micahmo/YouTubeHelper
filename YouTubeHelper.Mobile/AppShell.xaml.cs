@@ -6,6 +6,7 @@ using MongoDBHelpers;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
+using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Mobile.Notifications;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
@@ -109,6 +110,9 @@ namespace YouTubeHelper.Mobile
                 await ConnectToDatabase(withPrompt: true);
                 busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.LoadingChannels);
             }
+
+            // Connect to queue updates over SignalR
+            Task _ = Task.Run(async () => await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates));
 
             busyIndicator.Text = Mobile.Resources.Resources.LoadingChannels;
 
@@ -299,6 +303,52 @@ namespace YouTubeHelper.Mobile
             }
 
             return connected;
+        }
+
+        private async void HandleQueueUpdates(RequestData requestData)
+        {
+            // If we're in queue mode, we go one step further and move the video to the top of the queue or add it if it's not already there
+            if (AppShellViewModel is { QueueTabSelected: true, QueueChannelViewModel: { } queueChannel })
+            {
+                int indexOfCurrentVideo = queueChannel.Videos.ToList().FindIndex(videoViewModel => videoViewModel.Video.Id == requestData.VideoId);
+
+                if (indexOfCurrentVideo > -1)
+                {
+                    // It's already in the list, so just remove and re-add at the beginning
+                    VideoViewModel targetVideoViewModel = queueChannel.Videos[indexOfCurrentVideo];
+
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        queueChannel.Videos.Remove(targetVideoViewModel);
+                        queueChannel.Videos.Insert(0, targetVideoViewModel);
+                    });
+                }
+                else if (requestData.VideoId is not null)
+                {
+                    if ((await YouTubeApi.Instance.FindVideoDetails(new List<string> { requestData.VideoId }, null, null, SortMode.AgeDesc)).FirstOrDefault() is { } newVideo)
+                    {
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            queueChannel.Videos.Insert(0, new VideoViewModel(newVideo, this, queueChannel));
+                        });
+                    }
+                }
+            }
+
+            // If any videos that are currently being displayed match the ID in the request data, then start listening for updates
+            // This will include the queue
+            foreach (VideoViewModel videoViewModel in AppShellViewModel.ChannelViewModels.SelectMany(c => c.Videos).Union(AppShellViewModel.QueueChannelViewModel?.Videos ?? Enumerable.Empty<VideoViewModel>()).ToList())
+            {
+                if (videoViewModel.Video.Id == requestData.VideoId)
+                {
+                    videoViewModel.Video.Excluded = false;
+                    videoViewModel.Video.ExclusionReason = ExclusionReason.None;
+
+                    await ServerApiClient.Instance.JoinDownloadGroup(
+                        requestData.RequestGuid.ToString(),
+                        requestDataUpdate => videoViewModel.UpdateCheck(requestData.RequestGuid.ToString(), requestDataUpdate, showInAppNotifications: false));
+                }
+            }
         }
 
         public AppShellViewModel AppShellViewModel => (AppShellViewModel)BindingContext;

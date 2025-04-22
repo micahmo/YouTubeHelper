@@ -11,8 +11,10 @@ using System.Windows.Threading;
 using Flurl;
 using ModernWpf.Controls;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
+using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
@@ -42,6 +44,9 @@ namespace YouTubeHelper
         private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
             await ConnectToDatabase();
+
+            // Connect to queue updates over SignalR
+            Task _ = Task.Run(async () => await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates));
 
             MainControlViewModel = new();
             MainControl = new() { DataContext = MainControlViewModel };
@@ -150,7 +155,7 @@ namespace YouTubeHelper
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (MainControlViewModel!.SelectedChannel != null)
+            if (MainControlViewModel!.SelectedChannel is not null)
             {
                 ApplicationSettings.Instance.SelectedTabIndex = MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel);
             }
@@ -471,6 +476,57 @@ namespace YouTubeHelper
             }
 
             MainControlViewModel.IsBusy = false;
+        }
+
+        private async void HandleQueueUpdates(RequestData requestData)
+        {
+            if (MainControlViewModel == null) return;
+
+            // If we're in queue mode, we go one step further and move the video to the top of the queue or add it if it's not already there
+            if (MainControlViewModel.QueueMode)
+            {
+                if (MainControlViewModel.Channels.FirstOrDefault() is { } queueChannel)
+                {
+                    int indexOfCurrentVideo = queueChannel.Videos.ToList().FindIndex(videoViewModel => videoViewModel.Video.Id == requestData.VideoId);
+
+                    if (indexOfCurrentVideo > -1)
+                    {
+                        // It's already in the list, so just remove and re-add at the beginning
+                        VideoViewModel targetVideoViewModel = queueChannel.Videos[indexOfCurrentVideo];
+
+                        await Application.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            queueChannel.Videos.Remove(targetVideoViewModel);
+                            queueChannel.Videos.Insert(0, targetVideoViewModel);
+                        });
+                    }
+                    else if (requestData.VideoId is not null)
+                    {
+                        if ((await YouTubeApi.Instance.FindVideoDetails(new List<string> { requestData.VideoId }, null, null, SortMode.AgeDesc)).FirstOrDefault() is { } newVideo)
+                        {
+                            await Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                queueChannel.Videos.Insert(0, new VideoViewModel(newVideo, MainControlViewModel, queueChannel));
+                            });
+                        }
+                    }
+                }
+            }
+
+            // If any videos that are currently being displayed match the ID in the request data, then start listening for updates
+            // This will include the queue
+            foreach (VideoViewModel videoViewModel in MainControlViewModel.Channels.SelectMany(c => c.Videos).ToList())
+            {
+                if (videoViewModel.Video.Id == requestData.VideoId)
+                {
+                    videoViewModel.Video.Excluded = false;
+                    videoViewModel.Video.ExclusionReason = ExclusionReason.None;
+
+                    await ServerApiClient.Instance.JoinDownloadGroup(
+                        requestData.RequestGuid.ToString(),
+                        requestDataUpdate => videoViewModel.UpdateCheck(requestData.RequestGuid.ToString(), requestDataUpdate, showInAppNotifications: false));
+                }
+            }
         }
     }
 }

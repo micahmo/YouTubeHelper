@@ -164,9 +164,9 @@ namespace YouTubeHelper.ViewModels
 
         internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
-            if (!result.RequestGuid.ToString().Equals(requestId, StringComparison.OrdinalIgnoreCase))
+            if (result.VideoId != Video.Id)
             {
-                // We got an update for a different request
+                // We got an update for a different video
                 return;
             }
 
