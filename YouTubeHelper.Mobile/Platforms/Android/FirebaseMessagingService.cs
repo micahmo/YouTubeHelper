@@ -23,6 +23,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             data.TryGetValue("tag", out string? tag);
             data.TryGetValue("progress", out string? progressStr);
             bool hasProgress = double.TryParse(progressStr, out double progress);
+            data.TryGetValue("done", out string? doneStr);
+            bool isDone = bool.TryParse(doneStr, out bool done) && done;
 
             if (title is not null && body is not null && tag is not null)
             {
@@ -44,12 +46,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                         Ongoing = false,
                         AutoCancel = false,
                         IconSmallName = { ResourceName = "notification_icon" },
-                        Priority = AndroidPriority.Min,
                         ProgressBar = !hasProgress ? null : new AndroidProgressBar
                         {
                             Max = 100,
                             Progress = (int)progress
                         },
+                        ChannelId = isDone ? "completion" : "progress"
                     }
                 };
 

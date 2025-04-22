@@ -3,6 +3,7 @@ using Microsoft.Maui.Handlers;
 using Microsoft.Maui.LifecycleEvents;
 using MongoDBHelpers;
 using Plugin.LocalNotification;
+using Plugin.LocalNotification.AndroidOption;
 using ServerStatusBot.Definitions.Api;
 
 #if ANDROID
@@ -25,7 +26,26 @@ namespace YouTubeHelper.Mobile
                     fonts.AddFont("ionicons.ttf");
                 })
                 .UseMauiCommunityToolkit()
-                .UseLocalNotification()
+                .UseLocalNotification(config =>
+                {
+                    config.AddAndroid(android =>
+                        {
+                            android.AddChannel(new NotificationChannelRequest
+                            {
+                                Id = "progress",
+                                Name = "Download Progress Updates",
+                                Importance = AndroidImportance.Low
+                            });
+
+                            android.AddChannel(new NotificationChannelRequest
+                            {
+                                Id = "completion",
+                                Name = "Download Completion Updates",
+                                Importance = AndroidImportance.High
+                            });
+                        });
+
+                })
                 .ConfigureLifecycleEvents(events =>
                 {
 #if ANDROID
