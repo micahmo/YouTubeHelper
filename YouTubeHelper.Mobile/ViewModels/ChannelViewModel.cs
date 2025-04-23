@@ -258,6 +258,10 @@ namespace YouTubeHelper.Mobile.ViewModels
         private bool _findInProgress;
         private bool _hasSearchedAtLeastOnce;
 
+        // This action is set by the View during binding
+        // so that external callers can call back into the View to scroll up
+        public Action? ScrollToTopRequested { get; set; }
+
         public ICommand ChannelOptionsCommand => _channelOptionsCommand ??= new RelayCommand(ChannelOptions);
         private ICommand? _channelOptionsCommand;
 

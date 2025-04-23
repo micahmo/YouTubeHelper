@@ -325,6 +325,9 @@ namespace YouTubeHelper.Mobile
                     {
                         queueChannel.Videos.Remove(targetVideoViewModel);
                         queueChannel.Videos.Insert(0, targetVideoViewModel);
+
+                        // Scroll the view to the top so we can see the newly inserted item
+                        queueChannel.ScrollToTopRequested?.Invoke();
                     });
                 }
                 else if (requestData.VideoId is not null)
