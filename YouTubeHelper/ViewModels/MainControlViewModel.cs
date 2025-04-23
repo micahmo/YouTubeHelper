@@ -9,7 +9,10 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using MongoDB.Bson;
+using MongoDBHelpers;
 using ServerStatusBot.Definitions.Api;
+using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
@@ -27,11 +30,15 @@ namespace YouTubeHelper.ViewModels
                 {
                     if (AllowCreateNewChannel)
                     {
-                        Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                        Dispatcher.CurrentDispatcher.BeginInvoke(async () =>
                         {
-                            ChannelViewModel channelViewModel = new(new Channel { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 }, this);
+                            Channel channel = new Channel { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 };
+                            ChannelViewModel channelViewModel = new(channel, this);
                             Channels.Insert(Channels.Count - 1, channelViewModel);
                             SelectedChannel = channelViewModel;
+
+                            // Persist it!
+                            await Collections.ChannelCollection.UpsertAsync<Channel, ObjectId>(channel);
                         });
                     }
                 }
