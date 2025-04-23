@@ -46,7 +46,11 @@ namespace YouTubeHelper
             await ConnectToDatabase();
 
             // Connect to queue updates over SignalR
-            Task _ = Task.Run(async () => await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates));
+            Task _ = Task.Run(async () =>
+            {
+                await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
+                await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);
+            });
 
             MainControlViewModel = new();
             MainControl = new() { DataContext = MainControlViewModel };
@@ -525,6 +529,22 @@ namespace YouTubeHelper
                     await ServerApiClient.Instance.JoinDownloadGroup(
                         requestData.RequestGuid.ToString(),
                         requestDataUpdate => videoViewModel.UpdateCheck(requestData.RequestGuid.ToString(), requestDataUpdate, showInAppNotifications: false));
+                }
+            }
+        }
+
+        private void HandleVideoObjectUpdates(Video updatedVideo)
+        {
+            if (MainControlViewModel == null) return;
+
+            // If any videos that are currently being displayed match the ID in the updated video, then update it in the UI
+            // This will include the queue
+            foreach (VideoViewModel videoViewModel in MainControlViewModel.Channels.SelectMany(c => c.Videos).ToList())
+            {
+                if (videoViewModel.Video.Id == updatedVideo.Id)
+                {
+                    videoViewModel.Video.Excluded = updatedVideo.Excluded;
+                    videoViewModel.Video.ExclusionReason = updatedVideo.ExclusionReason;
                 }
             }
         }

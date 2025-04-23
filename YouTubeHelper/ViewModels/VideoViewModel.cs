@@ -254,7 +254,7 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(Video);
+            await ServerApiClient.Instance.UpdateVideo(Video);
 
             if (MainControlViewModel is { WatchMode: true, ShowExcludedVideos: false })
             {
@@ -269,7 +269,9 @@ namespace YouTubeHelper.ViewModels
         {
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
-            await Collections.ExcludedVideosCollection.DeleteAsync(Video.Id);
+            Video.MarkForDeletion = true;
+            await ServerApiClient.Instance.UpdateVideo(Video);
+            Video.MarkForDeletion = false;
         }
 
         public string ExcludedString => $"{Resources.Excluded} - {new ExclusionReasonExtended(Video.ExclusionReason).Description}";
