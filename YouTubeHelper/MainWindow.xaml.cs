@@ -48,6 +48,11 @@ namespace YouTubeHelper
             // Connect to queue updates over SignalR
             Task _ = Task.Run(async () =>
             {
+                await ServerApiClient.Instance.SubscribeToHubEvents(
+                    reconnecting: _ => Task.CompletedTask,
+                    reconnected: async _ => { await ServerApiClient.Instance.ReconnectAllGroups(); },
+                    closed: _ => Task.CompletedTask);
+
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
                 await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);
             });
