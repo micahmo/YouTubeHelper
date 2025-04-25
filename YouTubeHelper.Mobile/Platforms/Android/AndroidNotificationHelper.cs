@@ -1,4 +1,5 @@
 ﻿using _Microsoft.Android.Resource.Designer;
+using Android.App;
 using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
@@ -11,15 +12,30 @@ namespace YouTubeHelper.Mobile.Platforms.Android
         {
             Context context = global::Android.App.Application.Context;
 
+            PendingIntent? pendingIntent = null;
+            if (context.PackageName != null)
+            {
+                Intent intent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+
+                pendingIntent = PendingIntent.GetActivity(
+                    context,
+                    requestCode: 0,
+                    intent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
+            }
+
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
 
-            var builder = new NotificationCompat.Builder(context, channelId: isDone ? "completion" : "progress")
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: isDone ? "completion" : "progress")
                 .SetContentTitle(title)
                 .SetContentText(body)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
                 .SetLargeIcon(bitmap)
                 .SetOngoing(false)
-                .SetAutoCancel(false);
+                .SetAutoCancel(false)
+                .SetContentIntent(pendingIntent);
 
             if (hasProgress)
             {
