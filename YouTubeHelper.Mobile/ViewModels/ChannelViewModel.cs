@@ -245,7 +245,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     VideoViewModel videoViewModel = new VideoViewModel(video, Page, this);
                                     Videos.Add(videoViewModel);
                                     string requestId = distinctQueue.First(v => v.VideoId == video.Id).RequestGuid.ToString();
-                                    await ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
+
+                                    // Do not await this, as it slows the loading of the queue page
+                                    Task _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
                                 }
                             }
                         }
