@@ -136,6 +136,8 @@ namespace YouTubeHelper.Mobile
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
             foreach (Channel channel in channels.Reverse<Channel>())
             {
+                channel.Changed += (_, _) => ServerApiClient.Instance.UpdateChannel(channel);
+
                 ChannelViewModel channelViewModel = new(this)
                 {
                     Channel = channel,

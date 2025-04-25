@@ -52,7 +52,9 @@ namespace YouTubeHelper.ViewModels
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
             MainControlViewModel.Channels.Remove(this);
-            await Collections.ChannelCollection.DeleteAsync(Channel.Id);
+            Channel.MarkForDeletion = true;
+            Channel.Persistent = false; // Stop doing updates!
+            await ServerApiClient.Instance.UpdateChannel(Channel);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);

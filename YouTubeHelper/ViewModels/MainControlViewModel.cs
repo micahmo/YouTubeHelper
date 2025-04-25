@@ -9,10 +9,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using MongoDB.Bson;
-using MongoDBHelpers;
 using ServerStatusBot.Definitions.Api;
-using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
@@ -38,7 +35,13 @@ namespace YouTubeHelper.ViewModels
                             SelectedChannel = channelViewModel;
 
                             // Persist it!
-                            await Collections.ChannelCollection.UpsertAsync<Channel, ObjectId>(channel);
+                            Channel result = await ServerApiClient.Instance.UpdateChannel(channel);
+
+                            // Listen for changes
+                            channel.Changed += async (_, _) =>
+                            {
+                                await ServerApiClient.Instance.UpdateChannel(channel);
+                            };
                         });
                     }
                 }
@@ -339,6 +342,14 @@ namespace YouTubeHelper.ViewModels
             await Task.Run(() =>
             {
                 channels = ServerApiClient.Instance.GetChannels().GetAwaiter().GetResult();
+
+                channels.ToList().ForEach(c =>
+                {
+                    c.Changed += async (_, _) =>
+                    {
+                        await ServerApiClient.Instance.UpdateChannel(c);
+                    };
+                });
             });
 
             // Populate the UI with the channels we retrieved
