@@ -212,9 +212,9 @@ namespace YouTubeHelper.ViewModels
             {
                 Video.Status = Resources.FailedToDownload;
 
-                if (showInAppNotifications && _statusWasEverNotDone)
+                if (showInAppNotifications && _statusWasEverNotDone && result.Status != null)
                 {
-                    string status = result.Status.ToString();
+                    string status = result.Status!.ToString()!;
 
                     if (!string.IsNullOrEmpty(result.Reason))
                     {
