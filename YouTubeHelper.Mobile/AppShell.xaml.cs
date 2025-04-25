@@ -473,7 +473,7 @@ namespace YouTubeHelper.Mobile
 
                     foundChannelViewModel = new(this)
                     {
-                        Channel = new Channel(nonPersistent: true)
+                        Channel = new Channel(persistent: false)
                         {
                             VanityName = channelName,
                             ChannelPlaylist = channelPlaylist, 

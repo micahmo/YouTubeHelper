@@ -94,8 +94,8 @@ namespace YouTubeHelper.ViewModels
                 }
             };
 
-            _newChannelTab = new(new Channel(nonPersistent: true) { VanityName = "+" }, this);
-            _queueChannelTab = new(new Channel(nonPersistent: true) { VanityName = Resources.Queue }, this);
+            _newChannelTab = new(new Channel(persistent: false) { VanityName = "+" }, this);
+            _queueChannelTab = new(new Channel(persistent: false) { VanityName = Resources.Queue }, this);
         }
 
         public void RaisePropertyChanged(string propertyName)

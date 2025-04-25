@@ -465,7 +465,7 @@ namespace YouTubeHelper
                 {
                     string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Properties.Resources.Unknown);
 
-                    foundChannelViewModel = new(new Channel(nonPersistent: true)
+                    foundChannelViewModel = new(new Channel(persistent: false)
                     {
                         VanityName = channelName,
                         ChannelPlaylist = channelPlaylist,

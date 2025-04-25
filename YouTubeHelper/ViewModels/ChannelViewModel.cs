@@ -279,10 +279,10 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.RealChannels.Clear();
             MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
 
-            foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
+            foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await Collections.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+                await ServerApiClient.Instance.UpdateChannel(c.Channel);
             }
         }
 
@@ -302,10 +302,10 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.RealChannels.Clear();
             MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
 
-            foreach (ChannelViewModel c in MainControlViewModel.Channels.ToList())
+            foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await Collections.ChannelCollection.UpdateAsync<Channel, ObjectId>(c.Channel);
+                await ServerApiClient.Instance.UpdateChannel(c.Channel);
             }
         }
 
