@@ -197,7 +197,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await ServerApiClient.Instance.UpdateVideoWithUpdateResult(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
@@ -236,7 +236,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await ServerApiClient.Instance.UpdateVideoWithUpdateResult(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
@@ -275,7 +275,7 @@ namespace YouTubeHelper
                     int updatedCount = 0;
                     foreach (string videoId in videoIds)
                     {
-                        bool res = await Collections.ExcludedVideosCollection.UpsertAsync<Video, string>(new Video
+                        bool res = await ServerApiClient.Instance.UpdateVideoWithUpdateResult(new Video
                         {
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,
