@@ -316,7 +316,7 @@ namespace YouTubeHelper.Mobile
             {
                 int indexOfCurrentVideo = queueChannel.Videos.ToList().FindIndex(videoViewModel => videoViewModel.Video.Id == requestData.VideoId);
 
-                if (indexOfCurrentVideo > -1)
+                if (indexOfCurrentVideo > 0)
                 {
                     // It's already in the list, so just remove and re-add at the beginning
                     VideoViewModel targetVideoViewModel = queueChannel.Videos[indexOfCurrentVideo];
