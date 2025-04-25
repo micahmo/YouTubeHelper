@@ -335,7 +335,7 @@ namespace YouTubeHelper.Mobile
                         queueChannel.ScrollToTopRequested?.Invoke();
                     });
                 }
-                else if (requestData.VideoId is not null)
+                else if (indexOfCurrentVideo < 0)
                 {
                     if ((await YouTubeApi.Instance.FindVideoDetails(new List<string> { requestData.VideoId }, null, null, SortMode.AgeDesc)).FirstOrDefault() is { } newVideo)
                     {
