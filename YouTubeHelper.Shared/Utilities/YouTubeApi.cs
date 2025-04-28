@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Database.Models;
 using Channel = ServerStatusBot.Definitions.Database.Models.Channel;
-using Video = Google.Apis.YouTube.v3.Data.Video;
 using ModelVideo = ServerStatusBot.Definitions.Database.Models.Video;
 using ServerStatusBot.Definitions.Api;
+using ServerStatusBot.Definitions.Models;
 
 namespace YouTubeHelper.Shared.Utilities
 {
@@ -111,7 +108,17 @@ namespace YouTubeHelper.Shared.Utilities
                 videoIds = videoIds.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(videoIds, excludedVideos, channel, sortMode, searchTerms, count, dateRangeLimit, videoLengthMinimum);
+            return await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+            {
+                VideoIds = videoIds,
+                ExcludedVideos = excludedVideos,
+                Channel = channel,
+                SortMode = sortMode,
+                SearchTerms = searchTerms,
+                Count = count,
+                DateRangeLimit = dateRangeLimit,
+                VideoLengthMinimum = videoLengthMinimum
+            });
         }
 
         public async Task<IEnumerable<ModelVideo>> SearchVideos(Channel channel, List<ModelVideo> excludedVideos, bool showExclusions, SortMode sortMode, string lookup, int count = 10)
@@ -127,136 +134,14 @@ namespace YouTubeHelper.Shared.Utilities
                 items = items.Except(excludedVideos?.Select(v => v.Id) ?? Enumerable.Empty<string>()).ToList();
             }
 
-            return await FindVideoDetails(items, excludedVideos, channel, sortMode, count: count);
-        }
-
-        public async Task<IEnumerable<ModelVideo>> FindVideoDetails(
-            List<string> videoIds,
-            List<ModelVideo>? excludedVideos = null, 
-            Channel? channel = null,
-            SortMode? sortMode = null,
-            List<string>? searchTerms = null,
-            int count = 10,
-            DateTime? dateRangeLimit = null,
-            TimeSpan? videoLengthMinimum = null,
-            Func<List<Video>, List<Video>>? customSort = null)
-        {
-            List<ModelVideo> results = new();
-            List<string>? excludedVideoIds = excludedVideos?.Select(v => v.Id).ToList();
-
-            // Use the videoIds to look up real info
-            ConcurrentBag<IList<Video>> videoResults = new();
-
-#if DEBUG
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-#endif
-
-            await Parallel.ForEachAsync(videoIds.Chunk(50), async (chunkedVideoIds, _) =>
+            return await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
             {
-                VideosResource.ListRequest videoRequest = _youTubeService.Videos.List(new List<string> { "snippet", "contentDetails" });
-                videoRequest.Id = string.Join(",", chunkedVideoIds.Take(50));
-                var videoResponse = await videoRequest.ExecuteAsync();
-                videoResults.Add(videoResponse.Items);
+                VideoIds = items,
+                ExcludedVideos = excludedVideos,
+                Channel = channel,
+                SortMode = sortMode,
+                Count = count
             });
-
-            List<Video> videos = videoResults.SelectMany(v => v).ToList();
-
-#if DEBUG
-            stopwatch.Stop();
-            Debug.WriteLine($"Took {stopwatch.Elapsed} for second retrieve.");
-#endif
-
-            // Do optional filtering
-            if (searchTerms?.Any() == true)
-            {
-                // Filter by search terms
-                HashSet<Video> filteredVideos = new HashSet<Video>();
-                foreach (Video video in videos)
-                {
-                    bool result = true;
-                    foreach (string searchTerm in searchTerms)
-                    {
-                        if (!video.Snippet.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = false;
-                        }
-                    }
-                    if (result)
-                    {
-                        filteredVideos.Add(video);
-                    }
-
-                    result = true;
-                    foreach (string searchTerm in searchTerms)
-                    {
-                        if (!video.Snippet.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = false;
-                        }
-                    }
-                    if (result)
-                    {
-                        filteredVideos.Add(video);
-                    }
-                }
-
-                videos = filteredVideos.ToList();
-            }
-
-            // Filter by date range
-            if (dateRangeLimit.HasValue)
-            {
-                videos = videos.Except(videos.Where(v => v.Snippet.PublishedAtDateTimeOffset < dateRangeLimit.Value)).ToList();
-            }
-
-            // Filter by video length
-            if (videoLengthMinimum.HasValue)
-            {
-                videos = videos.Except(videos.Where(v => videoLengthMinimum.Value >= XmlConvert.ToTimeSpan(v.ContentDetails.Duration))).ToList();
-            }
-
-            // Remove videos that are not from this channel
-            if (channel is not null)
-            {
-                videos = videos.Except(videos.Where(v => v.Snippet.ChannelId != channel.ChannelId)).ToList();
-            }
-
-            // First sort by duration
-            var videosSortedByDuration = videos.OrderByDescending(v => XmlConvert.ToTimeSpan(v.ContentDetails.Duration)).ToList();
-
-            // Then sort by age
-            var videosSortedByAge = videos.OrderByDescending(v => v.Snippet.PublishedAtDateTimeOffset).ToList();
-
-            List<Video> rankedVideos = videos;
-            
-            if (sortMode != null)
-            {
-                rankedVideos = videos.OrderBy(v => YouTubeUtils.SortFunction(sortMode.Value, v, videosSortedByDuration, videosSortedByAge)).ToList();
-            }
-
-            if (customSort != null)
-            {
-                rankedVideos = customSort(videos);
-            }    
-
-            foreach (Video video in rankedVideos.Take(searchTerms?.Any() == true ? int.MaxValue : count))
-            {
-                results.Add(new ModelVideo
-                {
-                    Excluded = (excludedVideoIds ?? new List<string>()).Contains(video.Id),
-                    ExclusionReason = excludedVideos?.FirstOrDefault(v => v.Id == video.Id)?.ExclusionReason ?? ExclusionReason.None,
-                    Title = video.Snippet.Title,
-                    Id = video.Id,
-                    ChannelPlaylist = channel?.ChannelPlaylist ?? video.Snippet.ChannelId.Replace("UC", "UU"),
-                    Description = video.Snippet.Description,
-                    Duration = XmlConvert.ToTimeSpan(video.ContentDetails.Duration),
-                    ReleaseDate = video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue,
-                    ThumbnailUrl = /*v.Snippet.Thumbnails.Maxres?.Url ?? */video.Snippet.Thumbnails.Medium?.Url ?? video.Snippet.Thumbnails.Standard?.Url ?? video.Snippet.Thumbnails.High?.Url ?? video.Snippet.Thumbnails.Default__?.Url ?? string.Empty
-                });
-            }
-
-            return results;
         }
 
         private readonly YouTubeService _youTubeService;

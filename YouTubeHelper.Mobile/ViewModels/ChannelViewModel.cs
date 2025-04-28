@@ -221,8 +221,15 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                                 }
 
-                                var videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, SelectedSortMode?.Value ?? SortMode.AgeDesc, count: int.MaxValue);
-                                var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                                {
+                                    VideoIds = exclusions.Select(v => v.Id).ToList(),
+                                    ExcludedVideos = exclusions,
+                                    Channel = Channel,
+                                    SortMode = SelectedSortMode?.Value ?? SortMode.AgeDesc,
+                                    Count = int.MaxValue
+                                });
+                                List<VideoViewModel>? videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                 Videos.AddRange(videoViewModels);
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
@@ -233,12 +240,14 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 // Get all excluded videos
                                 List<Video> excludedVideos = await ServerApiClient.Instance.GetAllExcludedVideos();
 
-                                List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
-                                    distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
-                                    excludedVideos: excludedVideos,
-                                    customSort: videos => videos.OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue).ToList(),
-                                    count: int.MaxValue
-                                )).ToList();
+                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                                    {
+                                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
+                                        ExcludedVideos = excludedVideos,
+                                        Count = int.MaxValue
+                                    }))
+                                    .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue)
+                                    .ToList();
 
                                 foreach (Video? video in queuedVideos)
                                 {

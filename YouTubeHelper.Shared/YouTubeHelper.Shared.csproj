@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.69.0.3742" />
-    <PackageReference Include="mdm.ServerStatusBot.Definitions" Version="1.0.99" />
+    <PackageReference Include="mdm.ServerStatusBot.Definitions" Version="1.0.100" />
   </ItemGroup>
 
 </Project>

@@ -209,7 +209,14 @@ namespace YouTubeHelper.ViewModels
                             exclusions = exclusions.Where(v => MainControlViewModel.SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                         }
 
-                        IEnumerable<Video> videos = await YouTubeApi.Instance.FindVideoDetails(exclusions.Select(v => v.Id).ToList(), exclusions, Channel, MainControlViewModel.SelectedSortMode.Value, count: int.MaxValue);
+                        IEnumerable<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                        {
+                            VideoIds = exclusions.Select(v => v.Id).ToList(),
+                            ExcludedVideos = exclusions,
+                            Channel = Channel,
+                            SortMode = MainControlViewModel.SelectedSortMode.Value,
+                            Count = int.MaxValue
+                        });
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -240,19 +247,21 @@ namespace YouTubeHelper.ViewModels
                 // Get all excluded videos
                 List<Video> excludedVideos = await ServerApiClient.Instance.GetAllExcludedVideos();
 
-                List<Video> queuedVideos = (await YouTubeApi.Instance.FindVideoDetails(
-                    distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
-                    excludedVideos: excludedVideos,
-                    customSort: videos => videos.OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue).ToList(),
-                    count: int.MaxValue
-                )).ToList();
+                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                    {
+                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
+                        ExcludedVideos = excludedVideos,
+                        Count = int.MaxValue
+                    }))
+                    .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue)
+                    .ToList();
 
                 foreach (Video video in queuedVideos)
                 {
                     VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
                     Videos.Add(videoViewModel);
                     string requestId = distinctQueue.First(v => v.VideoId! == video.Id).RequestGuid.ToString();
-                    
+
                     // Do not await this, as it slows the loading of the queue page
                     Task _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
                 }

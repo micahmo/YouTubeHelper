@@ -339,7 +339,11 @@ namespace YouTubeHelper.Mobile
                 }
                 else if (indexOfCurrentVideo < 0)
                 {
-                    if ((await YouTubeApi.Instance.FindVideoDetails(new List<string> { requestData.VideoId }, null, null, SortMode.AgeDesc)).FirstOrDefault() is { } newVideo)
+                    if ((await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                        {
+                            VideoIds = new List<string> { requestData.VideoId },
+                            SortMode = SortMode.AgeDesc
+                        })).FirstOrDefault() is { } newVideo)
                     {
                         await MainThread.InvokeOnMainThreadAsync(() =>
                         {
@@ -423,8 +427,12 @@ namespace YouTubeHelper.Mobile
             if (!string.IsNullOrEmpty(videoId))
             {
                 busyIndicator.Text = Mobile.Resources.Resources.FindingSharedVideo;
-                
-                video = (await YouTubeApi.Instance.FindVideoDetails(new List<string> { videoId }, null, null, SortMode.AgeDesc)).FirstOrDefault();
+
+                video = (await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                {
+                    VideoIds = new List<string> { videoId },
+                    SortMode = SortMode.AgeDesc
+                })).FirstOrDefault();
                 if (video is not null)
                 {
                     // See if this video is excluded
