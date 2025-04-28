@@ -32,34 +32,6 @@ namespace YouTubeHelper.Shared.Utilities
             });
         }
 
-        public async Task<bool> PopulateChannel(Channel channel)
-        {
-            string? channelId = GetChannelIdFromUrl(channel.Identifier);
-
-            if (channelId != null)
-            {
-                ChannelsResource.ListRequest? channelsListRequest = _youTubeService.Channels.List("snippet,contentDetails");
-                channelsListRequest.Id = channelId;
-
-                ChannelListResponse? channelsListResponse = await channelsListRequest.ExecuteAsync();
-
-                if (channelsListResponse.Items.FirstOrDefault() is { } c)
-                {
-                    channel.VanityName = c.Snippet.Title;
-                    channel.ChannelId = c.Id;
-                    channel.ChannelPlaylist = c.ContentDetails.RelatedPlaylists.Uploads;
-                    channel.Description = c.Snippet.Description;
-                    return true;
-                }
-            }
-            else
-            {
-                throw new Exception($"Unable to extract Channel ID from given identifier: {channel.Identifier}. Try providing the whole URL to the channel.");
-            }
-
-            return false;
-        }
-
         public async Task<IEnumerable<ModelVideo>> FindVideos(
             Channel? channel, 
             List<ModelVideo> excludedVideos,
@@ -260,7 +232,7 @@ namespace YouTubeHelper.Shared.Utilities
             
             if (sortMode != null)
             {
-                rankedVideos = videos.OrderBy(v => SortFunction(sortMode.Value, v, videosSortedByDuration, videosSortedByAge)).ToList();
+                rankedVideos = videos.OrderBy(v => YouTubeUtils.SortFunction(sortMode.Value, v, videosSortedByDuration, videosSortedByAge)).ToList();
             }
 
             if (customSort != null)
@@ -287,87 +259,6 @@ namespace YouTubeHelper.Shared.Utilities
             return results;
         }
 
-        public async Task<string> FindChannelId(string channelHandle, string defaultValue = "")
-        {
-            SearchResource.ListRequest request = _youTubeService.Search.List("snippet");
-            request.Q = channelHandle;
-            SearchListResponse response = await request.ExecuteAsync();
-
-            return response.Items.FirstOrDefault()?.Snippet.ChannelId ?? defaultValue;
-        }
-
-        public async Task<string> FindChannelName(string channelId, string defaultValue)
-        {
-            ChannelsResource.ListRequest request = _youTubeService.Channels.List("snippet");
-            request.Id = channelId;
-            ChannelListResponse response = await request.ExecuteAsync();
-
-            return response.Items?.FirstOrDefault()?.Snippet.Title ?? defaultValue;
-        }
-
-        public string? ToChannelPlaylist(string? channelId) => channelId?.Replace("UC", "UU");
-
-        public string? ToChannelId(string? channelPlaylist) => channelPlaylist?.Replace("UU", "UC");
-
-        private double SortFunction(SortMode sortMode, Video video, List<Video> videosSortedByDuration, List<Video> videosSortedByAge)
-        {
-            switch (sortMode)
-            {
-                case SortMode.DurationDesc:
-                    return -XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
-                case SortMode.DurationAsc:
-                    return XmlConvert.ToTimeSpan(video.ContentDetails.Duration).TotalMilliseconds;
-                case SortMode.AgeDesc:
-                    return -(video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue).Ticks;
-                case SortMode.AgeAsc:
-                    return (video.Snippet.PublishedAtDateTimeOffset ?? DateTimeOffset.MinValue).Ticks;
-                case SortMode.DurationDescPlusAgeDesc:
-                    return videosSortedByDuration.IndexOf(video) + videosSortedByAge.IndexOf(video);
-                case SortMode.DurationAscPlusAgeDesc:
-                    List<Video> videosSortedByDurationReverse = videosSortedByDuration.ToList();
-                    videosSortedByDurationReverse.Reverse();
-                    return videosSortedByDurationReverse.IndexOf(video) + videosSortedByAge.IndexOf(video);
-                default:
-                    return 0;
-            }
-        }
-
-        private static string? GetChannelIdFromUrl(string? url)
-        {
-            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
-            {
-                return uri.Segments.Select(s => s.Trim('/')).FirstOrDefault(s => s.StartsWith("UC"));
-            }
-
-            return null;
-        }
-
         private readonly YouTubeService _youTubeService;
-    }
-
-    public enum SortMode
-    {
-        [Description("Duration Descending + Age Descending (Longest + Newest)")]
-        DurationDescPlusAgeDesc,
-
-        [Description("Duration Ascending + Age Descending (Shortest + Newest)")]
-        DurationAscPlusAgeDesc,
-
-        [Description("Duration Descending (Longest First)")]
-        DurationDesc,
-
-        [Description("Duration Ascending (Shortest First)")]
-        DurationAsc,
-
-        [Description("Age Descending (Newest First)")]
-        AgeDesc,
-
-        [Description("Age Ascending (Oldest First)")]
-        AgeAsc
-    }
-
-    public class SortModeExtended : EnumExtended<SortMode>
-    {
-        public SortModeExtended(SortMode sortMode) : base(sortMode) { }
     }
 }

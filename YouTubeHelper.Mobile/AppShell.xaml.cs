@@ -3,6 +3,7 @@ using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -434,15 +435,15 @@ namespace YouTubeHelper.Mobile
                     }
 
                     channelPlaylist = video.ChannelPlaylist;
-                    channelId = YouTubeApi.Instance.ToChannelId(channelPlaylist);
+                    channelId = YouTubeUtils.ToChannelId(channelPlaylist);
                 }
 
             }
 
             if (!string.IsNullOrEmpty(channelHandle))
             {
-                channelId = await YouTubeApi.Instance.FindChannelId(channelHandle);
-                channelPlaylist = YouTubeApi.Instance.ToChannelPlaylist(channelId);
+                channelId = await ServerApiClient.Instance.FindChannelId(channelHandle);
+                channelPlaylist = YouTubeUtils.ToChannelPlaylist(channelId);
             }
 
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
@@ -470,7 +471,7 @@ namespace YouTubeHelper.Mobile
 
                 if (foundChannelViewModel is null)
                 {
-                    string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Mobile.Resources.Resources.Unknown);
+                    string channelName = await ServerApiClient.Instance.FindChannelName(channelId, Mobile.Resources.Resources.Unknown);
 
                     foundChannelViewModel = new(this)
                     {

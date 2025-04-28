@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using MongoDBHelpers;
 using Newtonsoft.Json;
 using Polly;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;

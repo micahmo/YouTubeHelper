@@ -9,11 +9,11 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
-using YouTubeHelper.Shared.Utilities;
 
 namespace YouTubeHelper.ViewModels
 {

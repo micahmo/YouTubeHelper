@@ -4,8 +4,8 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 using System.IO;
 using System.Windows;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Database.Models;
-using YouTubeHelper.Shared.Utilities;
 
 namespace YouTubeHelper.Models
 {

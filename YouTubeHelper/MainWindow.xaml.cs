@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using Flurl;
 using ModernWpf.Controls;
 using MongoDBHelpers;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -429,14 +430,14 @@ namespace YouTubeHelper
                     }
 
                     channelPlaylist = video.ChannelPlaylist;
-                    channelId = YouTubeApi.Instance.ToChannelId(channelPlaylist);
+                    channelId = YouTubeUtils.ToChannelId(channelPlaylist);
                 }
             }
 
             if (!string.IsNullOrEmpty(channelHandle))
             {
-                channelId = await YouTubeApi.Instance.FindChannelId(channelHandle);
-                channelPlaylist = YouTubeApi.Instance.ToChannelPlaylist(channelId);
+                channelId = await ServerApiClient.Instance.FindChannelId(channelHandle);
+                channelPlaylist = YouTubeUtils.ToChannelPlaylist(channelId);
             }
 
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
@@ -462,7 +463,7 @@ namespace YouTubeHelper
 
                 if (foundChannelViewModel is null)
                 {
-                    string channelName = await YouTubeApi.Instance.FindChannelName(channelId, Properties.Resources.Unknown);
+                    string channelName = await ServerApiClient.Instance.FindChannelName(channelId, Properties.Resources.Unknown);
 
                     foundChannelViewModel = new(new Channel(persistent: false)
                     {

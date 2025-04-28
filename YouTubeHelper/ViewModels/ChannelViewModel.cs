@@ -60,7 +60,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void LookupChannel()
         {
-            if (await YouTubeApi.Instance.PopulateChannel(Channel))
+            if (await ServerApiClient.Instance.PopulateChannel(Channel))
             {
                 SearchGlyph = Icons.Check;
                 await Task.Delay(TimeSpan.FromSeconds(5));

@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3513" />
-    <PackageReference Include="mdm.ServerStatusBot.Definitions" Version="1.0.91" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.69.0.3742" />
+    <PackageReference Include="mdm.ServerStatusBot.Definitions" Version="1.0.99" />
   </ItemGroup>
 
 </Project>
