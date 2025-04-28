@@ -9,13 +9,12 @@ using System.Xml;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using MongoDBHelpers;
 using ServerStatusBot.Definitions;
-using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using Channel = ServerStatusBot.Definitions.Database.Models.Channel;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 using ModelVideo = ServerStatusBot.Definitions.Database.Models.Video;
+using ServerStatusBot.Definitions.Api;
 
 namespace YouTubeHelper.Shared.Utilities
 {
@@ -80,8 +79,12 @@ namespace YouTubeHelper.Shared.Utilities
             List<string> videoIds = new List<string>();
 
             // Load known videos
-            IEnumerable<string> knownVideos = (await Collections.KnownVideosCollection.FindByConditionAsync(v => v.ChannelPlaylist == channel!.ChannelPlaylist)).Select(v => v.Id);
-            videoIds.AddRange(knownVideos);
+            IEnumerable<string> knownVideos = new List<string>();
+            if (channel?.ChannelPlaylist != null)
+            {
+                knownVideos = await ServerApiClient.Instance.GetKnownVideos(channel.ChannelPlaylist!);
+                videoIds.AddRange(knownVideos);
+            }
 
 #if DEBUG
             Stopwatch stopwatch = new();
@@ -121,14 +124,14 @@ namespace YouTubeHelper.Shared.Utilities
             videoIds = videoIds.Distinct().ToList();
 
             // Save the newly loaded known videos
-            var knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new ModelVideo
+            List<ModelVideo> knownVideosToAdd = videoIds.Except(knownVideos).Select(v => new ModelVideo
             {
                 Id = v,
                 ChannelPlaylist = channel?.ChannelPlaylist
-            });
+            }).ToList();
             if (knownVideosToAdd.Any())
             {
-                await Collections.KnownVideosCollection.InsertManyAsync(knownVideosToAdd);
+                await ServerApiClient.Instance.AddKnownVideos(knownVideosToAdd);
             }
 
             if (!showExclusions)
