@@ -55,7 +55,7 @@ namespace YouTubeHelper.Mobile
                         {
                             for (int i = 0; i < 10; ++i)
                             {
-                                if (!string.IsNullOrEmpty(DatabaseEngine.ConnectionString))
+                                if (!string.IsNullOrEmpty(ServerApiClient.BaseUrl))
                                 {
                                     try
                                     {

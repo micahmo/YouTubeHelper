@@ -10,13 +10,11 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Flurl;
 using ModernWpf.Controls;
-using MongoDBHelpers;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Models;
-using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
@@ -43,7 +41,7 @@ namespace YouTubeHelper
 
         private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
-            await ConnectToDatabase();
+            await ConnectToServer();
 
             // Connect to queue updates over SignalR
             Task _ = Task.Run(async () =>
@@ -73,19 +71,17 @@ namespace YouTubeHelper
             await MainControlViewModel.Load();
         }
 
-        private static async Task ConnectToDatabase()
+        public static async Task ConnectToServer()
         {
-            // See if we already have a connection string encrypted
+            // See if we already have a server address encrypted
             bool connected = false;
             try
             {
-                byte[] connectionStringUnencryptedBytes = ProtectedData.Unprotect(ApplicationSettings.Instance.ConnectionString!, null, DataProtectionScope.CurrentUser);
-                string connectionString = Encoding.UTF8.GetString(connectionStringUnencryptedBytes);
-                DatabaseEngine.ConnectionString = connectionString;
-                if (string.IsNullOrEmpty(DatabaseEngine.TestConnection()))
-                {
-                    connected = true;
-                }
+                byte[] serverAddressUnencryptedBytes = ProtectedData.Unprotect(ApplicationSettings.Instance.ServerAddress!, null, DataProtectionScope.CurrentUser);
+                string serverAddress = Encoding.UTF8.GetString(serverAddressUnencryptedBytes);
+                ServerApiClient.SetBaseUrl(serverAddress);
+                Settings.Instance = await ServerApiClient.Instance.GetSettings();
+                connected = true;
             }
             catch
             {
@@ -94,18 +90,28 @@ namespace YouTubeHelper
 
             while (!connected)
             {
-                var result = await MessageBoxHelper.ShowInputBox(Properties.Resources.EnterConnectionString, Properties.Resources.Database);
+                var result = await MessageBoxHelper.ShowInputBox(Properties.Resources.EnterServerAddress, Properties.Resources.Server);
 
                 if (result.Result == ContentDialogResult.None)
                 {
                     Environment.Exit(1);
                 }
 
-                DatabaseEngine.ConnectionString = result.Text;
+                ServerApiClient.SetBaseUrl(result.Text);
 
-                if (DatabaseEngine.TestConnection() is { } error)
+                string error = string.Empty;
+                try
                 {
-                    await MessageBoxHelper.Show(string.Format(Properties.Resources.ErrorConnectingToDatabase, error), Properties.Resources.Error, MessageBoxButton.OK);
+                    Settings.Instance = await ServerApiClient.Instance.GetSettings();
+                }
+                catch (Exception ex)
+                {
+                    error = ex.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    await MessageBoxHelper.Show(string.Format(Properties.Resources.ErrorConnectingToServer, error), Properties.Resources.Error, MessageBoxButton.OK);
                 }
                 else
                 {
@@ -113,10 +119,10 @@ namespace YouTubeHelper
                 }
             }
 
-            // We made it here, so we must have connected successfully. Save the connection string.
-            byte[] connectionStringBytes = Encoding.UTF8.GetBytes(DatabaseEngine.ConnectionString!);
-            var connectionStringEncryptedBytes = ProtectedData.Protect(connectionStringBytes, null, DataProtectionScope.CurrentUser);
-            ApplicationSettings.Instance.ConnectionString = connectionStringEncryptedBytes;
+            // We made it here, so we must have connected successfully. Save the server address.
+            byte[] serverAddressBytes = Encoding.UTF8.GetBytes(ServerApiClient.BaseUrl!);
+            byte[] serverAddressEncryptedBytes = ProtectedData.Protect(serverAddressBytes, null, DataProtectionScope.CurrentUser);
+            ApplicationSettings.Instance.ServerAddress = serverAddressEncryptedBytes;
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

@@ -82,7 +82,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             FindVideos(count: 10);
         }
-        
+
         public async void FindVideos(int count)
         {
             if (_findInProgress)
@@ -103,18 +103,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                         await Page.DisplayAlert(Resources.Resources.Error, string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), Resources.Resources.OK);
                     });
                 })
-                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, async (ex, _) =>
+                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, (ex, _) =>
                 {
-                    // This retries a few times and lets us reset things before we try again.
-                    await MainThread.InvokeOnMainThreadAsync(() =>
-                    {
-                        if (ex is MongoConnectionPoolPausedException)
-                        {
-                            DatabaseEngine.Reset();
-                        }
-
-                        return Task.CompletedTask;
-                    });
+                    // Nothing to do
                 }))
                 .ExecuteAsync(async () =>
                 {

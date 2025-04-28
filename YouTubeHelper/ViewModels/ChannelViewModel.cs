@@ -89,13 +89,7 @@ namespace YouTubeHelper.ViewModels
             await Policy
                 .Handle<Exception>().RetryAsync(5, (ex, _) =>
                 {
-                    // This retries a few times and lets us reset things before we try again.
-                    if (ex is MongoConnectionPoolPausedException)
-                    {
-                        DatabaseEngine.Reset();
-                    }
-
-                    return Task.CompletedTask;
+                    // Nothing to do
                 })
                 .ExecuteAsync(async () =>
                 {
@@ -197,13 +191,7 @@ namespace YouTubeHelper.ViewModels
             await Policy
                 .Handle<Exception>().RetryAsync(5, (ex, _) =>
                 {
-                    // This retries a few times and lets us reset things before we try again.
-                    if (ex is MongoConnectionPoolPausedException)
-                    {
-                        DatabaseEngine.Reset();
-                    }
-
-                    return Task.CompletedTask;
+                    // Nothing to do
                 })
                 .ExecuteAsync(async () =>
                 {

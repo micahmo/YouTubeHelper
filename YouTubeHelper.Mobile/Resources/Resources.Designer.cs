@@ -124,20 +124,11 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connecting to database....
+        ///   Looks up a localized string similar to Connecting to server....
         /// </summary>
-        internal static string ConnectingToDatabase {
+        internal static string ConnectingToServer {
             get {
-                return ResourceManager.GetString("ConnectingToDatabase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Database.
-        /// </summary>
-        internal static string Database {
-            get {
-                return ResourceManager.GetString("Database", resourceCulture);
+                return ResourceManager.GetString("ConnectingToServer", resourceCulture);
             }
         }
         
@@ -205,15 +196,6 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter a MongoDB connection string..
-        /// </summary>
-        internal static string EnterConnectionString {
-            get {
-                return ResourceManager.GetString("EnterConnectionString", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enter the desired limit:.
         /// </summary>
         internal static string EnterDesiredLimit {
@@ -232,6 +214,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter the address for the server, including the API key.
+        /// </summary>
+        internal static string EnterServerAddress {
+            get {
+                return ResourceManager.GetString("EnterServerAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
@@ -241,11 +232,11 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error connecting to the database: {0}.
+        ///   Looks up a localized string similar to There was an error connecting to the server: {0}.
         /// </summary>
-        internal static string ErrorConnectingToDatabase {
+        internal static string ErrorConnectingToServer {
             get {
-                return ResourceManager.GetString("ErrorConnectingToDatabase", resourceCulture);
+                return ResourceManager.GetString("ErrorConnectingToServer", resourceCulture);
             }
         }
         
@@ -448,6 +439,15 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string SearchWithLimit {
             get {
                 return ResourceManager.GetString("SearchWithLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server.
+        /// </summary>
+        internal static string Server {
+            get {
+                return ResourceManager.GetString("Server", resourceCulture);
             }
         }
         

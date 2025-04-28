@@ -17,35 +17,26 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="10" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="10" />
+            <RowDefinition Height="20" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox
+        <Button
             Grid.Row="0"
             Grid.Column="0"
-            HorizontalAlignment="Stretch"
+            Width="200"
             VerticalAlignment="Center"
-            ui:ControlHelper.Header="YouTube API Key"
-            Text="{Binding Settings.YouTubeApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}"
-            ToolTip="{Binding Settings.YouTubeApiKey}" />
+            Command="{Binding ChangeServerAddressCommand}"
+            Content="Change Server Address"
+            ToolTip="Change Server Address" />
+
         <TextBox
             Grid.Row="2"
             Grid.Column="0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
-            ui:ControlHelper.Header="Server Address"
-            Text="{Binding Settings.ServerAddress, UpdateSourceTrigger=PropertyChanged, Delay=10}"
-            ToolTip="{Binding Settings.ServerAddress}" />
-        <TextBox
-            Grid.Row="4"
-            Grid.Column="0"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Center"
-            ui:ControlHelper.Header="Server API Key"
-            Text="{Binding Settings.ServerApiKey, UpdateSourceTrigger=PropertyChanged, Delay=10}"
-            ToolTip="{Binding Settings.ServerApiKey}" />
+            ui:ControlHelper.Header="Download Directory"
+            Text="{Binding Settings.DownloadDirectory, UpdateSourceTrigger=PropertyChanged, Delay=10}"
+            ToolTip="{Binding Settings.DownloadDirectory}" />
     </Grid>
 </UserControl>

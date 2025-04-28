@@ -40,7 +40,7 @@ namespace YouTubeHelper.Models
                 .Property(a => a.SelectedTabIndex)
                 .Property(a => a.SelectedSortMode)
                 .Property(a => a.SelectedExclusionReason)
-                .Property(a => a.ConnectionString)
+                .Property(a => a.ServerAddress)
                 .Track(this);
         }
 
@@ -70,12 +70,12 @@ namespace YouTubeHelper.Models
         }
         private ExclusionReason _selectedExclusionReason;
 
-        public byte[]? ConnectionString
+        public byte[]? ServerAddress
         {
-            get => _connectionString;
-            set => SetProperty(ref _connectionString, value);
+            get => _serverAddress;
+            set => SetProperty(ref _serverAddress, value);
         }
-        private byte[]? _connectionString;
+        private byte[]? _serverAddress;
 
         #region Tracker instance
 

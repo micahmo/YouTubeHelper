@@ -142,7 +142,7 @@ namespace YouTubeHelper.ViewModels
         }
         private bool _isBusy = true;
 
-        public string CurrentDownloadDirectoryLabel => string.Format(Resources.CurrentDownloadDirectory, Settings.Instance.DownloadDirectory);
+        public string CurrentDownloadDirectoryLabel => string.Format(Resources.CurrentDownloadDirectory, Settings.Instance!.DownloadDirectory);
 
         public string ActiveDownloadsCountLabel => string.Format(Resources.ActiveDownloads, Channels.Select(c => c.Videos.Count(v => !string.IsNullOrEmpty(v.Video.Status) && !v.Video.Excluded)).Sum());
 

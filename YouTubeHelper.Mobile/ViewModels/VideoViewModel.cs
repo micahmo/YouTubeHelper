@@ -83,7 +83,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         Resources.Resources.WatchExternal,
                         Resources.Resources.Unexclude,
                         Resources.Resources.DownloadCustom,
-                        string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
+                        string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
                 }
                 else
                 {
@@ -94,7 +94,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         Resources.Resources.ExcludeWontWatch,
                         Resources.Resources.ExcludeMightWatch,
                         Resources.Resources.DownloadCustom,
-                        string.Format(Resources.Resources.DownloadPath, Settings.Instance.DownloadDirectory));
+                        string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
                 }
 
                 bool excluded = false;

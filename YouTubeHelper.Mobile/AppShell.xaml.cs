@@ -2,7 +2,6 @@
 using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
-using MongoDBHelpers;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
@@ -10,7 +9,6 @@ using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Mobile.Notifications;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
-using YouTubeHelper.Shared.Utilities;
 using Environment = System.Environment;
 
 namespace YouTubeHelper.Mobile
@@ -99,15 +97,15 @@ namespace YouTubeHelper.Mobile
                 return;
             }
 
-            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase);
+            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToServer);
 
-            bool connectedToDatabase = await ConnectToDatabase(withPrompt: false);
+            bool connectedToServer = await ConnectToServer(withPrompt: false);
 
             // If we didn't connect successfully, we need to hide the busy indicator, then connect again with a prompt and a separate busy indicator.
-            if (!connectedToDatabase)
+            if (!connectedToServer)
             {
                 busyIndicator.Dispose();
-                await ConnectToDatabase(withPrompt: true);
+                await ConnectToServer(withPrompt: true);
                 busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.LoadingChannels);
             }
 
@@ -260,18 +258,16 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        private async Task<bool> ConnectToDatabase(bool withPrompt = true)
+        private async Task<bool> ConnectToServer(bool withPrompt = true)
         {
             bool connected = false;
 
             try
             {
-                string? connectionString = await SecureStorage.Default.GetAsync("connection_string");
-                DatabaseEngine.ConnectionString = connectionString;
-                if (string.IsNullOrEmpty(await DatabaseEngine.TestConnectionAsync()))
-                {
-                    connected = true;
-                }
+                string? serverAddress = await SecureStorage.Default.GetAsync("server_address");
+                ServerApiClient.SetBaseUrl(serverAddress!);
+                Settings.Instance = await ServerApiClient.Instance.GetSettings();
+                connected = true;
             }
             catch
             {
@@ -282,20 +278,30 @@ namespace YouTubeHelper.Mobile
             {
                 while (!connected)
                 {
-                    var res = await DisplayPromptAsync(Mobile.Resources.Resources.Database, Mobile.Resources.Resources.EnterConnectionString);
+                    var res = await DisplayPromptAsync(Mobile.Resources.Resources.Server, Mobile.Resources.Resources.EnterServerAddress);
 
                     if (string.IsNullOrEmpty(res))
                     {
                         Environment.Exit(1);
                     }
 
-                    DatabaseEngine.ConnectionString = res;
+                    ServerApiClient.SetBaseUrl(res);
 
-                    using (new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToDatabase))
+                    using (new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToServer))
                     {
-                        if (await DatabaseEngine.TestConnectionAsync() is { } err)
+                        string err = string.Empty;
+                        try
                         {
-                            await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.ErrorConnectingToDatabase, err), Mobile.Resources.Resources.OK);
+                            Settings.Instance = await ServerApiClient.Instance.GetSettings();
+                        }
+                        catch (Exception ex)
+                        {
+                            err = ex.ToString();
+                        }
+
+                        if (!string.IsNullOrEmpty(err))
+                        {
+                            await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.ErrorConnectingToServer, err), Mobile.Resources.Resources.OK);
                         }
                         else
                         {
@@ -304,8 +310,8 @@ namespace YouTubeHelper.Mobile
                     }
                 }
 
-                // We made it here, so we must have connected successfully. Save the connection string.
-                await SecureStorage.Default.SetAsync("connection_string", DatabaseEngine.ConnectionString!);
+                // We made it here, so we must have connected successfully. Save the server address.
+                await SecureStorage.Default.SetAsync("server_address", ServerApiClient.BaseUrl!);
             }
 
             if (connected)

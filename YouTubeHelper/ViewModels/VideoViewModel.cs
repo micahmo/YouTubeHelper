@@ -100,7 +100,7 @@ namespace YouTubeHelper.ViewModels
 
             if (rightClick)
             {
-                (string Text, ContentDialogResult Result) res = await MessageBoxHelper.ShowInputBox(Resources.DownloadDirectoryMessage, Resources.DownloadDirectoryMessage, Settings.Instance.DownloadDirectory);
+                (string Text, ContentDialogResult Result) res = await MessageBoxHelper.ShowInputBox(Resources.DownloadDirectoryMessage, Resources.DownloadDirectoryMessage, Settings.Instance!.DownloadDirectory);
 
                 if (res.Result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(res.Text))
                 {
@@ -113,7 +113,7 @@ namespace YouTubeHelper.ViewModels
                     return;
                 }
 
-                Settings.Instance.DownloadDirectory = res.Text;
+                Settings.Instance!.DownloadDirectory = res.Text;
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CurrentDownloadDirectoryLabel));
             }
 
@@ -125,7 +125,7 @@ namespace YouTubeHelper.ViewModels
                     url: url,
                     silent: true,
                     requestId: requestId,
-                    dataDirectorySubpath: Settings.Instance.DownloadDirectory,
+                    dataDirectorySubpath: Settings.Instance!.DownloadDirectory,
                     videoId: Video.Id,
                     videoName: Video.Title ?? string.Empty,
                     thumbnailUrl: Video.ThumbnailUrl ?? string.Empty,

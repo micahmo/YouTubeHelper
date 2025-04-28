@@ -160,15 +160,6 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Database.
-        /// </summary>
-        public static string Database {
-            get {
-                return ResourceManager.GetString("Database", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Date range limit.
         /// </summary>
         public static string DateRangeLimit {
@@ -250,11 +241,11 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter a MongoDB connection string..
+        ///   Looks up a localized string similar to Please enter the address for the server, including the API key.
         /// </summary>
-        public static string EnterConnectionString {
+        public static string EnterServerAddress {
             get {
-                return ResourceManager.GetString("EnterConnectionString", resourceCulture);
+                return ResourceManager.GetString("EnterServerAddress", resourceCulture);
             }
         }
         
@@ -268,13 +259,13 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error connecting to the database.
+        ///   Looks up a localized string similar to There was an error connecting to the server.
         ///
         ///{0}.
         /// </summary>
-        public static string ErrorConnectingToDatabase {
+        public static string ErrorConnectingToServer {
             get {
-                return ResourceManager.GetString("ErrorConnectingToDatabase", resourceCulture);
+                return ResourceManager.GetString("ErrorConnectingToServer", resourceCulture);
             }
         }
         
@@ -487,6 +478,15 @@ namespace YouTubeHelper.Properties {
         public static string Searching {
             get {
                 return ResourceManager.GetString("Searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server.
+        /// </summary>
+        public static string Server {
+            get {
+                return ResourceManager.GetString("Server", resourceCulture);
             }
         }
         
