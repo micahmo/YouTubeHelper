@@ -12,7 +12,6 @@ using Flurl;
 using ModernWpf.Controls;
 using MongoDBHelpers;
 using ServerStatusBot.Definitions.Api;
-using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Models;
@@ -423,7 +422,7 @@ namespace YouTubeHelper
                 if (video is not null)
                 {
                     // See if this video is excluded
-                    if (await Collections.ExcludedVideosCollection.FindByIdAsync(video.Id) is { } excludedVideo)
+                    if (await ServerApiClient.Instance.GetExcludedVideoById(video.Id) is { } excludedVideo)
                     {
                         video.Excluded = true;
                         video.ExclusionReason = excludedVideo.ExclusionReason;
