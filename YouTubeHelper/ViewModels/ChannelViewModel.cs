@@ -108,8 +108,17 @@ namespace YouTubeHelper.ViewModels
 
                         if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
                         {
-                            var videos = await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm, noLimit ? int.MaxValue : 10);
-                            var videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                            List<Video> videos = await ServerApiClient.Instance.SearchVideos(new FindVideosRequest
+                            {
+                                Channel = Channel,
+                                ExcludedVideos = exclusions,
+                                ShowExclusions = MainControlViewModel.ShowExcludedVideos,
+                                SortMode = MainControlViewModel.SelectedSortMode.Value,
+                                SearchTerms = new List<string> { MainControlViewModel.LookupSearchTerm },
+                                Count = noLimit ? int.MaxValue : 10
+                            });
+
+                            List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 Videos.AddRange(videoViewModels);
