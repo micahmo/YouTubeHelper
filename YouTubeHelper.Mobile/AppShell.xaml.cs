@@ -258,7 +258,7 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        private async Task<bool> ConnectToServer(bool withPrompt = true)
+        public async Task<bool> ConnectToServer(bool withPrompt = true)
         {
             bool connected = false;
 

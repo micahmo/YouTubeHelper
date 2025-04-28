@@ -262,4 +262,18 @@
   <data name="BatteryOptimizationsPrompt" xml:space="preserve">
     <value>YouTubeHelper is currently being optimized. Would you like to open the battery settings?</value>
   </data>
+  <data name="UnexpectedError" xml:space="preserve">
+    <value>The application encountered an unexpected error.
+
+{0}</value>
+  </data>
+  <data name="AddChannel" xml:space="preserve">
+    <value>Add Channel</value>
+  </data>
+  <data name="AddChannelMessage" xml:space="preserve">
+    <value>Enter the full URL for the channel</value>
+  </data>
+  <data name="NewChannel" xml:space="preserve">
+    <value>New Channel</value>
+  </data>
 </root>

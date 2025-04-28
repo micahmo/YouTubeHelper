@@ -3,6 +3,7 @@
     x:Class="YouTubeHelper.Mobile.Views.ChannelView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:views="clr-namespace:YouTubeHelper.Mobile.Views">
     <Grid>
         <Grid.RowDefinitions>
@@ -26,184 +27,305 @@
                 </DataTrigger>
             </Grid.Triggers>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
+            <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <CheckBox
-                    Grid.RowSpan="3"
-                    Grid.Column="0"
-                    Margin="10,5,10,4"
-                    IsChecked="{Binding ShowExcludedVideos}"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
-                <CheckBox
-                    Grid.RowSpan="3"
-                    Grid.Column="0"
-                    Margin="10,5,10,4"
-                    IsChecked="{Binding ShowExcludedVideos}"
-                    IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}" />
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <Label
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}"
-                    Text="Show excluded videos"
-                    VerticalOptions="CenterAndExpand"
-                    VerticalTextAlignment="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleShowExcludedVideosCommand}" NumberOfTapsRequired="1" />
-                    </Label.GestureRecognizers>
-                </Label>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="12" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-                <Label
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"
-                    Text="Show excluded videos"
-                    VerticalOptions="CenterAndExpand"
-                    VerticalTextAlignment="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleShowExcludedVideosCommand}" NumberOfTapsRequired="1" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </Grid>
+                    <CheckBox
+                        Grid.RowSpan="3"
+                        Grid.Column="0"
+                        Margin="10,5,10,4"
+                        IsChecked="{Binding ShowExcludedVideos}"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
+                    <CheckBox
+                        Grid.RowSpan="3"
+                        Grid.Column="0"
+                        Margin="10,5,10,4"
+                        IsChecked="{Binding ShowExcludedVideos}"
+                        IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}" />
 
-            <Picker
-                Title="Sort order"
-                Grid.Row="1"
-                Margin="10,-10,10,5"
-                IsVisible="{Binding Page.AppShellViewModel.NotQueueTabSelected}"
-                ItemDisplayBinding="{Binding Description}"
-                ItemsSource="{Binding SortModeValues}"
-                SelectedIndex="{Binding SelectedSortModeIndex}" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}"
+                        Text="Show excluded videos"
+                        VerticalOptions="CenterAndExpand"
+                        VerticalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleShowExcludedVideosCommand}" NumberOfTapsRequired="1" />
+                        </Label.GestureRecognizers>
+                    </Label>
 
-            <Picker
-                Title="Exclusion reason"
-                Grid.Row="2"
-                Margin="10,-11,10,0"
-                IsVisible="{Binding Page.AppShellViewModel.ExclusionsTabSelected}"
-                ItemDisplayBinding="{Binding Description}"
-                ItemsSource="{Binding ExclusionReasonValues}"
-                SelectedIndex="{Binding SelectedExclusionFilterIndex}" />
-
-            <Entry
-                Grid.Row="3"
-                Margin="10,-10,10,0"
-                IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"
-                Placeholder="Exact search"
-                ReturnCommand="{Binding FindVideosCommand}"
-                Text="{Binding ExactSearchTerm}" />
-
-            <Grid Grid.Row="3" Margin="0,-11,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="15" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <CheckBox
-                    Grid.RowSpan="3"
-                    Grid.Column="0"
-                    Margin="10,5,10,4"
-                    IsChecked="{Binding Channel.EnableDateRangeLimit}"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
-
-                <Label
-                    Grid.Column="1"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}"
-                    Text="Do not show videos before"
-                    VerticalOptions="CenterAndExpand"
-                    VerticalTextAlignment="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" NumberOfTapsRequired="1" />
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <DatePicker
-                    Grid.Column="3"
-                    Date="{Binding Channel.DateRangeLimit}"
-                    IsEnabled="{Binding Channel.EnableDateRangeLimit}"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
-            </Grid>
-
-            <!--  This is defined "above" row 4 of the grid so that the refresh indicator appears BELOW the button(s)  -->
-            <RefreshView
-                Grid.Row="5"
-                Command="{Binding FindVideosCommand}"
-                HorizontalOptions="CenterAndExpand"
-                IsRefreshing="{Binding IsRefreshing}"
-                VerticalOptions="StartAndExpand">
-                <Grid>
-                    <CollectionView x:Name="VideosCollectionView" ItemsSource="{Binding Videos}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <views:VideoView BindingContext="{Binding}" />
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"
+                        Text="Show excluded videos"
+                        VerticalOptions="CenterAndExpand"
+                        VerticalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleShowExcludedVideosCommand}" NumberOfTapsRequired="1" />
+                        </Label.GestureRecognizers>
+                    </Label>
                 </Grid>
-            </RefreshView>
 
-            <Grid Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                <Picker
+                    Title="Sort order"
+                    Grid.Row="1"
+                    Margin="10,-10,10,5"
+                    IsVisible="{Binding Page.AppShellViewModel.NotQueueTabSelected}"
+                    ItemDisplayBinding="{Binding Description}"
+                    ItemsSource="{Binding SortModeValues}"
+                    SelectedIndex="{Binding SelectedSortModeIndex}" />
 
-                <Button
-                    Grid.Column="0"
-                    Margin="10,0,10,0"
+                <Picker
+                    Title="Exclusion reason"
+                    Grid.Row="2"
+                    Margin="10,-11,10,0"
+                    IsVisible="{Binding Page.AppShellViewModel.ExclusionsTabSelected}"
+                    ItemDisplayBinding="{Binding Description}"
+                    ItemsSource="{Binding ExclusionReasonValues}"
+                    SelectedIndex="{Binding SelectedExclusionFilterIndex}" />
+
+                <Entry
+                    Grid.Row="3"
+                    Margin="10,-10,10,0"
+                    IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"
+                    Placeholder="Exact search"
+                    ReturnCommand="{Binding FindVideosCommand}"
+                    Text="{Binding ExactSearchTerm}" />
+
+                <Grid Grid.Row="3" Margin="0,-11,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="15" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <CheckBox
+                        Grid.RowSpan="3"
+                        Grid.Column="0"
+                        Margin="10,5,10,4"
+                        IsChecked="{Binding Channel.EnableDateRangeLimit}"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
+
+                    <Label
+                        Grid.Column="1"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}"
+                        Text="Do not show videos before"
+                        VerticalOptions="CenterAndExpand"
+                        VerticalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" NumberOfTapsRequired="1" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <DatePicker
+                        Grid.Column="3"
+                        Date="{Binding Channel.DateRangeLimit}"
+                        IsEnabled="{Binding Channel.EnableDateRangeLimit}"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}" />
+                </Grid>
+
+                <!--  This is defined "above" row 4 of the grid so that the refresh indicator appears BELOW the button(s)  -->
+                <RefreshView
+                    Grid.Row="5"
                     Command="{Binding FindVideosCommand}"
-                    Text="{Binding SearchCount}" />
+                    HorizontalOptions="CenterAndExpand"
+                    IsRefreshing="{Binding IsRefreshing}"
+                    VerticalOptions="StartAndExpand">
+                    <Grid>
+                        <CollectionView x:Name="VideosCollectionView" ItemsSource="{Binding Videos}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <views:VideoView BindingContext="{Binding}" />
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+                </RefreshView>
 
-                <!--  These two buttons are identical, but are shown on different pages to give us an "or" visibility binding.  -->
-                <Button
-                    Grid.Column="1"
-                    Margin="-5,0,10,0"
-                    Command="{Binding ChannelOptionsCommand}"
-                    IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}">
-                    <Button.ImageSource>
-                        <FontImageSource
-                            FontFamily="{OnPlatform Android=ionicons.ttf#}"
-                            Glyph="&#xF280;"
-                            Size="19" />
-                    </Button.ImageSource>
-                </Button>
-                <Button
-                    Grid.Column="1"
-                    Margin="-5,0,10,0"
-                    Command="{Binding ChannelOptionsCommand}"
-                    IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}">
-                    <Button.ImageSource>
-                        <FontImageSource
-                            FontFamily="{OnPlatform Android=ionicons.ttf#}"
-                            Glyph="&#xF280;"
-                            Size="19" />
-                    </Button.ImageSource>
-                </Button>
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        Grid.Column="0"
+                        Margin="10,0,10,0"
+                        Command="{Binding FindVideosCommand}"
+                        Text="{Binding SearchCount}" />
+
+                    <!--  These two buttons are identical, but are shown on different pages to give us an "or" visibility binding.  -->
+                    <Button
+                        Grid.Column="1"
+                        Margin="-5,0,10,0"
+                        Command="{Binding ChannelOptionsCommand}"
+                        IsVisible="{Binding Page.AppShellViewModel.WatchTabSelected}">
+                        <Button.ImageSource>
+                            <FontImageSource
+                                FontFamily="{OnPlatform Android=ionicons.ttf#}"
+                                Glyph="&#xF280;"
+                                Size="19" />
+                        </Button.ImageSource>
+                    </Button>
+                    <Button
+                        Grid.Column="1"
+                        Margin="-5,0,10,0"
+                        Command="{Binding ChannelOptionsCommand}"
+                        IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}">
+                        <Button.ImageSource>
+                            <FontImageSource
+                                FontFamily="{OnPlatform Android=ionicons.ttf#}"
+                                Glyph="&#xF280;"
+                                Size="19" />
+                        </Button.ImageSource>
+                    </Button>
+                </Grid>
             </Grid>
+
+            <!--  FAB!  -->
+            <BoxView
+                BackgroundColor="#66000000"
+                HorizontalOptions="Fill"
+                InputTransparent="False"
+                IsVisible="{Binding IsFabOpen}"
+                Opacity="0.3">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseFabCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <toolkit:Expander
+                Margin="20"
+                Direction="Up"
+                HorizontalOptions="End"
+                IsExpanded="{Binding IsFabOpen, Mode=TwoWay}"
+                VerticalOptions="End">
+
+                <toolkit:Expander.Header>
+                    <Frame
+                        Padding="0"
+                        BackgroundColor="Firebrick"
+                        CornerRadius="16"
+                        HasShadow="True"
+                        HeightRequest="56"
+                        HorizontalOptions="End"
+                        VerticalOptions="End"
+                        WidthRequest="56">
+
+                        <Label
+                            FontFamily="ionicons"
+                            FontSize="28"
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
+                            Text="•••"
+                            TextColor="White"
+                            VerticalOptions="Center"
+                            VerticalTextAlignment="Center" />
+                    </Frame>
+                </toolkit:Expander.Header>
+
+                <toolkit:Expander.Content>
+                    <VerticalStackLayout Spacing="15">
+                        <Frame
+                            Padding="10"
+                            BackgroundColor="White"
+                            CornerRadius="16"
+                            HasShadow="True"
+                            HeightRequest="56"
+                            HorizontalOptions="End"
+                            VerticalOptions="End">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAddChannelTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Label
+                                FontFamily="ionicons"
+                                FontSize="15"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="Add channel"
+                                TextColor="Black"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Frame>
+                        <Frame
+                            Padding="10"
+                            BackgroundColor="White"
+                            CornerRadius="16"
+                            HasShadow="True"
+                            HeightRequest="56"
+                            HorizontalOptions="End"
+                            VerticalOptions="End">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDeleteChannelTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Label
+                                FontFamily="ionicons"
+                                FontSize="15"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="Delete channel"
+                                TextColor="Black"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Frame>
+                        <Frame
+                            Padding="10"
+                            BackgroundColor="White"
+                            CornerRadius="16"
+                            HasShadow="True"
+                            HeightRequest="56"
+                            HorizontalOptions="End"
+                            VerticalOptions="End">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnChangeServerAddressTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Label
+                                FontFamily="ionicons"
+                                FontSize="15"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="Change server address"
+                                TextColor="Black"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Frame>
+
+                        <Grid Padding="0,5,0,0" />
+                    </VerticalStackLayout>
+                </toolkit:Expander.Content>
+            </toolkit:Expander>
         </Grid>
 
         <WebView

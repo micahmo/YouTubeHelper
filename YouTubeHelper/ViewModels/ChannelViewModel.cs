@@ -7,8 +7,6 @@ using System.Windows.Input;
 using System.Windows.Shell;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using MongoDB.Driver;
-using MongoDBHelpers;
 using Polly;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;

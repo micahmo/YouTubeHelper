@@ -427,5 +427,16 @@ namespace YouTubeHelper.Mobile.ViewModels
             set => SetProperty(ref _currentVideoUrl, value);
         }
         private string? _currentVideoUrl;
+
+        public bool IsFabOpen
+        {
+            get => _isFabOpen;
+            set => SetProperty(ref _isFabOpen, value);
+        }
+        private bool _isFabOpen;
+
+        // For when it's closed via tapping on the dim area
+        public ICommand CloseFabCommand => _closeFabCommand ??= new RelayCommand(() => IsFabOpen = false);
+        private ICommand? _closeFabCommand;
     }
 }

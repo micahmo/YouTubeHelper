@@ -79,6 +79,24 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Channel.
+        /// </summary>
+        internal static string AddChannel {
+            get {
+                return ResourceManager.GetString("AddChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the full URL for the channel.
+        /// </summary>
+        internal static string AddChannelMessage {
+            get {
+                return ResourceManager.GetString("AddChannelMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battery Optimizations.
         /// </summary>
         internal static string BatteryOptimizations {
@@ -333,6 +351,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Channel.
+        /// </summary>
+        internal static string NewChannel {
+            get {
+                return ResourceManager.GetString("NewChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No.
         /// </summary>
         internal static string No {
@@ -457,6 +484,17 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string Unexclude {
             get {
                 return ResourceManager.GetString("Unexclude", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The application encountered an unexpected error.
+        ///
+        ///{0}.
+        /// </summary>
+        internal static string UnexpectedError {
+            get {
+                return ResourceManager.GetString("UnexpectedError", resourceCulture);
             }
         }
         
