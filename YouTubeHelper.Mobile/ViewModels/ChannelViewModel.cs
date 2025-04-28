@@ -176,18 +176,19 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         }
                                     }
 
-                                    IEnumerable<Video> videos = await YouTubeApi.Instance.FindVideos(
-                                        Channel,
-                                        exclusions,
-                                        ShowExcludedVideos,
-                                        SelectedSortMode.Value, searchTerms, (_, _) =>
-                                        {
-                                            // TODO: Update progress?
-                                        },
-                                        count,
-                                        Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
-                                        Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null);
-                                    
+                                    List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                    {
+                                        Channel = Channel,
+                                        ExcludedVideos = exclusions,
+                                        ShowExclusions = ShowExcludedVideos,
+                                        SortMode = SelectedSortMode.Value,
+                                        SearchTerms = searchTerms,
+                                        Count = count,
+                                        DateRangeLimit = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
+                                        VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null,
+                                        PopulateFromChannelPlaylist = true
+                                    });
+
                                     List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 
@@ -221,7 +222,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
                                 }
 
-                                List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                                List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                                 {
                                     VideoIds = exclusions.Select(v => v.Id).ToList(),
                                     ExcludedVideos = exclusions,
@@ -240,7 +241,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 // Get all excluded videos
                                 List<Video> excludedVideos = await ServerApiClient.Instance.GetAllExcludedVideos();
 
-                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                                     {
                                         VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
                                         ExcludedVideos = excludedVideos,

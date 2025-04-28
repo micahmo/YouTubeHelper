@@ -339,7 +339,7 @@ namespace YouTubeHelper.Mobile
                 }
                 else if (indexOfCurrentVideo < 0)
                 {
-                    if ((await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                    if ((await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                         {
                             VideoIds = new List<string> { requestData.VideoId },
                             SortMode = SortMode.AgeDesc
@@ -428,7 +428,7 @@ namespace YouTubeHelper.Mobile
             {
                 busyIndicator.Text = Mobile.Resources.Resources.FindingSharedVideo;
 
-                video = (await ServerApiClient.Instance.FindVideoDetails(new FindVideoDetailsRequest
+                video = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                 {
                     VideoIds = new List<string> { videoId },
                     SortMode = SortMode.AgeDesc
