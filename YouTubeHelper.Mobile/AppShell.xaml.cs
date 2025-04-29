@@ -30,7 +30,7 @@ namespace YouTubeHelper.Mobile
         {
             if (_canClose)
             {
-                Application.Current?.Quit();
+                Environment.Exit(1);
             }
             
             bool anyPlayerOpen = false;
