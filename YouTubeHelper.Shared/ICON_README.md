@@ -1,14 +1,25 @@
+## Source
+
+- Assets\
+  - **logo_orig.svg**
+
 ## YouTubeHelper
 
 - Images\
-  - logo.ico - 128x128 - Used as the `ApplicationIcon` in the project file
-  - logo.png - 64x64 - ?
+  - **logo.ico**
+	- 16x16 - 256x25
+	- Manually constructed in GIMP from PNG exported from SVG
+	- Used as the `ApplicationIcon` in the project file
 
-### YouTubeHelper.Mobile
+## YouTubeHelper.Mobile
 
 - Resources\
   - AppIcon\
-    - logo.ico - 128x128 - Used as the `MauiIcon` in the project file
-    - splash.ico - 128x128 - Used as the `MauiSplashScreen` in the project file
+    - **logo.svg**
+	- Used as the `MauiIcon` and the `MauiSplashScreen` in the project file
+	- Exported fron original SVG (Page as Plain SVG)
   - Images\
-    - notification_icon.png - 24x24 - single-color (can be black) - Used as the `default_notification_icon` in the manifest, as the `SmallIcon` in the `AndroidNotificationHelper`, and as the small icon in `UpdateNotification()`. 
+    - **notification_icon.png**
+	- 24x24
+	- Exported from logo_orig.svg with full transparency in the middle (Path -> Difference)
+	- Used as the `default_notification_icon` in the manifest, as the `SmallIcon` in the `AndroidNotificationHelper`, and as the small icon in `UpdateNotification()`

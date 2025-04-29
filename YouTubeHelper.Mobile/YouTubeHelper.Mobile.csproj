@@ -36,10 +36,10 @@
 
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\logo.ico" ForegroundFile="Resources\AppIcon\logo.ico" />
+    <MauiIcon Include="Resources\AppIcon\logo.svg" Color="White" ForegroundScale="0.7" />
 
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\AppIcon\splash.ico" Color="White" BaseSize="128,128" />
+    <MauiSplashScreen Include="Resources\AppIcon\logo.svg" Color="White" BaseSize="128,128" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -54,7 +54,6 @@
   <ItemGroup>
     <None Remove="Platforms\Android\google-services.json" />
     <None Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
-    <None Remove="Resources\splash.ico" />
   </ItemGroup>
 
   <ItemGroup>
