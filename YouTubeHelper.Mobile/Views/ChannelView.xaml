@@ -283,7 +283,7 @@
                         <Frame
                             Padding="10"
                             BackgroundColor="White"
-                            BorderColor="Wheat"
+                            BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
                             HeightRequest="56"
