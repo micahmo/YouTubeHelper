@@ -441,6 +441,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 SetProperty(ref _isFabOpen, value);
                 ChannelView?.AnimateDimBackground(_isFabOpen);
+                ChannelView?.UpdateFabIcon(_isFabOpen);
             }
         }
         private bool _isFabOpen;

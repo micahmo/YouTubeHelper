@@ -243,8 +243,9 @@
                         WidthRequest="56">
 
                         <Label
+                            x:Name="FabIconLabel"
                             FontFamily="ionicons"
-                            FontSize="28"
+                            FontSize="23"
                             HorizontalOptions="Center"
                             HorizontalTextAlignment="Center"
                             Text="•••"

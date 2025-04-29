@@ -207,4 +207,12 @@ public partial class ChannelView : ContentPage
         }
     }
 
+    public void UpdateFabIcon(bool isOpen)
+    {
+        if (FabIconLabel == null)
+            return;
+
+        FabIconLabel.Text = isOpen ? "\uF406" : "•••"; // \uF406 is the Ionicons "close" or "X" glyph
+        FabIconLabel.FontSize = isOpen ? 35 : 23;
+    }
 }
