@@ -234,6 +234,7 @@
                     <Frame
                         Padding="0"
                         BackgroundColor="Firebrick"
+                        BorderColor="Firebrick"
                         CornerRadius="16"
                         HasShadow="True"
                         HeightRequest="56"
@@ -258,6 +259,7 @@
                         <Frame
                             Padding="10"
                             BackgroundColor="White"
+                            BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
                             HeightRequest="56"
@@ -281,6 +283,7 @@
                         <Frame
                             Padding="10"
                             BackgroundColor="White"
+                            BorderColor="Wheat"
                             CornerRadius="16"
                             HasShadow="True"
                             HeightRequest="56"
@@ -304,6 +307,7 @@
                         <Frame
                             Padding="10"
                             BackgroundColor="White"
+                            BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
                             HeightRequest="56"
