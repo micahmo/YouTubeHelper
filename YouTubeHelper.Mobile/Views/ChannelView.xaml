@@ -225,6 +225,7 @@
                 Direction="Up"
                 HorizontalOptions="End"
                 IsExpanded="{Binding IsFabOpen, Mode=TwoWay}"
+                IsVisible="{Binding ShowFab}"
                 VerticalOptions="End">
 
                 <toolkit:Expander.Header>

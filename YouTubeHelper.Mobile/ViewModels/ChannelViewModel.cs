@@ -55,6 +55,14 @@ namespace YouTubeHelper.Mobile.ViewModels
             };
 
             Videos.CollectionChanged += (_, _) => OnPropertyChanged(nameof(SearchCount));
+
+            Page.AppShellViewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(Page.AppShellViewModel.QueueTabSelected))
+                {
+                    OnPropertyChanged(nameof(ShowFab));
+                }
+            };
         }
 
         private static bool _listeningToPropertyChanges = true;
@@ -438,5 +446,10 @@ namespace YouTubeHelper.Mobile.ViewModels
         // For when it's closed via tapping on the dim area
         public ICommand CloseFabCommand => _closeFabCommand ??= new RelayCommand(() => IsFabOpen = false);
         private ICommand? _closeFabCommand;
+
+        /// <summary>
+        /// Whether or not the FAB should be shown
+        /// </summary>
+        public bool ShowFab => !Page.AppShellViewModel.QueueTabSelected;
     }
 }
