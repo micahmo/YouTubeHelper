@@ -2,8 +2,6 @@
 using CommunityToolkit.Maui.Alerts;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using MongoDB.Driver;
-using MongoDBHelpers;
 using Newtonsoft.Json;
 using Polly;
 using ServerStatusBot.Definitions;
@@ -439,7 +437,11 @@ namespace YouTubeHelper.Mobile.ViewModels
         public bool IsFabOpen
         {
             get => _isFabOpen;
-            set => SetProperty(ref _isFabOpen, value);
+            set
+            {
+                SetProperty(ref _isFabOpen, value);
+                ChannelView?.AnimateDimBackground(_isFabOpen);
+            }
         }
         private bool _isFabOpen;
 
@@ -451,5 +453,10 @@ namespace YouTubeHelper.Mobile.ViewModels
         /// Whether or not the FAB should be shown
         /// </summary>
         public bool ShowFab => !Page.AppShellViewModel.QueueTabSelected;
+
+        /// <summary>
+        /// A reference to the view control
+        /// </summary>
+        public ChannelView? ChannelView { get; set; }
     }
 }

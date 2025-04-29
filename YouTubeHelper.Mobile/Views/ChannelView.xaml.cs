@@ -2,6 +2,7 @@ using ServerStatusBot.Definitions.Api;
 using System.Collections;
 using ServerStatusBot.Definitions.Database.Models;
 using YouTubeHelper.Mobile.ViewModels;
+using CommunityToolkit.Maui.Views;
 
 namespace YouTubeHelper.Mobile.Views;
 
@@ -25,6 +26,8 @@ public partial class ChannelView : ContentPage
                     VideosCollectionView.ScrollTo(0, position: ScrollToPosition.Start, animate: true);
                 }
             };
+
+            channelViewModel.ChannelView = this;
         }
     }
 
@@ -155,4 +158,53 @@ public partial class ChannelView : ContentPage
             });
         }
     }
+
+    private async void OnExpanderExpandedChanged(object? sender, EventArgs e)
+    {
+        if (sender is Expander { Content: Layout layout } expander)
+        {
+            if (expander.IsExpanded)
+            {
+                // Opening animation
+                layout.IsVisible = true;
+                layout.TranslationY = 50;
+                layout.Opacity = 0;
+
+                await Task.WhenAll(
+                    layout.TranslateTo(0, 0, 250, Easing.SinOut),
+                    layout.FadeTo(1)
+                );
+            }
+            else
+            {
+                // Closing animation
+                await Task.WhenAll(
+                    layout.TranslateTo(0, 50, 200, Easing.SinIn),
+                    layout.FadeTo(0, 200)
+                );
+
+                layout.IsVisible = false;
+            }
+        }
+    }
+
+    public async void AnimateDimBackground(bool show)
+    {
+        if (BoxViewDim == null)
+            return;
+
+        if (show)
+        {
+            BoxViewDim.IsVisible = true;
+            BoxViewDim.Opacity = 0;
+
+            await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
+        }
+        else
+        {
+            await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
+            BoxViewDim.IsVisible = false;
+        }
+    }
+
 }

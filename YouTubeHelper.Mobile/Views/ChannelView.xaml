@@ -210,11 +210,12 @@
 
             <!--  FAB!  -->
             <BoxView
+                x:Name="BoxViewDim"
                 BackgroundColor="#66000000"
                 HorizontalOptions="Fill"
                 InputTransparent="False"
-                IsVisible="{Binding IsFabOpen}"
-                Opacity="0.3">
+                IsVisible="False"
+                Opacity="0">
                 <BoxView.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding CloseFabCommand}" />
                 </BoxView.GestureRecognizers>
@@ -223,6 +224,7 @@
             <toolkit:Expander
                 Margin="20"
                 Direction="Up"
+                ExpandedChanged="OnExpanderExpandedChanged"
                 HorizontalOptions="End"
                 IsExpanded="{Binding IsFabOpen, Mode=TwoWay}"
                 IsVisible="{Binding ShowFab}"
