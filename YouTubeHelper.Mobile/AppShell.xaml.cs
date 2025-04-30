@@ -121,6 +121,7 @@ namespace YouTubeHelper.Mobile
 
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
                 await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);
+                await ServerApiClient.Instance.JoinChannelObjectUpdatesGroup(HandleChannelObjectUpdates);
             });
 
             busyIndicator.Text = Mobile.Resources.Resources.LoadingChannels;
@@ -136,7 +137,10 @@ namespace YouTubeHelper.Mobile
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
             foreach (Channel channel in channels.Reverse<Channel>())
             {
-                channel.Changed += (_, _) => ServerApiClient.Instance.UpdateChannel(channel, ClientId);
+                channel.Changed += (_, _) =>
+                {
+                    ServerApiClient.Instance.UpdateChannel(channel, ClientId);
+                };
 
                 ChannelViewModel channelViewModel = new(this)
                 {
@@ -391,6 +395,95 @@ namespace YouTubeHelper.Mobile
                 {
                     videoViewModel.Video.Excluded = updatedVideo.Excluded;
                     videoViewModel.Video.ExclusionReason = updatedVideo.ExclusionReason;
+                }
+            }
+        }
+
+        private async void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
+        {
+            if (updatedChannelArgs.Originator == ClientId) return;
+
+            Channel updatedChannel = updatedChannelArgs.Obj;
+
+            ChannelViewModel? newlyAddedChannelViewModel = null;
+
+            // Look for the channel
+            foreach (Tab tab in new List<Tab> { WatchTab, SearchTab, ExclusionsTab })
+            {
+                bool found = false;
+                foreach (ShellContent? content in tab.Items.ToList())
+                {
+                    if (content.Content is ChannelView { BindingContext: ChannelViewModel channelViewModel } channelView && channelViewModel.Channel?.Id == updatedChannel.Id)
+                    {
+                        // We have it, but it's marked for deletion. Remove it!
+                        if (updatedChannel.MarkForDeletion)
+                        {
+                            await MainThread.InvokeOnMainThreadAsync(() =>
+                            {
+                                try
+                                {
+                                    tab.Items.Remove(content);
+                                }
+                                catch
+                                {
+                                    // This throws an exception, but it gets far enough.
+                                }
+                            });
+
+                            AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
+                            channelViewModel.Channel!.MarkForDeletion = true;
+                            channelViewModel.Channel!.Persistent = false;
+                        }
+                        else
+                        {
+                            // We have it! First update the UI
+                            content.Title = updatedChannel.VanityName;
+                            channelView.Title = updatedChannel.VanityName;
+                            
+                            // Then update the properties
+                            channelViewModel.Channel!.Persistent = false; // stop doing updates
+                            channelViewModel.Channel.Identifier = updatedChannel.Identifier;
+                            channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
+                            channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
+                            channelViewModel.Channel.VanityName = updatedChannel.VanityName;
+                            channelViewModel.Channel.Description = updatedChannel.Description;
+                            channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
+                            channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
+                            channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
+                            channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                            channelViewModel.Channel.Persistent = true; // resume updates
+                        }
+
+                        found = true;
+                    }
+                }
+
+                // We don't have it, and it's not marked for deletion, so it must be new. Add it!
+                if (!found && !updatedChannel.MarkForDeletion)
+                {
+                    if (newlyAddedChannelViewModel is null)
+                    {
+                        newlyAddedChannelViewModel = new(this)
+                        {
+                            Channel = updatedChannel,
+                            SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+                            SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0),
+                            Loading = false
+                        };
+
+                        AppShellViewModel.ChannelViewModels.Add(newlyAddedChannelViewModel);
+
+                        updatedChannel.Changed += async (_, _) =>
+                        {
+                            await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
+                        };
+                    }
+
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        ChannelView channelView = new ChannelView { BindingContext = newlyAddedChannelViewModel };
+                        tab.Items.Add(new ShellContent { Title = updatedChannel.VanityName, Content = channelView });
+                    });
                 }
             }
         }

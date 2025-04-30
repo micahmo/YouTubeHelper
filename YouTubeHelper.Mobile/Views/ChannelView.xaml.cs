@@ -80,7 +80,10 @@ public partial class ChannelView : ContentPage
         }
 
         // And finally, listen for any changes and persist them
-        channel.Changed += async (_, _) => { await ServerApiClient.Instance.UpdateChannel(channel, AppShell.ClientId); };
+        channel.Changed += async (_, _) =>
+        {
+            await ServerApiClient.Instance.UpdateChannel(channel, AppShell.ClientId);
+        };
     }
 
     private async void OnDeleteChannelTapped(object? sender, TappedEventArgs e)

@@ -55,6 +55,7 @@ namespace YouTubeHelper
 
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
                 await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);
+                await ServerApiClient.Instance.JoinChannelObjectUpdatesGroup(HandleChannelObjectUpdates);
             });
 
             MainControlViewModel = new();
@@ -571,6 +572,64 @@ namespace YouTubeHelper
                     videoViewModel.Video.Excluded = updatedVideo.Excluded;
                     videoViewModel.Video.ExclusionReason = updatedVideo.ExclusionReason;
                 }
+            }
+        }
+
+        private void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
+        {
+            if (updatedChannelArgs.Originator == ClientId) return;
+
+            if (MainControlViewModel == null) return;
+
+            Channel updatedChannel = updatedChannelArgs.Obj;
+
+            // Look for the channel
+            bool found = false;
+            foreach (ChannelViewModel channelViewModel in MainControlViewModel.Channels.ToList())
+            {
+                if (channelViewModel.Channel.Id == updatedChannel.Id)
+                {
+                    // We have it, but it's marked for deletion. Remove it!
+                    if (updatedChannel.MarkForDeletion)
+                    {
+                        if (MainControlViewModel.SelectedChannel == channelViewModel)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
+                        }
+                        Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
+                        channelViewModel.Channel.Persistent = false;
+                    }
+                    else
+                    {
+                        // We have it, update the properties
+                        channelViewModel.Channel.Persistent = false; // stop doing updates
+                        channelViewModel.Channel.Identifier = updatedChannel.Identifier;
+                        channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
+                        channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
+                        channelViewModel.Channel.VanityName = updatedChannel.VanityName;
+                        channelViewModel.Channel.Description = updatedChannel.Description;
+                        channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
+                        channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
+                        channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
+                        channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                        channelViewModel.Channel.Persistent = true; // resume updates
+                    }
+
+                    found = true;
+                }
+            }
+
+            // We don't have it, and it's not marked for deletion, so it must be new. Add it!
+            if (!found && !updatedChannel.MarkForDeletion)
+            {
+                ChannelViewModel channelViewModel = new(updatedChannel, MainControlViewModel);
+                Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
+
+                // Listen for changes
+                updatedChannel.Changed += async (_, _) =>
+                {
+                    await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
+                };
             }
         }
     }
