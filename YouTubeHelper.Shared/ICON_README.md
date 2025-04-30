@@ -20,6 +20,6 @@
 	- Exported fron original SVG (Page as Plain SVG)
   - Images\
     - **notification_icon.png**
-	- 24x24
+	- 96x96
 	- Exported from logo_orig.svg with full transparency in the middle (Path -> Difference)
 	- Used as the `default_notification_icon` in the manifest, as the `SmallIcon` in the `AndroidNotificationHelper`, and as the small icon in `UpdateNotification()`
