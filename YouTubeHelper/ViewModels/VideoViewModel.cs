@@ -254,7 +254,7 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            await ServerApiClient.Instance.UpdateVideo(Video);
+            await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
 
             if (MainControlViewModel is { WatchMode: true, ShowExcludedVideos: false })
             {
@@ -270,7 +270,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
             Video.MarkForDeletion = true;
-            await ServerApiClient.Instance.UpdateVideo(Video);
+            await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
             Video.MarkForDeletion = false;
         }
 

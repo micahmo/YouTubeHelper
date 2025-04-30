@@ -54,7 +54,7 @@ public partial class ChannelView : ContentPage
         // See if we can populate it
         try
         {
-            await ServerApiClient.Instance.PopulateChannel(channel);
+            await ServerApiClient.Instance.PopulateChannel(channel, AppShell.ClientId);
         }
         catch (Exception ex)
         {
@@ -80,7 +80,7 @@ public partial class ChannelView : ContentPage
         }
 
         // And finally, listen for any changes and persist them
-        channel.Changed += async (_, _) => { await ServerApiClient.Instance.UpdateChannel(channel); };
+        channel.Changed += async (_, _) => { await ServerApiClient.Instance.UpdateChannel(channel, AppShell.ClientId); };
     }
 
     private async void OnDeleteChannelTapped(object? sender, TappedEventArgs e)
@@ -114,7 +114,7 @@ public partial class ChannelView : ContentPage
 
             channelViewModel.Channel!.MarkForDeletion = true;
             channelViewModel.Channel!.Persistent = false; // Stop doing updates!
-            await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel);
+            await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, AppShell.ClientId);
         }
     }
 

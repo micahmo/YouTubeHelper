@@ -26,6 +26,8 @@ namespace YouTubeHelper
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string ClientId { get; } = Guid.NewGuid().ToString();
+
         public MainWindow()
         {
             ApplicationSettings.Instance.Load();
@@ -208,7 +210,7 @@ namespace YouTubeHelper
                             Id = videoId,
                             ExclusionReason = ExclusionReason.Watched,
                             ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
-                        });
+                        }, ClientId);
 
                         if (res)
                         {
@@ -247,7 +249,7 @@ namespace YouTubeHelper
                             Id = videoId,
                             ExclusionReason = ExclusionReason.WontWatch,
                             ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
-                        });
+                        }, ClientId);
 
                         if (res)
                         {
@@ -286,7 +288,7 @@ namespace YouTubeHelper
                             Id = videoId,
                             ExclusionReason = ExclusionReason.MightWatch,
                             ChannelPlaylist = MainControlViewModel.SelectedChannel?.Channel.ChannelPlaylist
-                        });
+                        }, ClientId);
 
                         if (res)
                         {
@@ -552,9 +554,13 @@ namespace YouTubeHelper
             }
         }
 
-        private void HandleVideoObjectUpdates(Video updatedVideo)
+        private void HandleVideoObjectUpdates(ObjectChangedEventArgs<Video> updatedVideoArgs)
         {
+            if (updatedVideoArgs.Originator == ClientId) return;
+            
             if (MainControlViewModel == null) return;
+
+            Video updatedVideo = updatedVideoArgs.Obj;
 
             // If any videos that are currently being displayed match the ID in the updated video, then update it in the UI
             // This will include the queue

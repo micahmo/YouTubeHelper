@@ -167,7 +167,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
                     Video.MarkForDeletion = true;
-                    await ServerApiClient.Instance.UpdateVideo(Video);
+                    await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
                     Video.MarkForDeletion = false;
                 }
                 else if (action == Resources.Resources.DownloadCustom)
@@ -190,7 +190,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 if (excluded)
                 {
                     Video.Excluded = true;
-                    await ServerApiClient.Instance.UpdateVideo(Video);
+                    await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
 
                     if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
                     {
@@ -235,7 +235,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
             Video.MarkForDeletion = true;
-            await ServerApiClient.Instance.UpdateVideo(Video);
+            await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
             Video.MarkForDeletion = false;
 
             try

@@ -15,6 +15,8 @@ namespace YouTubeHelper.Mobile
 {
     public partial class AppShell : Shell
     {
+        public static string ClientId { get; } = Guid.NewGuid().ToString();
+
         public static AppShell? Instance { get; private set; }
         private Tab? _currentTab;
 
@@ -134,7 +136,7 @@ namespace YouTubeHelper.Mobile
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
             foreach (Channel channel in channels.Reverse<Channel>())
             {
-                channel.Changed += (_, _) => ServerApiClient.Instance.UpdateChannel(channel);
+                channel.Changed += (_, _) => ServerApiClient.Instance.UpdateChannel(channel, ClientId);
 
                 ChannelViewModel channelViewModel = new(this)
                 {
@@ -375,8 +377,12 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        private void HandleVideoObjectUpdates(Video updatedVideo)
+        private void HandleVideoObjectUpdates(ObjectChangedEventArgs<Video> updatedVideoArgs)
         {
+            if (updatedVideoArgs.Originator == ClientId) return;
+
+            Video updatedVideo = updatedVideoArgs.Obj;
+
             // If any videos that are currently being displayed match the ID in the updated video, then update it in the UI
             // This will include the queue
             foreach (VideoViewModel videoViewModel in AppShellViewModel.ChannelViewModels.SelectMany(c => c.Videos).Union(AppShellViewModel.QueueChannelViewModel?.Videos ?? Enumerable.Empty<VideoViewModel>()).ToList())

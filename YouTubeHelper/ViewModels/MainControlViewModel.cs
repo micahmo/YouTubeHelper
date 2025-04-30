@@ -35,12 +35,12 @@ namespace YouTubeHelper.ViewModels
                             SelectedChannel = channelViewModel;
 
                             // Persist it!
-                            Channel result = await ServerApiClient.Instance.UpdateChannel(channel);
+                            await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
 
                             // Listen for changes
                             channel.Changed += async (_, _) =>
                             {
-                                await ServerApiClient.Instance.UpdateChannel(channel);
+                                await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
                             };
                         });
                     }
@@ -347,7 +347,7 @@ namespace YouTubeHelper.ViewModels
                 {
                     c.Changed += async (_, _) =>
                     {
-                        await ServerApiClient.Instance.UpdateChannel(c);
+                        await ServerApiClient.Instance.UpdateChannel(c, MainWindow.ClientId);
                     };
                 });
             });

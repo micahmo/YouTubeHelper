@@ -50,7 +50,7 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.Channels.Remove(this);
             Channel.MarkForDeletion = true;
             Channel.Persistent = false; // Stop doing updates!
-            await ServerApiClient.Instance.UpdateChannel(Channel);
+            await ServerApiClient.Instance.UpdateChannel(Channel, MainWindow.ClientId);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
@@ -58,7 +58,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void LookupChannel()
         {
-            if (await ServerApiClient.Instance.PopulateChannel(Channel))
+            if (await ServerApiClient.Instance.PopulateChannel(Channel, MainWindow.ClientId))
             {
                 SearchGlyph = Icons.Check;
                 await Task.Delay(TimeSpan.FromSeconds(5));
@@ -285,7 +285,7 @@ namespace YouTubeHelper.ViewModels
             foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await ServerApiClient.Instance.UpdateChannel(c.Channel);
+                await ServerApiClient.Instance.UpdateChannel(c.Channel, MainWindow.ClientId);
             }
         }
 
@@ -308,7 +308,7 @@ namespace YouTubeHelper.ViewModels
             foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
             {
                 c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await ServerApiClient.Instance.UpdateChannel(c.Channel);
+                await ServerApiClient.Instance.UpdateChannel(c.Channel, MainWindow.ClientId);
             }
         }
 
