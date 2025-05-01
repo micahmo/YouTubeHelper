@@ -263,7 +263,7 @@
                             BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
-                            HeightRequest="56"
+                            HeightRequest="40"
                             HorizontalOptions="End"
                             VerticalOptions="End">
 
@@ -287,7 +287,7 @@
                             BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
-                            HeightRequest="56"
+                            HeightRequest="40"
                             HorizontalOptions="End"
                             VerticalOptions="End">
 
@@ -311,7 +311,7 @@
                             BorderColor="White"
                             CornerRadius="16"
                             HasShadow="True"
-                            HeightRequest="56"
+                            HeightRequest="40"
                             HorizontalOptions="End"
                             VerticalOptions="End">
 
