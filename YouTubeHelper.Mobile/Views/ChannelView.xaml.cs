@@ -196,6 +196,11 @@ public partial class ChannelView : ContentPage
         if (BoxViewDim == null)
             return;
 
+        if (_currentlyDimmingBackground)
+            return;
+
+        _currentlyDimmingBackground = true;
+
         if (show)
         {
             BoxViewDim.IsVisible = true;
@@ -208,7 +213,10 @@ public partial class ChannelView : ContentPage
             await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
             BoxViewDim.IsVisible = false;
         }
+
+        _currentlyDimmingBackground = false;
     }
+    bool _currentlyDimmingBackground;
 
     public void UpdateFabIcon(bool isOpen)
     {
