@@ -128,7 +128,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindVideos
                             if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
                             {
-                                List<Video> exclusions = await ServerApiClient.Instance.GetExcludedVideosByChannel(Channel!.ChannelPlaylist!);
                                 List<string>? searchTerms = null;
 
                                 //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
@@ -176,7 +175,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                     {
                                         Channel = Channel,
-                                        ExcludedVideos = exclusions,
                                         ShowExclusions = ShowExcludedVideos,
                                         SortMode = SelectedSortMode.Value,
                                         SearchTerms = searchTerms,
@@ -214,20 +212,14 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 List<Video> exclusions = await ServerApiClient.Instance.GetExcludedVideosByChannel(Channel!.ChannelPlaylist!);
 
-                                if (SelectedExclusionFilter.Value != ExclusionReason.None)
-                                {
-                                    exclusions = exclusions.Where(v => SelectedExclusionFilter.Value.HasFlag(v.ExclusionReason)).ToList();
-                                }
-
                                 List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                                 {
-                                    VideoIds = exclusions.Select(v => v.Id).ToList(),
-                                    ExcludedVideos = exclusions,
+                                    ExclusionReason = SelectedExclusionFilter.Value != ExclusionReason.None ? SelectedExclusionFilter.Value : null,
                                     Channel = Channel,
                                     SortMode = SelectedSortMode?.Value ?? SortMode.AgeDesc,
                                     Count = int.MaxValue
                                 });
-                                List<VideoViewModel>? videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                 Videos.AddRange(videoViewModels);
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
@@ -235,13 +227,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 // Get the queue from the server
                                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
-                                // Get all excluded videos
-                                List<Video> excludedVideos = await ServerApiClient.Instance.GetAllExcludedVideos();
-
                                 List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                                     {
                                         VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
-                                        ExcludedVideos = excludedVideos,
                                         Count = int.MaxValue
                                     }))
                                     .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue)
