@@ -211,7 +211,7 @@
             <!--  FAB!  -->
             <BoxView
                 x:Name="BoxViewDim"
-                BackgroundColor="#66000000"
+                BackgroundColor="#00000000"
                 HorizontalOptions="Fill"
                 InputTransparent="False"
                 IsVisible="False"

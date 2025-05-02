@@ -203,8 +203,8 @@ public partial class ChannelView : ContentPage
 
         if (show)
         {
-            BoxViewDim.IsVisible = true;
             BoxViewDim.Opacity = 0;
+            BoxViewDim.IsVisible = true;
 
             await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
         }
