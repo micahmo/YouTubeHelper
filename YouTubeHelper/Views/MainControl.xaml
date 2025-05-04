@@ -483,7 +483,7 @@
                                                                     <TextBlock
                                                                         Padding="0,0,15,0"
                                                                         FontWeight="Medium"
-                                                                        Foreground="Red"
+                                                                        Foreground="Firebrick"
                                                                         Text="{Binding ExcludedString}"
                                                                         TextWrapping="Wrap"
                                                                         Visibility="{c:Binding Video.Excluded,
