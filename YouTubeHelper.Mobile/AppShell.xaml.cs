@@ -621,5 +621,22 @@ namespace YouTubeHelper.Mobile
 
             busyIndicator.Dispose();
         }
+
+        public async Task NavigateToQueueTab()
+        {
+            // Don't navigate if the app is already loaded
+            if (_loaded) return;
+
+            while (!_loaded)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                TabBar.CurrentItem = QueueTab;
+                TabBar.CurrentItem.CurrentItem = QueueTab.Items.FirstOrDefault();
+            });
+        }
     }
 }

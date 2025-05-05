@@ -28,6 +28,7 @@ namespace YouTubeHelper.Mobile
         {
             base.OnNewIntent(intent);
 
+            // See if we got an intent to load a video
             string? rawUrl = intent?.GetStringExtra(Intent.ExtraText);
 
             if (!string.IsNullOrEmpty(rawUrl))
@@ -52,6 +53,12 @@ namespace YouTubeHelper.Mobile
                     _ = AppShell.Instance?.HandleSharedLink(null, channelHandle);
                 }
             }
+
+            // See if we got an intent to navigate to the queue tab
+            if (intent?.GetStringExtra("navigateTo") == "queue")
+            {
+                AppShell.Instance?.NavigateToQueueTab();
+            } 
         }
     }
 }

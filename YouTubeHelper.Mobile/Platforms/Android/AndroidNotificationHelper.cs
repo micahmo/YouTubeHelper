@@ -17,6 +17,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             {
                 Intent intent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
                 intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                intent.PutExtra("navigateTo", "queue");
 
                 pendingIntent = PendingIntent.GetActivity(
                     context,
