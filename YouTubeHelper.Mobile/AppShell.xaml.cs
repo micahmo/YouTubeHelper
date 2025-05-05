@@ -360,6 +360,9 @@ namespace YouTubeHelper.Mobile
                         await MainThread.InvokeOnMainThreadAsync(() =>
                         {
                             queueChannel.Videos.Insert(0, new VideoViewModel(newVideo, this, queueChannel));
+
+                            // Scroll the view to the top so we can see the newly inserted item
+                            queueChannel.ScrollToTopRequested?.Invoke();
                         });
                     }
                 }
