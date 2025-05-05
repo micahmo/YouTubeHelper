@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.LifecycleEvents;
-using MongoDBHelpers;
 using Plugin.LocalNotification;
 using Plugin.LocalNotification.AndroidOption;
 using ServerStatusBot.Definitions.Api;
@@ -21,8 +20,6 @@ namespace YouTubeHelper.Mobile
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("ionicons.ttf");
                 })
                 .UseMauiCommunityToolkit()
