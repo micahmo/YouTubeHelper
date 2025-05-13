@@ -309,6 +309,11 @@ namespace YouTubeHelper
 
         private void ChangeView_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (MainControlViewModel?.IsBusy == true)
+            {
+                return;
+            }
+
             if (Keyboard.IsKeyDown(Key.D1))
             {
                 MainControlViewModel!.IsMainControlExpanded = true;
