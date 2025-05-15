@@ -210,15 +210,7 @@ namespace YouTubeHelper.ViewModels
 
             if (result.Status == DownloadStatus.Failed)
             {
-                if (_statusWasEverNotDone)
-                {
-                    Video.Status = Resources.FailedToDownload;
-                }
-                else
-                {
-                    Video.Status = null;
-                    Video.Progress = 100;
-                }
+                Video.Status = Resources.FailedToDownload;
 
                 if (showInAppNotifications && _statusWasEverNotDone && result.Status != null)
                 {
