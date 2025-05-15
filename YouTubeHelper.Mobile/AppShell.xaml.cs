@@ -51,6 +51,13 @@ namespace YouTubeHelper.Mobile
                 return true;
             }
 
+            // Close the cookie browser
+            if (Current.Navigation.NavigationStack.Count > 1)
+            {
+                Current.Navigation.PopAsync();
+                return true;
+            }
+
             // Next, re-select the main/watch tab
             if (!AppShellViewModel.WatchTabSelected)
             {
