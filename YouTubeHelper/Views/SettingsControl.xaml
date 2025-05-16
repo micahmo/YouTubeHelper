@@ -19,6 +19,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="20" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Button
@@ -30,8 +32,17 @@
             Content="Change Server Address"
             ToolTip="Change Server Address" />
 
-        <TextBox
+        <Button
             Grid.Row="2"
+            Grid.Column="0"
+            Width="200"
+            VerticalAlignment="Center"
+            Command="{Binding UploadCookiesCommand}"
+            Content="Upload Cookies"
+            ToolTip="Upload Cookies" />
+
+        <TextBox
+            Grid.Row="4"
             Grid.Column="0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
