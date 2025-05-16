@@ -24,6 +24,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool hasProgress = double.TryParse(progressStr, out double progress);
             data.TryGetValue("done", out string? doneStr);
             bool isDone = bool.TryParse(doneStr, out bool done) && done;
+            data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
 
             if (title is not null && body is not null && tag is not null)
@@ -40,6 +41,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 AndroidNotificationHelper.Show(
                     title: title,
                     body: body,
+                    videoUrl: videoUrl,
                     thumbnailPath: await Utilities.GetCachedImagePath(thumbnailUrl),
                     channelId: isDone ? "completion" : "progress",
                     notificationId: int.Parse(tag),
