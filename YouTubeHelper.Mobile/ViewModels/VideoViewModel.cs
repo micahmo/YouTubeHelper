@@ -3,8 +3,6 @@ using CommunityToolkit.Maui.Core;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Windows.Input;
-using MongoDBHelpers;
-using ServerStatusBot.Definitions.Database;
 using YouTubeHelper.Mobile.Views;
 using ServerStatusBot.Definitions.Models;
 using ServerStatusBot.Definitions.Database.Models;
@@ -75,27 +73,11 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                string action;
-                if (Video.Excluded)
-                {
-                    action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
-                        Resources.Resources.Watch,
-                        Resources.Resources.WatchExternal,
-                        Resources.Resources.Unexclude,
-                        Resources.Resources.DownloadCustom,
-                        string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
-                }
-                else
-                {
-                    action = await _page.DisplayActionSheet(Video.Title, Resources.Resources.Cancel, null,
-                        Resources.Resources.Watch,
-                        Resources.Resources.WatchExternal,
-                        Resources.Resources.ExcludeWatched,
-                        Resources.Resources.ExcludeWontWatch,
-                        Resources.Resources.ExcludeMightWatch,
-                        Resources.Resources.DownloadCustom,
-                        string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
-                }
+                string? action = await _page.DisplayActionSheet(
+                    Video.Title,
+                    Resources.Resources.Cancel,
+                    null,
+                    GetActionSheetOptions(excluded: Video.Excluded, queueTabSelected: AppShell.Instance?.AppShellViewModel.QueueTabSelected == true));
 
                 bool excluded = false;
 
@@ -172,7 +154,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.DownloadCustom)
                 {
-                    string res = await _page.DisplayPromptAsync(Resources.Resources.DownloadDirectoryTitle, Resources.Resources.DownloadDirectoryMessage, initialValue: Settings.Instance.DownloadDirectory);
+                    string res = await _page.DisplayPromptAsync(Resources.Resources.DownloadDirectoryTitle, Resources.Resources.DownloadDirectoryMessage, initialValue: Settings.Instance!.DownloadDirectory);
 
                     if (string.IsNullOrWhiteSpace(res))
                     {
@@ -184,7 +166,11 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action?.StartsWith(Resources.Resources.Download) == true)
                 {
-                    await DownloadVideo(Settings.Instance.DownloadDirectory);
+                    await DownloadVideo(Settings.Instance!.DownloadDirectory);
+                }
+                else if (action == Resources.Resources.GoToChannel)
+                {
+                    AppShell.Instance?.HandleSharedLink(Video.Id, null);
                 }
 
                 if (excluded)
@@ -204,6 +190,37 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
         private static bool _isPopupOpen;
+
+        private string[] GetActionSheetOptions(bool excluded, bool queueTabSelected)
+        {
+            List<string> options = new List<string>
+            {
+                Resources.Resources.Watch,
+                Resources.Resources.WatchExternal
+            };
+
+            if (excluded)
+            {
+                options.Add(Resources.Resources.Unexclude);
+            }
+            else
+            {
+                options.Add(Resources.Resources.ExcludeWatched);
+                options.Add(Resources.Resources.ExcludeWontWatch);
+                options.Add(Resources.Resources.ExcludeMightWatch);
+            }
+
+            options.Add(Resources.Resources.DownloadCustom);
+            options.Add(string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
+
+            if (queueTabSelected)
+            {
+                options.Add(Resources.Resources.GoToChannel);
+            }
+
+            return options.ToArray();
+        }
+
 
         public static Task<string> GetRawUrl(string videoId)
         {

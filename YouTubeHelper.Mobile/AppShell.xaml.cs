@@ -571,6 +571,12 @@ namespace YouTubeHelper.Mobile
 
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
             {
+                // We successfully identified a channel, so navigate to the watch tab
+                if (!AppShellViewModel.WatchTabSelected)
+                {
+                    AppShellViewModel.SelectWatchTab();
+                }
+
                 ChannelViewModel? foundChannelViewModel = default;
                 foreach (var content in WatchTab.Items)
                 {

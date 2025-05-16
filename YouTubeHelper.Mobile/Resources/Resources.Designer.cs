@@ -324,6 +324,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go to channel.
+        /// </summary>
+        internal static string GoToChannel {
+            get {
+                return ResourceManager.GetString("GoToChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Handling shared link....
         /// </summary>
         internal static string HandlingSharedLink {
