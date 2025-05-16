@@ -18,14 +18,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 Intent intent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
                 intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
 
-                if (isDone)
-                {
-                    intent.PutExtra(Intent.ExtraText, videoUrl);
-                }
-                else
-                {
-                    intent.PutExtra("navigateTo", "queue");
-                }
+                // Put the video URL in the intent so it will navigate directly there
+                intent.PutExtra(Intent.ExtraText, videoUrl);
+                
+                // Optionally, we can make the notification navigate to the queue tab
+                //intent.PutExtra("navigateTo", "queue");
 
                 pendingIntent = PendingIntent.GetActivity(
                     context,
