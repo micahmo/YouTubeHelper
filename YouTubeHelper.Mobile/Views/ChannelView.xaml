@@ -164,6 +164,10 @@
                                     <views:VideoView BindingContext="{Binding}" />
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
+
+                            <CollectionView.Footer>
+                                <Grid HeightRequest="90" />
+                            </CollectionView.Footer>
                         </CollectionView>
                     </Grid>
                 </RefreshView>
