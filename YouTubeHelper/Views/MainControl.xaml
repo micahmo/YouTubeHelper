@@ -510,7 +510,10 @@
                                                                     Header="Description"
                                                                     IsExpanded="{Binding IsDescriptionExpanded}">
                                                                     <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
-                                                                        <TextBlock FontSize="13" Text="{Binding Video.Description}" />
+                                                                        <TextBlock
+                                                                            Margin="0,0,0,10"
+                                                                            utilities:InlineHelper.Inlines="{Binding FormattedDescription}"
+                                                                            TextWrapping="Wrap" />
                                                                     </ScrollViewer>
                                                                 </Expander>
                                                             </Grid>

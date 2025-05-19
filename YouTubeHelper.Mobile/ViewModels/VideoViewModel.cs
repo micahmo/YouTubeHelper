@@ -1,8 +1,11 @@
-﻿using CommunityToolkit.Maui.Alerts;
+﻿using System.Text.RegularExpressions;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Windows.Input;
+using Android.Util;
+using Flurl;
 using YouTubeHelper.Mobile.Views;
 using ServerStatusBot.Definitions.Models;
 using ServerStatusBot.Definitions.Database.Models;
@@ -360,6 +363,61 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="EventLogTags.Description"/> formatted for link clickability
+        /// </summary>
+        public FormattedString FormattedDescription
+        {
+            get
+            {
+                FormattedString formatted = new FormattedString();
+                Regex urlRegex = new Regex(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
+                string[] parts = urlRegex.Split(Video.Description ?? "");
+
+                foreach (string part in parts)
+                {
+                    if (urlRegex.IsMatch(part))
+                    {
+                        Span span = new Span { Text = part, TextColor = Colors.Blue, TextDecorations = TextDecorations.Underline };
+                        TapGestureRecognizer tapGesture = new TapGestureRecognizer();
+                        tapGesture.Tapped += async (_, _) =>
+                        {
+                            Url? url = Url.Parse(part);
+                            if (url.Host is "youtube.com" or "youtu.be")
+                            {
+                                bool res = await AppShell.Instance!.DisplayAlert(
+                                    Resources.Resources.OpenYouTubeLinkTitle,
+                                    string.Format(Resources.Resources.OpenYouTubeLinkMessage, part),
+                                    accept: Resources.Resources.OpenInYouTubeHelper,
+                                    cancel: Resources.Resources.OpenExternally);
+
+                                if (res)
+                                {
+                                    await AppShell.Instance.HandleSharedLink(part);
+                                }
+                                else
+                                {
+                                    await Launcher.Default.OpenAsync(part);
+                                }
+                            }
+                            else
+                            {
+                                await Launcher.Default.OpenAsync(part);
+                            }
+                        };
+                        span.GestureRecognizers.Add(tapGesture);
+                        formatted.Spans.Add(span);
+                    }
+                    else
+                    {
+                        formatted.Spans.Add(new Span { Text = part });
+                    }
+                }
+
+                return formatted;
             }
         }
     }

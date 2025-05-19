@@ -279,4 +279,18 @@
   <data name="GoToChannel" xml:space="preserve">
     <value>Go to channel</value>
   </data>
+  <data name="OpenYouTubeLinkMessage" xml:space="preserve">
+    <value>Would you like to open this YouTube link externally or within YouTubeHelper?
+
+{0}</value>
+  </data>
+  <data name="OpenYouTubeLinkTitle" xml:space="preserve">
+    <value>Open Link</value>
+  </data>
+  <data name="OpenInYouTubeHelper" xml:space="preserve">
+    <value>Open in YouTubeHelper</value>
+  </data>
+  <data name="OpenExternally" xml:space="preserve">
+    <value>Open Externally</value>
+  </data>
 </root>

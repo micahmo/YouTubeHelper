@@ -435,6 +435,44 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open Externally.
+        /// </summary>
+        public static string OpenExternally {
+            get {
+                return ResourceManager.GetString("OpenExternally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in YouTubeHelper.
+        /// </summary>
+        public static string OpenInYouTubeHelper {
+            get {
+                return ResourceManager.GetString("OpenInYouTubeHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to open this YouTube link externally or within YouTubeHelper?
+        ///
+        ///{0}.
+        /// </summary>
+        public static string OpenYouTubeLinkMessage {
+            get {
+                return ResourceManager.GetString("OpenYouTubeLinkMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Link.
+        /// </summary>
+        public static string OpenYouTubeLinkTitle {
+            get {
+                return ResourceManager.GetString("OpenYouTubeLinkTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ▶.
         /// </summary>
         public static string Playing {

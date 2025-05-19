@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using CliWrap;
 using CliWrap.Buffered;
+using Flurl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
@@ -297,6 +303,66 @@ namespace YouTubeHelper.ViewModels
             catch
             {
                 return Task.FromResult("https://google.com");
+            }
+        }
+
+        /// <summary>
+        /// Wraps the <see cref="Video.Description"/> and returns it in such a way that it can be displayed with Inlines in a TextBlock
+        /// </summary>
+        public Inline[] FormattedDescription
+        {
+            get
+            {
+                List<Inline> inlines = new List<Inline>();
+                Regex urlRegex = new Regex(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
+                string[] parts = urlRegex.Split(Video.Description ?? "");
+
+                foreach (string part in parts)
+                {
+                    if (urlRegex.IsMatch(part))
+                    {
+                        Hyperlink hyperlink = new Hyperlink(new Run(part))
+                        {
+                            NavigateUri = new Uri(part)
+                        };
+
+                        hyperlink.Click += async (_, e) =>
+                        {
+                            e.Handled = true;
+
+                            Url? url = Url.Parse(part);
+                            if (url.Host is "youtube.com" or "youtu.be")
+                            {
+                                ContentDialogResult res = await MessageBoxHelper.Show(string.Format(Resources.OpenYouTubeLinkMessage, part),
+                                    Resources.OpenYouTubeLinkTitle,
+                                    MessageBoxButton.OKCancel,
+                                    primaryButtonText: Resources.OpenInYouTubeHelper,
+                                    secondaryButtonText: Resources.OpenExternally);
+
+                                if (res == ContentDialogResult.Primary)
+                                {
+                                    MainWindow.Instance?.HandleSharedLink(part);
+                                }
+                                else
+                                {
+                                    Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                                }
+                            }
+                            else
+                            {
+                                Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                            }
+                        };
+
+                        inlines.Add(hyperlink);
+                    }
+                    else
+                    {
+                        inlines.Add(new Run(part));
+                    }
+                }
+
+                return inlines.ToArray();
             }
         }
     }

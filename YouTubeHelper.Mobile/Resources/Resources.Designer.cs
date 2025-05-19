@@ -387,6 +387,44 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open Externally.
+        /// </summary>
+        internal static string OpenExternally {
+            get {
+                return ResourceManager.GetString("OpenExternally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in YouTubeHelper.
+        /// </summary>
+        internal static string OpenInYouTubeHelper {
+            get {
+                return ResourceManager.GetString("OpenInYouTubeHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to open this YouTube link externally or within YouTubeHelper?
+        ///
+        ///{0}.
+        /// </summary>
+        internal static string OpenYouTubeLinkMessage {
+            get {
+                return ResourceManager.GetString("OpenYouTubeLinkMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Link.
+        /// </summary>
+        internal static string OpenYouTubeLinkTitle {
+            get {
+                return ResourceManager.GetString("OpenYouTubeLinkTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Press back again to close.
         /// </summary>
         internal static string PressBackAgainToClose {

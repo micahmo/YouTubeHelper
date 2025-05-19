@@ -2,6 +2,7 @@
 using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using Flurl;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
@@ -524,6 +525,29 @@ namespace YouTubeHelper.Mobile
                 {
                     AppShellViewModel.QueueChannelViewModel!.FindVideos();
                 }
+            }
+        }
+
+        public async Task HandleSharedLink(string rawUrl)
+        {
+            Url url = new Url(rawUrl);
+
+            if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string videoId)
+            {
+                await HandleSharedLink(videoId, null);
+            }
+            else if (url.Authority == "youtu.be")
+            {
+                await HandleSharedLink(url.PathSegments[0], null);
+            }
+            else if (url.Authority == "www.youtube.com" && url.PathSegments.Count >= 2 && url.PathSegments[0] == "live")
+            {
+                await HandleSharedLink(url.PathSegments[1], null);
+            }
+
+            if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
+            {
+                await HandleSharedLink(null, channelHandle);
             }
         }
 

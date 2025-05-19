@@ -89,8 +89,7 @@
                 Grid.Row="0"
                 Padding="10,0,10,0"
                 LineBreakMode="TailTruncation"
-                MaxLines="1"
-                Text="{Binding Video.Description}">
+                MaxLines="1">
                 <Label.Behaviors>
                     <toolkit:AnimationBehavior>
                         <toolkit:AnimationBehavior.AnimationType>
@@ -110,6 +109,14 @@
                         Value="True">
                         <Setter Property="LineBreakMode" Value="WordWrap" />
                         <Setter Property="MaxLines" Value="-1" />
+
+                        <!--  Use FormattedText when expanded  -->
+                        <Setter TargetName="" Property="FormattedText">
+                            <Setter.Value>
+                                <Binding Path="FormattedDescription" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Text" Value="{x:Null}" />
                     </DataTrigger>
                     <DataTrigger
                         Binding="{Binding IsDescriptionExpanded}"
@@ -117,6 +124,10 @@
                         Value="False">
                         <Setter Property="LineBreakMode" Value="TailTruncation" />
                         <Setter Property="MaxLines" Value="1" />
+
+                        <!--  Just use Text when not expanded  -->
+                        <Setter Property="FormattedText" Value="{x:Null}" />
+                        <Setter Property="Text" Value="{Binding Video.Description}" />
                     </DataTrigger>
                 </Label.Triggers>
             </Label>

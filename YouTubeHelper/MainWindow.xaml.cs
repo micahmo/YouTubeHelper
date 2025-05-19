@@ -29,10 +29,16 @@ namespace YouTubeHelper
     {
         public static string ClientId { get; } = Guid.NewGuid().ToString();
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        public static MainWindow? Instance { get; private set; }
+
         public MainWindow()
         {
             ApplicationSettings.Instance.Load();
             InitializeComponent();
+            Instance = this;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -400,9 +406,15 @@ namespace YouTubeHelper
 
         private async void HandlePaste_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            string rawUrl = Clipboard.GetText();
+            
+            await HandleSharedLink(rawUrl);
+        }
+
+        public async Task HandleSharedLink(string rawUrl)
+        {
             MainControlViewModel!.IsBusy = true;
 
-            string rawUrl = Clipboard.GetText();
             string? videoId = default;
             string? channelHandle = default;
             string? channelId = default;
@@ -474,7 +486,7 @@ namespace YouTubeHelper
                     if (channelViewModel.Channel.ChannelPlaylist == channelPlaylist)
                     {
                         foundChannelViewModel = channelViewModel;
-                        
+
                         MainControlViewModel.SelectedChannel = foundChannelViewModel;
                         break;
                     }

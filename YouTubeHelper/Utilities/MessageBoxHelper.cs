@@ -15,7 +15,7 @@ namespace YouTubeHelper.Utilities
         /// <summary>
         /// Show a MessageBox with the given options
         /// </summary>
-        public static Task<ContentDialogResult> Show(string message, string title, MessageBoxButton buttons)
+        public static Task<ContentDialogResult> Show(string message, string title, MessageBoxButton buttons, string? primaryButtonText = null, string? secondaryButtonText = null)
         {
             ContentDialog contentDialog = new ContentDialog
             {
@@ -32,19 +32,19 @@ namespace YouTubeHelper.Utilities
             switch (buttons)
             {
                 case MessageBoxButton.OK:
-                    contentDialog.PrimaryButtonText = Resources.OK;
+                    contentDialog.PrimaryButtonText = primaryButtonText ?? Resources.OK;
                     break;
                 case MessageBoxButton.OKCancel:
-                    contentDialog.PrimaryButtonText = Resources.OK;
-                    contentDialog.SecondaryButtonText = Resources.Cancel;
+                    contentDialog.PrimaryButtonText = primaryButtonText ?? Resources.OK;
+                    contentDialog.SecondaryButtonText = secondaryButtonText ?? Resources.Cancel;
                     break;
                 case MessageBoxButton.YesNo:
-                    contentDialog.PrimaryButtonText = Resources.Yes;
-                    contentDialog.SecondaryButtonText = Resources.No;
+                    contentDialog.PrimaryButtonText = primaryButtonText ?? Resources.Yes;
+                    contentDialog.SecondaryButtonText = secondaryButtonText ?? Resources.No;
                     break;
                 case MessageBoxButton.YesNoCancel:
-                    contentDialog.PrimaryButtonText = Resources.Yes;
-                    contentDialog.SecondaryButtonText = Resources.No;
+                    contentDialog.PrimaryButtonText = primaryButtonText ?? Resources.Yes;
+                    contentDialog.SecondaryButtonText = secondaryButtonText ?? Resources.No;
                     contentDialog.CloseButtonText = Resources.Cancel;
                     break;
             }
