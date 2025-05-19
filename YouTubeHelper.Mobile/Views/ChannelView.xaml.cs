@@ -20,6 +20,13 @@ public partial class ChannelView : ContentPage
         BindingContextChanged += OnBindingContextChanged;
     }
 
+    /// <inheritdoc/>
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        UpdateFooter();
+    }
+
     private void OnBindingContextChanged(object? sender, EventArgs e)
     {
         if (BindingContext is ChannelViewModel channelViewModel)
@@ -351,4 +358,11 @@ public partial class ChannelView : ContentPage
             await Shell.Current.Navigation.PopAsync();
         }
     }
+
+    private void UpdateFooter()
+    {
+        // If the footer appears where there is no FAB, some funky stuff happens
+        VideosCollectionView.Footer = AppShell.Instance!.AppShellViewModel.QueueTabSelected ? null : new Grid { HeightRequest = 90 };
+    }
+
 }
