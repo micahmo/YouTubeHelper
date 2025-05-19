@@ -187,24 +187,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                     Videos.AddRange(videoViewModels);
 
-                                    try
-                                    {
-                                        List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
-                                        foreach (VideoViewModel? videoViewModel in videoViewModels)
-                                        {
-                                            Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
-                                            if (requestId != null)
-                                            {
-                                                await ServerApiClient.Instance.JoinDownloadGroup(requestId!.ToString()!, requestData => videoViewModel.UpdateCheck(requestId!.ToString()!, requestData, showInAppNotifications: false));
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        // Ignore this, because getting the queue isn't a big deal, and we don't want it to trip the outer retry.
-                                    }
-
-                                    // TODO: Reset progress?
+                                    await QueueUtils.TryJoinDownloadGroup(videoViewModels);
                                 }
                             }
                             // FindExclusions

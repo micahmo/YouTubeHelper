@@ -15,6 +15,7 @@ using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Models;
+using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.ViewModels;
 using YouTubeHelper.Views;
@@ -498,7 +499,10 @@ namespace YouTubeHelper
 
                 if (video is not null)
                 {
-                    foundChannelViewModel.Videos.Add(new VideoViewModel(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true });
+                    VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
+                    foundChannelViewModel.Videos.Add(videoViewModel);
+
+                    await QueueUtils.TryJoinDownloadGroup(videoViewModel);
                 }
             }
 

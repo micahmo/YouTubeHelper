@@ -8,19 +8,18 @@ using CliWrap.Buffered;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
-using MongoDBHelpers;
 using Notification.Wpf;
 using ServerStatusBot.Definitions.Api;
-using ServerStatusBot.Definitions.Database;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Shared;
 using YouTubeHelper.Utilities;
 using YouTubeHelper.Views;
 
 namespace YouTubeHelper.ViewModels
 {
-    public class VideoViewModel : ObservableObject
+    public class VideoViewModel : ObservableObject, IVideoViewModel
     {
         public VideoViewModel(Video video, MainControlViewModel mainControlViewModel, ChannelViewModel channelViewModel)
         {
@@ -162,7 +161,7 @@ namespace YouTubeHelper.ViewModels
         private string? _previousRequestId;
         private bool _statusWasEverNotDone;
 
-        internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
+        public void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
             if (result.VideoId != Video.Id)
             {

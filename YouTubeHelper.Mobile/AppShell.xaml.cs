@@ -9,6 +9,7 @@ using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Mobile.Notifications;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
+using YouTubeHelper.Shared.Utilities;
 using Environment = System.Environment;
 
 namespace YouTubeHelper.Mobile
@@ -628,7 +629,10 @@ namespace YouTubeHelper.Mobile
 
                 if (video is not null)
                 {
-                    foundChannelViewModel.Videos.Add(new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true });
+                    VideoViewModel videoViewModel = new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
+                    foundChannelViewModel.Videos.Add(videoViewModel);
+
+                    await QueueUtils.TryJoinDownloadGroup(videoViewModel);
                 }
             }
 

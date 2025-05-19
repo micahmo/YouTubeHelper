@@ -7,10 +7,11 @@ using YouTubeHelper.Mobile.Views;
 using ServerStatusBot.Definitions.Models;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Api;
+using YouTubeHelper.Shared;
 
 namespace YouTubeHelper.Mobile.ViewModels
 {
-    public class VideoViewModel : ObservableObject
+    public class VideoViewModel : ObservableObject, IVideoViewModel
     {
         private readonly AppShell _page;
         private readonly ChannelViewModel _channelViewModel;
@@ -296,7 +297,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         private string? _previousRequestId;
         private bool _statusWasEverNotDone;
 
-        internal void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
+        public void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
             if (result.VideoId != Video.Id)
             {
