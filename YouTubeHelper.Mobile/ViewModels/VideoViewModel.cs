@@ -386,7 +386,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         tapGesture.Tapped += async (_, _) =>
                         {
                             Url? url = Url.Parse(part);
-                            if (url.Host is "youtube.com" or "youtu.be")
+                            if (url.Host.EndsWith("youtube.com") || url.Host.EndsWith("youtu.be"))
                             {
                                 bool res = await AppShell.Instance!.DisplayAlert(
                                     Resources.Resources.OpenYouTubeLinkTitle,

@@ -331,7 +331,7 @@ namespace YouTubeHelper.ViewModels
                             e.Handled = true;
 
                             Url? url = Url.Parse(part);
-                            if (url.Host is "youtube.com" or "youtu.be")
+                            if (url.Host.EndsWith("youtube.com") || url.Host.EndsWith("youtu.be"))
                             {
                                 ContentDialogResult res = await MessageBoxHelper.Show(string.Format(Resources.OpenYouTubeLinkMessage, part),
                                     Resources.OpenYouTubeLinkTitle,
