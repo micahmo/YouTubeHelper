@@ -22,6 +22,8 @@ namespace YouTubeHelper.Mobile
         public static AppShell? Instance { get; private set; }
         private Tab? _currentTab;
 
+        private int _selectedChannelTabIndex;
+
         public AppShell()
         {
             InitializeComponent();
@@ -212,8 +214,32 @@ namespace YouTubeHelper.Mobile
             // Check for battery restrictions
             _ = CheckBatteryOptimizations();
 
+            SyncSelectedChannel();
+
             _loaded = true;
         }
+
+        private void SyncSelectedChannel()
+        {
+            foreach (Tab tab in new[] { WatchTab, SearchTab, ExclusionsTab, QueueTab })
+            {
+                tab.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(Tab.CurrentItem))
+                    {
+                        if (s is Tab changedTab)
+                        {
+                            int index = changedTab.Items.IndexOf(changedTab.CurrentItem);
+                            if (index >= 0)
+                            {
+                                _selectedChannelTabIndex = index;
+                            }
+                        }
+                    }
+                };
+            }
+        }
+
 
         private async Task CheckBatteryOptimizations()
         {
@@ -516,10 +542,10 @@ namespace YouTubeHelper.Mobile
                 _currentTab = CurrentItem.CurrentItem as Tab;
                 AppShellViewModel.ChannelViewModels.ForEach(c => c.Videos.Clear());
 
-                // There's a weird issue where changing bottom tabs focuses the last top tab.
-                // Manually fix that here.
-                // ONLY do this when changing bottom tabs, otherwise this causes issues in VS 17.6.2.
-                CurrentItem.CurrentItem.CurrentItem = CurrentItem.CurrentItem.Items.FirstOrDefault();
+                if (_currentTab != null && _selectedChannelTabIndex < _currentTab.Items.Count)
+                {
+                    _currentTab.CurrentItem = _currentTab.Items[_selectedChannelTabIndex];
+                }
 
                 if (AppShellViewModel.QueueTabSelected)
                 {
