@@ -642,9 +642,12 @@ namespace YouTubeHelper.Mobile
 
                     var channelView = new ChannelView { BindingContext = foundChannelViewModel };
 
-                    WatchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
+                    ShellContent watchTabContent = new ShellContent { Title = channelName, Content = channelView };
+                    WatchTab.Items.Insert(0, watchTabContent);
                     SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
                     ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
+
+                    WatchTab.CurrentItem = watchTabContent;
 
                     foundChannelViewModel.Loading = false;
                 }
