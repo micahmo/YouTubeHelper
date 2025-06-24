@@ -78,6 +78,7 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: v1.0.${{ github.run_number }}
           files: YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION }}.apk
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
