@@ -71,18 +71,13 @@ jobs:
             $apkPath
         shell: pwsh
 
-      - name: List output APK directory contents
-        run: |
-          Get-ChildItem -Path "YouTubeHelper.Mobile\bin\Release\net8.0-android" -Recurse | Select-Object FullName, Length
-        shell: pwsh
-
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         if: success()
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: v1.0.${{ github.run_number }}
-          files: YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION }}.apk
+          files: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-${{ env.VERSION }}.apk
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
