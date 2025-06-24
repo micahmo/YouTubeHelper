@@ -48,4 +48,4 @@ jobs:
         with:
           name: YouTubeHelper.APK
           path: |
-            **/bin/Release/net8.0-android/*/*.apk
+            YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-Signed.apk
