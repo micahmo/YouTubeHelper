@@ -65,6 +65,7 @@ jobs:
 
           & "${env:ANDROID_HOME}\build-tools\34.0.0\apksigner.bat" sign `
             --ks my-release-key.keystore `
+            --ks-key-alias "${{ secrets.KEY_ALIAS }}" `
             --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} `
             --out $signedApk `
             $apkPath
