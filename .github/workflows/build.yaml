@@ -68,7 +68,7 @@ jobs:
           $version = "v1.0.${{ github.run_number }}"
           $repo = "${{ github.repository }}"
           $apkUrl = "https://github.com/$repo/releases/download/$version/com.micahmo.youtubehelper-Signed.apk"
-          $text = "✅ *YouTubeHelper $version* has been published.\n[Download APK]($apkUrl)"
+          $text = "✅ *YouTubeHelper $version* has been published.`n[Download APK]($apkUrl)"
           
           $payload = @{
             chat_id = "76034823"
