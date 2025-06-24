@@ -52,13 +52,31 @@ jobs:
       - name: Build Android APK
         run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android -c Release -p:AndroidPackageFormat=apk
 
+      - name: Decode keystore
+        run: |
+          $bytes = [System.Convert]::FromBase64String("${{ secrets.KEYSTORE_FILE_BASE64 }}")
+          [IO.File]::WriteAllBytes("my-release-key.keystore", $bytes)
+        shell: pwsh
+
+      - name: Sign APK manually
+        run: |
+          $apkPath = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-Signed.apk"
+          $signedApk = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION }}.apk"
+
+          & "${env:ANDROID_HOME}\build-tools\34.0.0\apksigner.bat" sign `
+            --ks my-release-key.keystore `
+            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} `
+            --out $signedApk `
+            $apkPath
+        shell: pwsh
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         if: success()
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: v1.0.${{ github.run_number }}
-          files: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-Signed.apk
+          files: YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -67,7 +85,7 @@ jobs:
         run: |
           $version = "v1.0.${{ github.run_number }}"
           $repo = "${{ github.repository }}"
-          $apkUrl = "https://github.com/$repo/releases/download/$version/com.micahmo.youtubehelper-Signed.apk"
+          $apkUrl = "https://github.com/$repo/releases/download/$version/com.micahmo.youtubehelper-${{ env.VERSION }}.apk"
           $text = "✅ *YouTubeHelper $version* has been published.`n[Download APK]($apkUrl)"
           
           $payload = @{
