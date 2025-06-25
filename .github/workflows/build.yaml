@@ -164,15 +164,23 @@ jobs:
           </AppUpdate>
           "@
 
+          $body = @{
+            files = @{
+              "YouTubeHelperVersionInfo.xml" = @{
+                content = $xmlContent
+              }
+            }
+          } | ConvertTo-Json -Depth 10
+
           $headers = @{
             Authorization = "token ${{ secrets.GIST_TOKEN }}"
-            "Content-Type" = "text/plain"
+            "Content-Type" = "application/json"
           }
 
-          Invoke-RestMethod -Uri "https://gist.githubusercontent.com/micahmo/2f8966f2a9acbc8d11d70d69dc75c34c/raw/YouTubeHelperVersionInfo.xml" `
-                            -Method Put `
+          Invoke-RestMethod -Uri "https://api.github.com/gists/2f8966f2a9acbc8d11d70d69dc75c34c" `
+                            -Method PATCH `
                             -Headers $headers `
-                            -Body $xmlContent
+                            -Body $body
         shell: pwsh
 
       - name: Upload Installer to GitHub Release
