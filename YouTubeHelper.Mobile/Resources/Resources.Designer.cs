@@ -396,6 +396,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in Plex.
+        /// </summary>
+        internal static string OpenInPlex {
+            get {
+                return ResourceManager.GetString("OpenInPlex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open in YouTubeHelper.
         /// </summary>
         internal static string OpenInYouTubeHelper {
@@ -591,6 +600,15 @@ namespace YouTubeHelper.Mobile.Resources {
         internal static string VideoDownloadSucceeded {
             get {
                 return ResourceManager.GetString("VideoDownloadSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Video not found in Plex.
+        /// </summary>
+        internal static string VideoNotFoundInPlex {
+            get {
+                return ResourceManager.GetString("VideoNotFoundInPlex", resourceCulture);
             }
         }
         

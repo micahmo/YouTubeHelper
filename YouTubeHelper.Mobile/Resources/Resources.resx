@@ -293,4 +293,10 @@
   <data name="OpenExternally" xml:space="preserve">
     <value>Open Externally</value>
   </data>
+  <data name="OpenInPlex" xml:space="preserve">
+    <value>Open in Plex</value>
+  </data>
+  <data name="VideoNotFoundInPlex" xml:space="preserve">
+    <value>Video not found in Plex</value>
+  </data>
 </root>

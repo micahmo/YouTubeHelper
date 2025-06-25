@@ -81,7 +81,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Title,
                     Resources.Resources.Cancel,
                     null,
-                    GetActionSheetOptions(excluded: Video.Excluded, queueTabSelected: AppShell.Instance?.AppShellViewModel.QueueTabSelected == true));
+                    GetActionSheetOptions(excluded: Video.Excluded, exclusionReason: Video.ExclusionReason, queueTabSelected: AppShell.Instance?.AppShellViewModel.QueueTabSelected == true));
 
                 bool excluded = false;
 
@@ -176,6 +176,24 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     AppShell.Instance?.HandleSharedLink(Video.Id, null);
                 }
+                else if (action == Resources.Resources.OpenInPlex)
+                {
+                    string? ratingKey;
+                    using (new BusyIndicator(_page))
+                    {
+                        ratingKey = await ServerApiClient.Instance.GetPlexRatingKey(Video.Title!, Video.Id);
+                    }
+
+                    if (string.IsNullOrEmpty(ratingKey))
+                    {
+                        await Toast.Make(Resources.Resources.VideoNotFoundInPlex, ToastDuration.Long).Show();
+                    }
+                    else
+                    {
+                        string plexUri = $"plex://server://8316eb530162c189b29f3250d4734700515fc5f8/com.plexapp.plugins.library/library/metadata/{ratingKey}";
+                        await Launcher.Default.OpenAsync(new Uri(plexUri));
+                    }
+                }
 
                 if (excluded)
                 {
@@ -195,7 +213,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private static bool _isPopupOpen;
 
-        private string[] GetActionSheetOptions(bool excluded, bool queueTabSelected)
+        private string[] GetActionSheetOptions(bool excluded, ExclusionReason exclusionReason, bool queueTabSelected)
         {
             List<string> options = new List<string>
             {
@@ -220,6 +238,11 @@ namespace YouTubeHelper.Mobile.ViewModels
             if (queueTabSelected)
             {
                 options.Add(Resources.Resources.GoToChannel);
+            }
+
+            if (exclusionReason == ExclusionReason.Watched)
+            {
+                options.Add(Resources.Resources.OpenInPlex);
             }
 
             return options.ToArray();
