@@ -144,6 +144,37 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Installer\Setup.iss
         shell: pwsh
 
+      - name: Update AppUpdate.xml in Gist
+        run: |
+          $version = "1.0.${{ github.run_number }}"
+          $date = Get-Date -Format "yyyy-MM-dd"
+          $downloadLink = "https://github.com/micahmo/YouTubeHelper/releases/download/v$version/YouTubeHelperSetup-$version.exe"
+          $fileName = "WS4WSetup-$version.exe"
+
+          $xmlContent = @"
+          <?xml version="1.0" encoding="utf-8" ?>
+          <AppUpdate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/micahmo/YouTubeHelper/refs/heads/main/Installer/AppUpdate.xsd">
+            <Version>$version</Version>
+            <ReleaseDate>$date</ReleaseDate>
+            <DownloadLink>$downloadLink</DownloadLink>
+            <DownloadFileName>$fileName</DownloadFileName>
+            <VersionNotes></VersionNotes>
+            <ReleaseNotes></ReleaseNotes>
+          </AppUpdate>
+          "@
+
+          $headers = @{
+            Authorization = "token ${{ secrets.GIST_TOKEN }}"
+            "Content-Type" = "text/plain"
+          }
+
+          Invoke-RestMethod -Uri "https://gist.githubusercontent.com/micahmo/2f8966f2a9acbc8d11d70d69dc75c34c/raw/YouTubeHelperVersionInfo.xml" `
+                            -Method Put `
+                            -Headers $headers `
+                            -Body $xmlContent
+        shell: pwsh
+
       - name: Upload Installer to GitHub Release
         uses: softprops/action-gh-release@v1
         if: success()
