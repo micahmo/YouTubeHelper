@@ -81,27 +81,6 @@ jobs:
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Send Telegram message with APK link
-        if: success()
-        run: |
-          $version = "v1.0.${{ github.run_number }}"
-          $repo = "${{ github.repository }}"
-          $apkUrl = "https://github.com/$repo/releases/download/$version/com.micahmo.youtubehelper-${{ env.VERSION }}.apk"
-          $text = "✅ *YouTubeHelper $version* has been published.`n[Download APK]($apkUrl)"
-          
-          $payload = @{
-            chat_id = "76034823"
-            text = $text
-            parse_mode = "Markdown"
-            disable_web_page_preview = $true
-          }
-
-          Invoke-RestMethod -Uri "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" `
-                            -Method Post `
-                            -ContentType "application/json" `
-                            -Body ($payload | ConvertTo-Json -Depth 10)
-        shell: pwsh
 
   build-desktop:
     name: Build Windows Installer
