@@ -10,7 +10,7 @@ on:
     branches:
       - main
 
-name: Build MAUI Android APK
+name: Build for Android and Windows
 
 jobs:
   build-android:
@@ -102,3 +102,47 @@ jobs:
                             -ContentType "application/json" `
                             -Body ($payload | ConvertTo-Json -Depth 10)
         shell: pwsh
+
+  build-desktop:
+    name: Build Windows Installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build WPF Desktop App
+        run: dotnet publish YouTubeHelper\YouTubeHelper.csproj -c Release -f net8.0-windows
+
+      - name: Set VERSION env variable
+        run: echo "VERSION=1.0.${{ github.run_number }}" >> $env:GITHUB_ENV
+
+      - name: Install Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
+          Start-Process .\is.exe -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+        shell: pwsh
+
+      - name: Build Installer (Inno Setup)
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Installer\Setup.iss
+        shell: pwsh
+
+      - name: Upload Installer to GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: v1.0.${{ github.run_number }}
+          files: Installer\YouTubeHelperSetup-${{ env.VERSION }}.exe
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
