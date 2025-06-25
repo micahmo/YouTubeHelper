@@ -22,6 +22,7 @@ namespace YouTubeHelper.Utilities
             ChangeView.InputGestures.Add(new KeyGesture(Key.PageUp, ModifierKeys.Control | ModifierKeys.Shift));
             ChangeView.InputGestures.Add(new KeyGesture(Key.PageDown, ModifierKeys.Control | ModifierKeys.Shift));
             HandlePaste.InputGestures.Add(new KeyGesture(Key.V, ModifierKeys.Control));
+            AboutBox.InputGestures.Add(new KeyGesture(Key.F1));
         }
 
         public static RoutedCommand AddWatchedIds { get; } = new();
@@ -33,6 +34,8 @@ namespace YouTubeHelper.Utilities
         public static RoutedCommand ChangeView { get; } = new();
 
         public static RoutedCommand HandlePaste { get; } = new();
+
+        public static RoutedCommand AboutBox { get; } = new();
 
         #endregion
     }

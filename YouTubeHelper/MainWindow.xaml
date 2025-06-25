@@ -12,6 +12,7 @@
     Width="1450"
     Height="700"
     Closing="Window_Closing"
+    Loaded="Window_Loaded"
     MouseDown="Window_MouseDown"
     mc:Ignorable="d">
     <Window.CommandBindings>
@@ -20,6 +21,7 @@
         <CommandBinding Command="{x:Static local:ShortcutCommands.AddMightWatchIds}" Executed="AddMightWatchIds_Executed" />
         <CommandBinding Command="{x:Static local:ShortcutCommands.ChangeView}" Executed="ChangeView_Executed" />
         <CommandBinding Command="{x:Static local:ShortcutCommands.HandlePaste}" Executed="HandlePaste_Executed" />
+        <CommandBinding Command="{x:Static local:ShortcutCommands.AboutBox}" Executed="AboutBoxCommand_Executed" />
     </Window.CommandBindings>
 
     <Window.TaskbarItemInfo>

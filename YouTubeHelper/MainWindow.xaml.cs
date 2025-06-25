@@ -1,5 +1,14 @@
-﻿using System;
+﻿using Bluegrams.Application;
+using Bluegrams.Application.WPF;
+using Flurl;
+using ModernWpf.Controls;
+using ServerStatusBot.Definitions;
+using ServerStatusBot.Definitions.Api;
+using ServerStatusBot.Definitions.Database.Models;
+using ServerStatusBot.Definitions.Models;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,13 +16,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
+using System.Windows.Resources;
 using System.Windows.Threading;
-using Flurl;
-using ModernWpf.Controls;
-using ServerStatusBot.Definitions;
-using ServerStatusBot.Definitions.Api;
-using ServerStatusBot.Definitions.Database.Models;
-using ServerStatusBot.Definitions.Models;
 using YouTubeHelper.Models;
 using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
@@ -34,11 +40,16 @@ namespace YouTubeHelper
         /// </summary>
         public static MainWindow? Instance { get; private set; }
 
+        private readonly WpfUpdateChecker _updateChecker;
+
         public MainWindow()
         {
             ApplicationSettings.Instance.Load();
             InitializeComponent();
             Instance = this;
+
+            // Check for updates
+            _updateChecker = new MyUpdateChecker("https://raw.githubusercontent.com/micahmo/YouTubeHelper/refs/heads/main/Installer/VersionInfo.xml", this);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -187,6 +198,12 @@ namespace YouTubeHelper
 
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
             ApplicationSettings.Instance.SelectedExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Auto allows the user to Skip (updates are still available via F1)
+            _updateChecker.CheckForUpdates(UpdateNotifyMode.Auto);
         }
 
         private static MainControlViewModel? MainControlViewModel;
@@ -652,6 +669,29 @@ namespace YouTubeHelper
                     await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
                 };
             }
+        }
+
+        private void AboutBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            // Get the icon
+            Uri iconUri = new Uri("pack://application:,,,/Images/logo.ico", UriKind.Absolute);
+            StreamResourceInfo? info = Application.GetResourceStream(iconUri);
+
+            BitmapSource? bitmapIcon = null;
+            if (info != null)
+            {
+                using Icon icon = new Icon(info.Stream);
+                bitmapIcon = Imaging.CreateBitmapSourceFromHIcon(
+                    icon.Handle,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+            }
+
+            new AboutBox(bitmapIcon, showLanguageSelection: false)
+            {
+                Owner = this,
+                UpdateChecker = _updateChecker,
+            }.ShowDialog();
         }
     }
 }
