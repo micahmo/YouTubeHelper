@@ -49,7 +49,7 @@ namespace YouTubeHelper
             Instance = this;
 
             // Check for updates
-            _updateChecker = new MyUpdateChecker("https://raw.githubusercontent.com/micahmo/YouTubeHelper/refs/heads/main/Installer/VersionInfo.xml", this);
+            _updateChecker = new MyUpdateChecker("https://gist.githubusercontent.com/micahmo/2f8966f2a9acbc8d11d70d69dc75c34c/raw/YouTubeHelperVersionInfo.xml", this);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
