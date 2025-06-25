@@ -116,6 +116,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Add GitHub NuGet source
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/micahmo/index.json `
+            --name GitHub_micahmo `
+            --username micahmo `
+            --password "${{ secrets.GH_NUGET_PAT }}" `
+            --store-password-in-clear-text
+
       - name: Restore dependencies
         run: dotnet restore
 
