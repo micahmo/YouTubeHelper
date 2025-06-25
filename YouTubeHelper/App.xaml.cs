@@ -1,6 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Threading;
+﻿using HarmonyLib;
 using Notification.Wpf;
+using System.Windows;
+using System.Windows.Threading;
 using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper
@@ -13,6 +14,9 @@ namespace YouTubeHelper
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            Harmony harmony = new Harmony("com.micahmo.youtubehelper");
+            harmony.PatchAll();
 
             DispatcherUnhandledException += App_DispatcherUnhandledException;
         }
