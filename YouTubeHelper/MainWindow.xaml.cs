@@ -48,6 +48,8 @@ namespace YouTubeHelper
             InitializeComponent();
             Instance = this;
 
+            Title = $"{Properties.Resources.ApplicationName} {Versioning.GetInstalledMsiVersion()}";
+
             // Check for updates
             _updateChecker = new MyUpdateChecker("https://gist.githubusercontent.com/micahmo/2f8966f2a9acbc8d11d70d69dc75c34c/raw/YouTubeHelperVersionInfo.xml", this);
         }
