@@ -75,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-${{ env:VERSION }}.apk
+          path: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-1.0.${{ github.run_number }}.apk
 
   build-desktop:
     name: Build Windows Installer
