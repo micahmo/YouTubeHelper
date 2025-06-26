@@ -10,6 +10,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      buildDebug:
+        description: 'Build Windows app in Debug mode'
+        required: false
+        default: 'false'
 
 name: Build for Android and Windows
 
@@ -17,6 +22,9 @@ jobs:
   build-android:
     name: Build Android APK
     runs-on: windows-latest
+
+    env:
+      VERSION_TAG: 1.0.${{ github.run_number }}
 
     steps:
       - name: Checkout repository
@@ -30,13 +38,9 @@ jobs:
       - name: Install MAUI workload for Android
         run: dotnet workload install maui-android
 
-      - name: Generate version number
-        id: version
-        run: echo "VERSION=1.0.${{ github.run_number }}" >> $env:GITHUB_ENV
-
       - name: Update version in .csproj
         run: |
-          (Get-Content YouTubeHelper.Mobile\YouTubeHelper.Mobile.csproj) -replace '<ApplicationDisplayVersion>.*?</ApplicationDisplayVersion>', "<ApplicationDisplayVersion>$env:VERSION</ApplicationDisplayVersion>" |
+          (Get-Content YouTubeHelper.Mobile\YouTubeHelper.Mobile.csproj) -replace '<ApplicationDisplayVersion>.*?</ApplicationDisplayVersion>', "<ApplicationDisplayVersion>${{ env.VERSION_TAG }}</ApplicationDisplayVersion>" |
           Set-Content YouTubeHelper.Mobile\YouTubeHelper.Mobile.csproj
 
       - name: Add GitHub NuGet source
@@ -62,7 +66,7 @@ jobs:
       - name: Sign APK manually
         run: |
           $apkPath = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-Signed.apk"
-          $signedApk = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-$env:VERSION.apk"
+          $signedApk = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk"
 
           & "${env:ANDROID_HOME}\build-tools\34.0.0\apksigner.bat" sign `
             --ks my-release-key.keystore `
@@ -76,11 +80,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-1.0.${{ github.run_number }}.apk
+          path: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk
 
   build-desktop:
     name: Build Windows Installer
     runs-on: windows-latest
+    
+    env:
+      BUILD_CONFIGURATION: ${{ github.event.inputs.buildDebug == 'true' && 'Debug' || 'Release' }}
+      VERSION_TAG: 1.0.${{ github.run_number }}${{ github.event.inputs.buildDebug == 'true' && '-debug' || '' }}
 
     steps:
       - name: Checkout repository
@@ -103,10 +111,7 @@ jobs:
         run: dotnet restore
 
       - name: Build WPF Desktop App
-        run: dotnet publish YouTubeHelper\YouTubeHelper.csproj -c Release -f net8.0-windows
-
-      - name: Set VERSION env variable
-        run: echo "VERSION=1.0.${{ github.run_number }}" >> $env:GITHUB_ENV
+        run: dotnet publish YouTubeHelper\YouTubeHelper.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net8.0-windows
 
       - name: Install Inno Setup
         run: |
@@ -121,7 +126,7 @@ jobs:
 
       - name: Update AppUpdate.xml in Gist
         run: |
-          $version = "1.0.${{ github.run_number }}"
+          $version = "${{ env.VERSION_TAG }}"
           $date = Get-Date -Format "yyyy-MM-dd"
           $downloadLink = "https://github.com/micahmo/YouTubeHelper/releases/download/v$version/YouTubeHelperSetup-$version.exe"
           $fileName = "WS4WSetup-$version.exe"
@@ -162,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: Installer/YouTubeHelperSetup-1.0.${{ github.run_number }}.exe
+          path: Installer/YouTubeHelperSetup-${{ env.VERSION_TAG }}.exe
 
   create-release:
     name: Create GitHub Release with Artifacts
@@ -170,6 +175,11 @@ jobs:
       - build-android
       - build-desktop
     runs-on: windows-latest
+    
+    env:
+      BUILD_CONFIGURATION: ${{ github.event.inputs.buildDebug == 'true' && 'Debug' || 'Release' }}
+      VERSION_TAG: 1.0.${{ github.run_number }}${{ github.event.inputs.buildDebug == 'true' && '-debug' || '' }}
+    
     steps:
       - name: Download Android APK
         uses: actions/download-artifact@v4
@@ -186,11 +196,12 @@ jobs:
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: v1.0.${{ github.run_number }}
+          tag_name: v${{ env.VERSION_TAG }}
+          name: v${{ env.VERSION_TAG }}
           files: |
-            artifacts/com.micahmo.youtubehelper-1.0.${{ github.run_number }}.apk
-            artifacts/YouTubeHelperSetup-1.0.${{ github.run_number }}.exe
+            artifacts/com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk
+            artifacts/YouTubeHelperSetup-${{ env.VERSION_TAG }}.exe
           fail_on_unmatched_files: true
+          prerelease: ${{ github.event.inputs.buildDebug == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
