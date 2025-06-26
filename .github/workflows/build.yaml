@@ -181,7 +181,8 @@ jobs:
     
     env:
       BUILD_CONFIGURATION: ${{ github.event.inputs.buildDebug == 'true' && 'Debug' || 'Release' }}
-      VERSION_TAG: 1.0.${{ github.run_number }}${{ github.event.inputs.buildDebug == 'true' && '-debug' || '' }}
+      WINDOW_VERSION_TAG: 1.0.${{ github.run_number }}${{ github.event.inputs.buildDebug == 'true' && '-debug' || '' }}
+      ANDROID_VERSION_TAG: 1.0.${{ github.run_number }}
     
     steps:
       - name: Download Android APK
@@ -199,11 +200,11 @@ jobs:
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION_TAG }}
-          name: v${{ env.VERSION_TAG }}
+          tag_name: v${{ env.WINDOW_VERSION_TAG }}
+          name: v${{ env.WINDOW_VERSION_TAG }}
           files: |
-            artifacts/com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk
-            artifacts/YouTubeHelperSetup-${{ env.VERSION_TAG }}.exe
+            artifacts/com.micahmo.youtubehelper-${{ env.ANDROID_VERSION_TAG }}.apk
+            artifacts/YouTubeHelperSetup-${{ env.WINDOW_VERSION_TAG }}.exe
           fail_on_unmatched_files: true
           prerelease: ${{ github.event.inputs.buildDebug == 'true' }}
         env:
