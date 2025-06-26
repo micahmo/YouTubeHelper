@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "YouTubeHelper": {
+      "commandName": "Project"
+    },
+    "Debug installed Windows app": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\YouTubeHelper\\YouTubeHelper.exe"
+    }
+  }
+}
