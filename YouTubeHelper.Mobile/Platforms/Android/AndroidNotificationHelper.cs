@@ -8,26 +8,68 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 {
     public static class AndroidNotificationHelper
     {
+        private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
+        private const int DismissIntentId = 100;
+        private const int NavigateToVideoIntentId = 101;
+        private const int NavigateToQueueIntentId = 102;
+        private const int OpenInPlexIntentId = 103;
+
         public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress)
         {
             Context context = global::Android.App.Application.Context;
 
-            PendingIntent? pendingIntent = null;
+            PendingIntent? dismissPendingIntent = null;
+            PendingIntent? navigateToVideoPendingIntent = null;
+            PendingIntent? navigateToQueuePendingIntent = null;
+            PendingIntent? openInPlexPendingIntent = null;
+
             if (context.PackageName != null)
             {
-                Intent intent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-
-                // Put the video URL in the intent so it will navigate directly there
-                intent.PutExtra(Intent.ExtraText, videoUrl);
-                
-                // Optionally, we can make the notification navigate to the queue tab
-                //intent.PutExtra("navigateTo", "queue");
-
-                pendingIntent = PendingIntent.GetActivity(
+                // Dismiss Action
+                Intent dismissIntent = new Intent(ActionNotification);
+                dismissIntent.SetPackage(context.PackageName);
+                dismissIntent.PutExtra("actionType", "dismiss");
+                dismissIntent.PutExtra("notificationId", notificationId);
+                dismissPendingIntent = PendingIntent.GetBroadcast(
                     context,
-                    requestCode: 0,
-                    intent,
+                    DismissIntentId,
+                    dismissIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
+
+                // Navigate to Video Action
+                Intent navigateToVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                navigateToVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                navigateToVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                navigateToVideoPendingIntent = PendingIntent.GetActivity(
+                    context,
+                    requestCode: NavigateToVideoIntentId,
+                    navigateToVideoIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
+
+                // Navigate to Queue Action
+                Intent navigateToQueueIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                navigateToQueueIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                navigateToQueueIntent.PutExtra("navigateTo", "queue");
+                navigateToQueuePendingIntent = PendingIntent.GetActivity(
+                    context,
+                    requestCode: NavigateToQueueIntentId,
+                    navigateToQueueIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
+
+                // Open In Plex Action
+                Intent openInPlexIntent = new Intent(ActionNotification);
+                openInPlexIntent.SetPackage(context.PackageName);
+                openInPlexIntent.PutExtra("actionType", "openInPlex");
+                openInPlexIntent.PutExtra("videoTitle", title);
+                openInPlexIntent.PutExtra("videoUrl", videoUrl);
+                openInPlexIntent.PutExtra("notificationId", notificationId);
+                openInPlexPendingIntent = PendingIntent.GetBroadcast(
+                    context,
+                    OpenInPlexIntentId,
+                    openInPlexIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
             }
@@ -41,7 +83,16 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDone)
                 .SetAutoCancel(isDone)
-                .SetContentIntent(pendingIntent);
+                .SetContentIntent(dismissPendingIntent);
+
+            if (isDone)
+            {
+                builder
+                    //.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent)
+                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
+                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent)
+                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Plex", openInPlexPendingIntent);
+            }
 
             if (hasProgress)
             {

@@ -556,21 +556,13 @@ namespace YouTubeHelper.Mobile
 
         public async Task HandleSharedLink(string rawUrl)
         {
-            Url url = new Url(rawUrl);
-
-            if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string videoId)
+            string? videoId = YouTubeUtils.GetVideoIdFromUrl(rawUrl);
+            if (!string.IsNullOrEmpty(YouTubeUtils.GetVideoIdFromUrl(rawUrl)))
             {
                 await HandleSharedLink(videoId, null);
             }
-            else if (url.Authority == "youtu.be")
-            {
-                await HandleSharedLink(url.PathSegments[0], null);
-            }
-            else if (url.Authority == "www.youtube.com" && url.PathSegments.Count >= 2 && url.PathSegments[0] == "live")
-            {
-                await HandleSharedLink(url.PathSegments[1], null);
-            }
 
+            Url url = new Url(rawUrl);
             if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
             {
                 await HandleSharedLink(null, channelHandle);
@@ -694,9 +686,6 @@ namespace YouTubeHelper.Mobile
 
         public async Task NavigateToQueueTab()
         {
-            // Don't navigate if the app is already loaded
-            if (_loaded) return;
-
             while (!_loaded)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
