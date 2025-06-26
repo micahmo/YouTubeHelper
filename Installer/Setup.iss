@@ -5,6 +5,7 @@
 #define MyAppURL "https://github.com/micahmo/youtubehelper"
 ; This is relative to SourceDir
 #define RepoRoot "..\..\..\..\"
+#define Configuration GetEnv("CONFIGURATION")
 
 [Setup]
 AppId={{744FA957-AB5E-455A-8CEC-A29448D1FB93}
@@ -20,7 +21,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 ; This is relative to the .iss file location
-SourceDir=..\YouTubeHelper\bin\Release\net8.0-windows
+SourceDir=..\YouTubeHelper\bin\{#Configuration}\net8.0-windows
 OutputDir={#RepoRoot}\Installer
 SetupIconFile={#RepoRoot}\YouTubeHelper\Images\logo.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}

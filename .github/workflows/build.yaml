@@ -123,6 +123,7 @@ jobs:
       - name: Build Installer (Inno Setup)
         run: |
           $env:VERSION = "${{ env.VERSION_TAG }}"
+          $env:CONFIGURATION = "${{ env.BUILD_CONFIGURATION }}"
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Installer\Setup.iss
         shell: pwsh
 
