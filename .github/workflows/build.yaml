@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       buildDebug:
-        description: 'Build Windows app in Debug mode'
+        description: 'Build Windows app in Debug mode and push prerelease release'
         type: boolean
         required: false
         default: false
