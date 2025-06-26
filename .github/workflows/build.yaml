@@ -71,17 +71,6 @@ jobs:
             $apkPath
         shell: pwsh
 
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: success()
-        with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: v1.0.${{ github.run_number }}
-          files: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-${{ env.VERSION }}.apk
-          fail_on_unmatched_files: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-desktop:
     name: Build Windows Installer
     runs-on: windows-latest
@@ -162,13 +151,21 @@ jobs:
                             -Body $body
         shell: pwsh
 
-      - name: Upload Installer to GitHub Release
+  create-release:
+    name: Create GitHub Release with Artifacts
+    needs:
+      - build-android
+      - build-desktop
+    runs-on: windows-latest
+    steps:
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
-        if: success()
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: v1.0.${{ github.run_number }}
-          files: Installer/YouTubeHelperSetup-${{ env.VERSION }}.exe
+          files: |
+            YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-1.0.${{ github.run_number }}.apk
+            Installer/YouTubeHelperSetup-1.0.${{ github.run_number }}.exe
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
