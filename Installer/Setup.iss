@@ -35,7 +35,7 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "*"; DestDir: "{app}"; Flags: recursesubdirs
+Source: "*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
