@@ -61,15 +61,7 @@ namespace YouTubeHelper
 
         private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
         {
-            var __ = Task.Run(async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(2));
-
-                Dispatcher.BeginInvoke(() =>
-                {
-                    Title = $"{Properties.Resources.ApplicationName} {Versioning.GetInstalledMsiVersion()}";
-                });
-            });
+            Title = $"{Properties.Resources.ApplicationName} {Versioning.GetInstalledMsiVersion()}";
 
             await ConnectToServer();
 
