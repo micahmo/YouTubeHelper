@@ -30,6 +30,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 dismissIntent.SetPackage(context.PackageName);
                 dismissIntent.PutExtra("actionType", "dismiss");
                 dismissIntent.PutExtra("notificationId", notificationId);
+                dismissIntent.PutExtra("isDone", isDone);
                 dismissPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     DismissIntentId,
@@ -41,6 +42,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 Intent navigateToVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
                 navigateToVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
                 navigateToVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                navigateToVideoIntent.PutExtra("notificationId", notificationId);
+                navigateToVideoIntent.PutExtra("isDone", isDone);
                 navigateToVideoPendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: NavigateToVideoIntentId,
@@ -52,6 +55,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 Intent navigateToQueueIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
                 navigateToQueueIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
                 navigateToQueueIntent.PutExtra("navigateTo", "queue");
+                navigateToQueueIntent.PutExtra("notificationId", notificationId);
+                navigateToQueueIntent.PutExtra("isDone", isDone);
                 navigateToQueuePendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: NavigateToQueueIntentId,
@@ -66,6 +71,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 openInPlexIntent.PutExtra("videoTitle", title);
                 openInPlexIntent.PutExtra("videoUrl", videoUrl);
                 openInPlexIntent.PutExtra("notificationId", notificationId);
+                openInPlexIntent.PutExtra("isDone", isDone);
                 openInPlexPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     OpenInPlexIntentId,
@@ -83,15 +89,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDone)
                 .SetAutoCancel(isDone)
-                .SetContentIntent(dismissPendingIntent);
+                //.SetContentIntent(navigateToVideoPendingIntent)
+                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
+                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
 
             if (isDone)
             {
-                builder
-                    //.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent)
-                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
-                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent)
-                    .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Plex", openInPlexPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
             }
 
             if (hasProgress)

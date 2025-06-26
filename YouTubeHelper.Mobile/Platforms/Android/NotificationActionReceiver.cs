@@ -36,6 +36,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             string videoUrl = intent.GetStringExtra("videoUrl")!;
             string videoId = YouTubeUtils.GetVideoIdFromUrl(videoUrl)!;
             int notificationId = intent.GetIntExtra("notificationId", -1);
+            bool isDone = intent.GetBooleanExtra("isDone", false);
 
             string? ratingKey = await ServerApiClient.Instance.GetPlexRatingKey(videoTitle, videoId);
             if (!string.IsNullOrEmpty(ratingKey))
@@ -44,7 +45,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 await Launcher.Default.OpenAsync(new Uri(plexUri));
             }
 
-            AndroidX.Core.App.NotificationManagerCompat.From(context).Cancel(notificationId);
+            if (isDone)
+            {
+                AndroidX.Core.App.NotificationManagerCompat.From(context).Cancel(notificationId);
+            }
         }
 
         private Task HandleDismiss(Context context, Intent intent)

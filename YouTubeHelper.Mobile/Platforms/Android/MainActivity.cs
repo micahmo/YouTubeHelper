@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Flurl;
+using Polly;
 using Color = Android.Graphics.Color;
 
 namespace YouTubeHelper.Mobile
@@ -26,10 +27,19 @@ namespace YouTubeHelper.Mobile
 
         protected override void OnNewIntent(Intent? intent)
         {
+            if (intent is null) return;
+            
             base.OnNewIntent(intent);
 
             // See if we got an intent to load a video
-            string? rawUrl = intent?.GetStringExtra(Intent.ExtraText);
+            string? rawUrl = intent.GetStringExtra(Intent.ExtraText);
+            bool isDone = intent.GetBooleanExtra("isDone", false);
+            int notificationId = intent.GetIntExtra("notificationId", -1);
+
+            if (isDone)
+            {
+                AndroidX.Core.App.NotificationManagerCompat.From(this).Cancel(notificationId);
+            }
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
