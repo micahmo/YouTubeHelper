@@ -9,8 +9,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     [IntentFilter(new[] { "com.micahmo.youtubehelper.NOTIFICATION_ACTION" })]
     public class NotificationActionReceiver : BroadcastReceiver
     {
-        public override async void OnReceive(Context context, Intent intent)
+        public override async void OnReceive(Context? context, Intent? intent)
         {
+            if (context is null || intent is null)
+            {
+                return;
+            }
+            
             string? actionType = intent.GetStringExtra("actionType");
 
             switch (actionType)
@@ -21,9 +26,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 case "dismiss":
                     await HandleDismiss(context, intent);
-                    break;
-
-                default:
                     break;
             }
         }
