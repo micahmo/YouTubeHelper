@@ -141,8 +141,7 @@ namespace YouTubeHelper.ViewModels
                                 SearchTerms = searchTerms,
                                 Count = noLimit ? int.MaxValue : 10,
                                 DateRangeLimit = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
-                                VideoLengthMinimum = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null,
-                                PopulateFromChannelPlaylist = true
+                                VideoLengthMinimum = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null
                             });
 
                             List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
