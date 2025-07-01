@@ -62,14 +62,14 @@ namespace YouTubeHelper.ViewModels
                             });
                             break;
                         case MainControlMode.Watch:
-                            ExactSearchTerm = LookupSearchTerm = null;
+                            SearchByTitleTerm = null;
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
                             });
                             break;
                         case MainControlMode.Exclusions:
-                            ExactSearchTerm = LookupSearchTerm = null;
+                            SearchByTitleTerm = null;
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
@@ -293,16 +293,16 @@ namespace YouTubeHelper.ViewModels
         }
         private int _selectedExclusionFilterIndex;
 
-        public string? ExactSearchTerm
+        public string? SearchByTitleTerm
         {
-            get => _exactSearchTerm;
-            set => SetProperty(ref _exactSearchTerm, value);
+            get => _searchByTitleTerm;
+            set => SetProperty(ref _searchByTitleTerm, value);
         }
-        private string? _exactSearchTerm;
+        private string? _searchByTitleTerm;
 
-        public string? LookupSearchTerm
+        public string? SearchByIdTerm
         {
-            get => _lookupSearchTerm;
+            get => _searchByIdTerm;
             set
             {
                 // See if this is a URL and try to parse it
@@ -312,16 +312,16 @@ namespace YouTubeHelper.ViewModels
                     string? videoId = queryString["v"];
                     if (!string.IsNullOrEmpty(videoId))
                     {
-                        SetProperty(ref _lookupSearchTerm, videoId);
+                        SetProperty(ref _searchByIdTerm, videoId);
                         return;
                     }
                 }
 
-                SetProperty(ref _lookupSearchTerm, value);
+                SetProperty(ref _searchByIdTerm, value);
             }
         }
 
-        private string? _lookupSearchTerm;
+        private string? _searchByIdTerm;
 
         #endregion
 

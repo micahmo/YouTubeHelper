@@ -26,7 +26,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     return;
                 }
 
-                if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(ExactSearchTerm))
+                if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(SearchByTitleTerm))
                 {
                     Preferences.Default.Set(nameof(SelectedSortModeIndex), SelectedSortModeIndex);
                     Preferences.Default.Set(nameof(SelectedExclusionFilterIndex), SelectedExclusionFilterIndex);
@@ -46,7 +46,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                             c.SelectedExclusionFilterIndex = SelectedExclusionFilterIndex;
                         }
 
-                        c.ExactSearchTerm = ExactSearchTerm;
+                        c.SearchByTitleTerm = SearchByTitleTerm;
                     });
                     _listeningToPropertyChanges = true;
                 }
@@ -130,46 +130,39 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 List<string>? searchTerms = null;
 
-                                //if (Page.SearchTabSelected && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
-                                //{
-                                //    (await YouTubeApi.Instance.SearchVideos(Channel, exclusions, MainControlViewModel.ShowExcludedVideos, MainControlViewModel.SelectedSortMode.Value, MainControlViewModel.LookupSearchTerm)).ToList().ForEach(v => Videos.Add(new VideoViewModel(v, MainControlViewModel, this)));
-                                //}
-                                //else
+                                if (Page.AppShellViewModel.SearchTabSelected)
                                 {
-                                    if (Page.AppShellViewModel.SearchTabSelected)
+                                    if (!string.IsNullOrEmpty(SearchByTitleTerm))
                                     {
-                                        if (!string.IsNullOrEmpty(ExactSearchTerm))
+                                        string searchByTitleTermTrimmed = SearchByTitleTerm.Trim();
+
+                                        if (searchByTitleTermTrimmed.StartsWith('"')
+                                            && searchByTitleTermTrimmed.EndsWith('"')
+                                            && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')))
                                         {
-                                            string exactSearchTermTrimmed = ExactSearchTerm.Trim();
-
-                                            if (exactSearchTermTrimmed.StartsWith('"')
-                                                && exactSearchTermTrimmed.EndsWith('"')
-                                                && !string.IsNullOrEmpty(exactSearchTermTrimmed.TrimStart('"').TrimEnd('"')))
-                                            {
-                                                searchTerms = new List<string> { exactSearchTermTrimmed.TrimStart('"').TrimEnd('"') };
-                                            }
-                                            else
-                                            {
-                                                searchTerms = exactSearchTermTrimmed.Split().ToList();
-                                            }
-
-                                            // Update the history
-                                            string? searchTermHistory = Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null);
-                                            List<string> searchTermHistoryList;
-                                            try
-                                            {
-                                                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
-                                            }
-                                            catch
-                                            {
-                                                searchTermHistoryList = new();
-                                            }
-
-                                            searchTermHistoryList.RemoveAll(s => s.Equals(exactSearchTermTrimmed, StringComparison.OrdinalIgnoreCase));
-                                            searchTermHistoryList.Insert(0, exactSearchTermTrimmed);
-                                            searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
-                                            Preferences.Default.Set(nameof(ExactSearchTerm), JsonConvert.SerializeObject(searchTermHistoryList));
+                                            searchTerms = new List<string> { searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"') };
                                         }
+                                        else
+                                        {
+                                            searchTerms = searchByTitleTermTrimmed.Split().ToList();
+                                        }
+
+                                        // Update the history
+                                        string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
+                                        List<string> searchTermHistoryList;
+                                        try
+                                        {
+                                            searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+                                        }
+                                        catch
+                                        {
+                                            searchTermHistoryList = new();
+                                        }
+
+                                        searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
+                                        searchTermHistoryList.Insert(0, searchByTitleTermTrimmed);
+                                        searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
+                                        Preferences.Default.Set(nameof(SearchByTitleTerm), JsonConvert.SerializeObject(searchTermHistoryList));
                                     }
 
                                     List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
@@ -263,7 +256,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 if (Page.AppShellViewModel.SearchTabSelected)
                 {
-                    options.Add(Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null) is null 
+                    options.Add(Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null) is null 
                         ? Resources.Resources.SearchHistoryNone 
                         : Resources.Resources.SearchHistory);
                 }
@@ -291,7 +284,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.SearchHistory)
                 {
-                    string? searchTermHistory = Preferences.Default.Get<string?>(nameof(ExactSearchTerm), null);
+                    string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
                     List<string> searchTermHistoryList;
                     try
                     {
@@ -306,11 +299,11 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                     if (res == Resources.Resources.Clear)
                     {
-                        Preferences.Default.Set<string?>(nameof(ExactSearchTerm), null);
+                        Preferences.Default.Set<string?>(nameof(SearchByTitleTerm), null);
                     }
                     else if (res is not null && res != Resources.Resources.Cancel)
                     {
-                        ExactSearchTerm = res;
+                        SearchByTitleTerm = res;
                         FindVideos();
                     }
                 }
@@ -356,12 +349,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private int _selectedExclusionFilterIndex;
 
-        public string? ExactSearchTerm
+        public string? SearchByTitleTerm
         {
-            get => _exactSearchTerm;
-            set => SetProperty(ref _exactSearchTerm, value);
+            get => _searchByTitleTerm;
+            set => SetProperty(ref _searchByTitleTerm, value);
         }
-        private string? _exactSearchTerm;
+        private string? _searchByTitleTerm;
 
         public bool ShowExcludedVideos
         {

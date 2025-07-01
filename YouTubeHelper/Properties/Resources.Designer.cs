@@ -279,15 +279,6 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exact search.
-        /// </summary>
-        public static string ExactSearch {
-            get {
-                return ResourceManager.GetString("ExactSearch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to EXCLUDED.
         /// </summary>
         public static string Excluded {
@@ -329,15 +320,6 @@ namespace YouTubeHelper.Properties {
         public static string Loading {
             get {
                 return ResourceManager.GetString("Loading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Lookup.
-        /// </summary>
-        public static string Lookup {
-            get {
-                return ResourceManager.GetString("Lookup", resourceCulture);
             }
         }
         
@@ -507,6 +489,15 @@ namespace YouTubeHelper.Properties {
         public static string Search {
             get {
                 return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search by title.
+        /// </summary>
+        public static string SearchByTitle {
+            get {
+                return ResourceManager.GetString("SearchByTitle", resourceCulture);
             }
         }
         

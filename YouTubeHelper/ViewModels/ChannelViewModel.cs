@@ -97,61 +97,41 @@ namespace YouTubeHelper.ViewModels
 
                         List<string>? searchTerms = null;
 
-                        if (MainControlViewModel.Mode == MainControlMode.Search && !string.IsNullOrEmpty(MainControlViewModel.LookupSearchTerm))
+                        if (MainControlViewModel.Mode == MainControlMode.Search)
                         {
-                            List<Video> videos = await ServerApiClient.Instance.SearchVideos(new FindVideosRequest
+                            if (!string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm))
                             {
-                                Channel = Channel,
-                                ShowExclusions = MainControlViewModel.ShowExcludedVideos,
-                                SortMode = MainControlViewModel.SelectedSortMode.Value,
-                                SearchTerms = new List<string> { MainControlViewModel.LookupSearchTerm },
-                                Count = noLimit ? int.MaxValue : 10
-                            });
-
-                            List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                Videos.AddRange(videoViewModels);
-                            });
-                        }
-                        else
-                        {
-                            if (MainControlViewModel.Mode == MainControlMode.Search)
-                            {
-                                if (!string.IsNullOrEmpty(MainControlViewModel.ExactSearchTerm))
+                                if (MainControlViewModel.SearchByTitleTerm.StartsWith('"')
+                                    && MainControlViewModel.SearchByTitleTerm.EndsWith('"')
+                                    && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')))
                                 {
-                                    if (MainControlViewModel.ExactSearchTerm.StartsWith('"')
-                                        && MainControlViewModel.ExactSearchTerm.EndsWith('"')
-                                        && !string.IsNullOrEmpty(MainControlViewModel.ExactSearchTerm.TrimStart('"').TrimEnd('"')))
-                                    {
-                                        searchTerms = new List<string> { MainControlViewModel.ExactSearchTerm.TrimStart('"').TrimEnd('"') };
-                                    }
-                                    else
-                                    {
-                                        searchTerms = MainControlViewModel.ExactSearchTerm.Split().ToList();
-                                    }
+                                    searchTerms = new List<string> { MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"') };
+                                }
+                                else
+                                {
+                                    searchTerms = MainControlViewModel.SearchByTitleTerm.Split().ToList();
                                 }
                             }
-
-                            List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                            {
-                                Channel = Channel,
-                                ShowExclusions = MainControlViewModel.ShowExcludedVideos,
-                                SortMode = MainControlViewModel.SelectedSortMode.Value,
-                                SearchTerms = searchTerms,
-                                Count = noLimit ? int.MaxValue : 10,
-                                DateRangeLimit = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
-                                VideoLengthMinimum = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null
-                            });
-
-                            List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
-                            Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
-
-                            await QueueUtils.TryJoinDownloadGroup(videoViewModels);
-
-                            MainControlViewModel.Progress = 0;
-                            MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
                         }
+
+                        List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                        {
+                            Channel = Channel,
+                            ShowExclusions = MainControlViewModel.ShowExcludedVideos,
+                            SortMode = MainControlViewModel.SelectedSortMode.Value,
+                            SearchTerms = searchTerms,
+                            Count = noLimit ? int.MaxValue : 10,
+                            DateRangeLimit = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
+                            VideoLengthMinimum = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null
+                        });
+
+                        List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+                        Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
+
+                        await QueueUtils.TryJoinDownloadGroup(videoViewModels);
+
+                        MainControlViewModel.Progress = 0;
+                        MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
                     }
                     finally
                     {

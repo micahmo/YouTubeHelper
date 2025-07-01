@@ -323,9 +323,9 @@
                                                         Padding="10,5,10,5"
                                                         VerticalAlignment="Stretch"
                                                         VerticalContentAlignment="Center"
-                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.ExactSearch}"
+                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.SearchByTitle}"
                                                         KeyDown="Search_KeyDown"
-                                                        Text="{Binding MainControlViewModel.ExactSearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                                                        Text="{Binding MainControlViewModel.SearchByTitleTerm, UpdateSourceTrigger=PropertyChanged}"
                                                         Visibility="{c:Binding 'SearchMode',
                                                                                FalseToVisibility=Collapsed}" />
 
@@ -335,18 +335,6 @@
                                                         IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
                                                         SelectedDate="{Binding MainControlViewModel.SelectedChannel.Channel.DateRangeLimit}"
                                                         Visibility="{c:Binding WatchMode,
-                                                                               FalseToVisibility=Collapsed}" />
-
-                                                    <TextBox
-                                                        Grid.Column="8"
-                                                        MinWidth="400"
-                                                        Padding="10,5,10,5"
-                                                        VerticalAlignment="Stretch"
-                                                        VerticalContentAlignment="Center"
-                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.Lookup}"
-                                                        KeyDown="Search_KeyDown"
-                                                        Text="{Binding MainControlViewModel.LookupSearchTerm, UpdateSourceTrigger=PropertyChanged}"
-                                                        Visibility="{c:Binding 'SearchMode',
                                                                                FalseToVisibility=Collapsed}" />
 
                                                     <CheckBox
@@ -373,6 +361,7 @@
                                                                                FalseToVisibility=Collapsed}">
                                                         <ui:FontIcon Glyph="&#xE760;" />
                                                     </Button>
+
                                                     <Button
                                                         Grid.Column="16"
                                                         Margin="0,0,0,0"

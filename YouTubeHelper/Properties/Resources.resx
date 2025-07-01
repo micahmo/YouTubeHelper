@@ -152,11 +152,8 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading...</value>
   </data>
-  <data name="ExactSearch" xml:space="preserve">
-    <value>Exact search</value>
-  </data>
-  <data name="Lookup" xml:space="preserve">
-    <value>Lookup</value>
+  <data name="SearchByTitle" xml:space="preserve">
+    <value>Search by title</value>
   </data>
   <data name="ShowExcludedVideos" xml:space="preserve">
     <value>Show excluded videos</value>

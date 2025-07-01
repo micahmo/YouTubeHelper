@@ -109,9 +109,9 @@
                     Grid.Row="3"
                     Margin="10,-10,10,0"
                     IsVisible="{Binding Page.AppShellViewModel.SearchTabSelected}"
-                    Placeholder="Exact search"
+                    Placeholder="Search by title"
                     ReturnCommand="{Binding FindVideosCommand}"
-                    Text="{Binding ExactSearchTerm}" />
+                    Text="{Binding SearchByTitleTerm}" />
 
                 <Grid Grid.Row="3" Margin="0,-11,0,0">
                     <Grid.ColumnDefinitions>
