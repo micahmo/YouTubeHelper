@@ -204,8 +204,10 @@ namespace YouTubeHelper
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+#if !DEBUG
             // Auto allows the user to Skip (updates are still available via F1)
             _updateChecker.CheckForUpdates(UpdateNotifyMode.Auto);
+#endif
         }
 
         private static MainControlViewModel? MainControlViewModel;
