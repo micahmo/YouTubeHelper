@@ -180,8 +180,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         SearchTerms = searchTerms,
                                         Count = count,
                                         DateRangeLimit = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
-                                        VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null,
-                                        PopulateFromChannelPlaylist = true
+                                        VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
                                     });
 
                                     List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
@@ -193,8 +192,6 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindExclusions
                             else if (Page.AppShellViewModel.ExclusionsTabSelected)
                             {
-                                List<Video> exclusions = await ServerApiClient.Instance.GetExcludedVideosByChannel(Channel!.ChannelPlaylist!);
-
                                 List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
                                 {
                                     ExclusionReason = SelectedExclusionFilter.Value != ExclusionReason.None ? SelectedExclusionFilter.Value : null,
