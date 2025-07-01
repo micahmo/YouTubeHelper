@@ -62,18 +62,18 @@ namespace YouTubeHelper.Mobile
                 return true;
             }
 
-            // Next, re-select the main/watch tab
-            if (!AppShellViewModel.WatchTabSelected)
-            {
-                AppShellViewModel.SelectWatchTab();
-                return true;
-            }
-
-            // Or, select the first channel
+            // Next, select the first channel
             if (TabBar.CurrentItem.CurrentItem != TabBar.CurrentItem.Items.FirstOrDefault())
             {
                 TabBar.CurrentItem.CurrentItem = null;
                 TabBar.CurrentItem.CurrentItem = TabBar.CurrentItem.Items.FirstOrDefault();
+                return true;
+            }
+
+            // Or, re-select the main/watch tab
+            if (!AppShellViewModel.WatchTabSelected)
+            {
+                AppShellViewModel.SelectWatchTab();
                 return true;
             }
 

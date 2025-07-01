@@ -367,15 +367,15 @@ namespace YouTubeHelper
                 {
                     MainControlViewModel.IsPlayerExpanded = false;
                 }
-                else if ((NavigationViewItem)NavigationView.SelectedItem != WatchNavigationItem)
-                {
-                    NavigationView.SelectedItem = WatchNavigationItem;
-                    HandleNavigationItemChanged(Properties.Resources.Watch, false);
-                }
                 else if (MainControlViewModel.Channels.Count > 0
                          && MainControlViewModel.Channels.IndexOf(MainControlViewModel.SelectedChannel!) != 0)
                 {
                     MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.FirstOrDefault();
+                }
+                else if ((NavigationViewItem)NavigationView.SelectedItem != WatchNavigationItem)
+                {
+                    NavigationView.SelectedItem = WatchNavigationItem;
+                    HandleNavigationItemChanged(Properties.Resources.Watch, false);
                 }
                 else
                 {
