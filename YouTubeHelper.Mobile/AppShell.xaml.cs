@@ -591,19 +591,12 @@ namespace YouTubeHelper.Mobile
                     VideoIds = new List<string> { videoId },
                     SortMode = SortMode.AgeDesc
                 })).FirstOrDefault();
+                
                 if (video is not null)
                 {
-                    // See if this video is excluded
-                    if (await ServerApiClient.Instance.GetExcludedVideoById(video.Id) is { } excludedVideo)
-                    {
-                        video.Excluded = true;
-                        video.ExclusionReason = excludedVideo.ExclusionReason;
-                    }
-
                     channelPlaylist = video.ChannelPlaylist;
                     channelId = YouTubeUtils.ToChannelId(channelPlaylist);
                 }
-
             }
 
             if (!string.IsNullOrEmpty(channelHandle))
