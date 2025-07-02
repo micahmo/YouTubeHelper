@@ -472,12 +472,14 @@ namespace YouTubeHelper
 
             if (!string.IsNullOrEmpty(videoId))
             {
-                video = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                video = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                 {
+                    ShowExclusions = true,
                     VideoIds = new List<string> { videoId },
-                    SortMode = SortMode.AgeDesc
+                    SortMode = SortMode.AgeDesc,
+                    Count = int.MaxValue
                 })).FirstOrDefault();
-                
+
                 if (video is not null)
                 {
                     channelPlaylist = video.ChannelPlaylist;
@@ -565,10 +567,12 @@ namespace YouTubeHelper
                     }
                     else if (indexOfCurrentVideo < 0)
                     {
-                        if ((await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                        if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                             {
+                                ShowExclusions = true,
                                 VideoIds = new List<string> { requestData.VideoId },
-                                SortMode = SortMode.AgeDesc
+                                SortMode = SortMode.AgeDesc,
+                                Count = int.MaxValue
                             })).FirstOrDefault() is { } newVideo)
                         {
                             await Application.Current.Dispatcher.BeginInvoke(() =>

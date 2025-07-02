@@ -109,7 +109,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                         await Page.DisplayAlert(Resources.Resources.Error, string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), Resources.Resources.OK);
                     });
                 })
-                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, (ex, _) =>
+                .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, (_, _) =>
                 {
                     // Nothing to do
                 }))
@@ -185,11 +185,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                             // FindExclusions
                             else if (Page.AppShellViewModel.ExclusionsTabSelected)
                             {
-                                List<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                                List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                 {
-                                    ExclusionReason = SelectedExclusionFilter.Value != ExclusionReason.None ? SelectedExclusionFilter.Value : null,
+                                    ShowExclusions = true,
+                                    ExclusionReasonFilter = SelectedExclusionFilter.Value,
                                     Channel = Channel,
-                                    SortMode = SelectedSortMode?.Value ?? SortMode.AgeDesc,
+                                    SortMode = SelectedSortMode.Value,
                                     Count = int.MaxValue
                                 });
                                 List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
@@ -200,9 +201,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 // Get the queue from the server
                                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
-                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                     {
-                                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
+                                        ShowExclusions = true,
+                                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
                                         Count = int.MaxValue
                                     }))
                                     .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue)

@@ -148,7 +148,7 @@ namespace YouTubeHelper.ViewModels
             Videos.Clear();
 
             await Policy
-                .Handle<Exception>().RetryAsync(5, (ex, _) =>
+                .Handle<Exception>().RetryAsync(5, (_, _) =>
                 {
                     // Nothing to do
                 })
@@ -158,9 +158,10 @@ namespace YouTubeHelper.ViewModels
                     {
                         MainControlViewModel.IsBusy = true;
 
-                        IEnumerable<Video> videos = await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                        IEnumerable<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                         {
-                            ExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value != ExclusionReason.None ? MainControlViewModel.SelectedExclusionFilter.Value : null,
+                            ShowExclusions = true,
+                            ExclusionReasonFilter = MainControlViewModel.SelectedExclusionFilter.Value,
                             Channel = Channel,
                             SortMode = MainControlViewModel.SelectedSortMode.Value,
                             Count = int.MaxValue
@@ -192,19 +193,20 @@ namespace YouTubeHelper.ViewModels
                 // Get the queue from the server
                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
-                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideoDetails(new FindVideosRequest
+                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                     {
-                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId!).ToList(),
+                        ShowExclusions = true,
+                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
                         Count = int.MaxValue
                     }))
-                    .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId! == video.Id)?.DateAdded ?? DateTimeOffset.MinValue)
+                    .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTimeOffset.MinValue)
                     .ToList();
 
                 foreach (Video video in queuedVideos)
                 {
                     VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
                     Videos.Add(videoViewModel);
-                    string requestId = distinctQueue.First(v => v.VideoId! == video.Id).RequestGuid.ToString();
+                    string requestId = distinctQueue.First(v => v.VideoId == video.Id).RequestGuid.ToString();
 
                     // Do not await this, as it slows the loading of the queue page
                     Task _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
