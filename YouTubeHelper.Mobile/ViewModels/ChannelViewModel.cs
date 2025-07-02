@@ -164,23 +164,23 @@ namespace YouTubeHelper.Mobile.ViewModels
                                         searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
                                         Preferences.Default.Set(nameof(SearchByTitleTerm), JsonConvert.SerializeObject(searchTermHistoryList));
                                     }
-
-                                    List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                    {
-                                        Channel = Channel,
-                                        ShowExclusions = ShowExcludedVideos,
-                                        SortMode = SelectedSortMode.Value,
-                                        SearchTerms = searchTerms,
-                                        Count = count,
-                                        DateRangeLimit = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
-                                        VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
-                                    });
-
-                                    List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
-                                    Videos.AddRange(videoViewModels);
-
-                                    await QueueUtils.TryJoinDownloadGroup(videoViewModels);
                                 }
+
+                                List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                {
+                                    Channel = Channel,
+                                    ShowExclusions = ShowExcludedVideos,
+                                    SortMode = SelectedSortMode.Value,
+                                    SearchTerms = searchTerms,
+                                    Count = count,
+                                    DateRangeLimit = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
+                                    VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
+                                });
+
+                                List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+                                Videos.AddRange(videoViewModels);
+
+                                await QueueUtils.TryJoinDownloadGroup(videoViewModels);
                             }
                             // FindExclusions
                             else if (Page.AppShellViewModel.ExclusionsTabSelected)
