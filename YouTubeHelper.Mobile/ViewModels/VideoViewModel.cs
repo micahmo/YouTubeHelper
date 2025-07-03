@@ -59,7 +59,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             IsDescriptionExpanded = !IsDescriptionExpanded;
         }
 
-        public string? ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
+        public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
 
