@@ -9,10 +9,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     public static class AndroidNotificationHelper
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
-        private const int DismissIntentId = 100;
-        private const int NavigateToVideoIntentId = 101;
-        private const int NavigateToQueueIntentId = 102;
-        private const int OpenInPlexIntentId = 103;
 
         public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress)
         {
@@ -22,6 +18,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? navigateToVideoPendingIntent = null;
             PendingIntent? navigateToQueuePendingIntent = null;
             PendingIntent? openInPlexPendingIntent = null;
+
+            int dismissIntentId = notificationId * 10 + 0;
+            int navigateToVideoIntentId = notificationId * 10 + 1;
+            int navigateToQueueIntentId = notificationId * 10 + 2;
+            int openInPlexIntentId = notificationId * 10 + 3;
 
             if (context.PackageName != null)
             {
@@ -33,7 +34,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 dismissIntent.PutExtra("isDone", isDone);
                 dismissPendingIntent = PendingIntent.GetBroadcast(
                     context,
-                    DismissIntentId,
+                    dismissIntentId,
                     dismissIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
@@ -46,7 +47,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 navigateToVideoIntent.PutExtra("isDone", isDone);
                 navigateToVideoPendingIntent = PendingIntent.GetActivity(
                     context,
-                    requestCode: NavigateToVideoIntentId,
+                    requestCode: navigateToVideoIntentId,
                     navigateToVideoIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
@@ -59,7 +60,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 navigateToQueueIntent.PutExtra("isDone", isDone);
                 navigateToQueuePendingIntent = PendingIntent.GetActivity(
                     context,
-                    requestCode: NavigateToQueueIntentId,
+                    requestCode: navigateToQueueIntentId,
                     navigateToQueueIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
@@ -74,7 +75,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 openInPlexIntent.PutExtra("isDone", isDone);
                 openInPlexPendingIntent = PendingIntent.GetBroadcast(
                     context,
-                    OpenInPlexIntentId,
+                    openInPlexIntentId,
                     openInPlexIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
