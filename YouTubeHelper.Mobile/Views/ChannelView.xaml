@@ -48,7 +48,7 @@
                 <Picker
                     Title="Exclusions mode"
                     Grid.Row="1"
-                    Margin="10,0,0,0"
+                    Margin="10,-5,10,0"
                     IsVisible="{Binding Page.AppShellViewModel.ChannelTabSelected}"
                     ItemDisplayBinding="{Binding Description}"
                     ItemsSource="{Binding ExclusionsModeValues}"
@@ -57,7 +57,7 @@
                 <Picker
                     Title="Exclusion reason"
                     Grid.Row="2"
-                    Margin="10,0,10,0"
+                    Margin="10,-5,10,0"
                     IsVisible="{Binding ShowExclusions}"
                     ItemDisplayBinding="{Binding Description}"
                     ItemsSource="{Binding ExclusionReasonValues}"
