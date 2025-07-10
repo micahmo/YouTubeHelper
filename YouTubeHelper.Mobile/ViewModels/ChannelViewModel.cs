@@ -26,7 +26,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                     return;
                 }
 
-                if (args.PropertyName is nameof(SelectedExclusionsModeIndex) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(SearchByTitleTerm) or nameof(EnableCountLimit) or nameof(CountLimit))
+                if (args.PropertyName is nameof(SelectedExclusionsModeIndex)
+                    or nameof(SelectedSortModeIndex)
+                    or nameof(SelectedExclusionFilterIndex)
+                    or nameof(SearchByTitleTerm)
+                    or nameof(EnableCountLimit)
+                    or nameof(CountLimit))
                 {
                     Preferences.Default.Set(nameof(SelectedSortModeIndex), SelectedSortModeIndex);
                     Preferences.Default.Set(nameof(SelectedExclusionsModeIndex), SelectedExclusionsModeIndex);
@@ -61,6 +66,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                         c.SearchByTitleTerm = SearchByTitleTerm;
                     });
                     _listeningToPropertyChanges = true;
+
+                    OnPropertyChanged(nameof(SearchOptionsSummary));
                 }
             };
 
@@ -77,7 +84,29 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private static bool _listeningToPropertyChanges = true;
 
-        public Channel? Channel { get; init; }
+        public Channel? Channel
+        {
+            get => _channel!;
+            init
+            {
+                _channel = value;
+
+                if (_channel is not null)
+                {
+                    _channel.PropertyChanged += (_, channelArgs) =>
+                    {
+                        if (channelArgs.PropertyName is nameof(Channel.EnableDateRangeLimit)
+                            or nameof(Channel.DateRangeLimit)
+                            or nameof(Channel.EnableVideoLengthMinimum)
+                            or nameof(Channel.VideoLengthMinimum))
+                        {
+                            OnPropertyChanged(nameof(SearchOptionsSummary));
+                        }
+                    };
+                }
+            }
+        }
+        private readonly Channel? _channel;
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
@@ -234,229 +263,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                Popup popup = new Popup();
-
-                VerticalStackLayout contentLayout = new VerticalStackLayout
-                {
-                    Padding = 20,
-                    BackgroundColor = Colors.White
-                };
-
-                Label channelNameLabel = new Label
-                {
-                    Text = Channel?.VanityName,
-                    FontAttributes = FontAttributes.Bold,
-                    FontSize = 16
-                };
-
-                BoxView spacer0 = new BoxView
-                {
-                    HeightRequest = 20,
-                    Color = Colors.Transparent
-                };
-
-                Label searchOptionsSummaryLabel = new Label
-                {
-                    Text = SearchOptionsSummary,
-                    TextColor = Colors.Gray,
-                };
-
-                // Search term
-                Entry searchTermEntry = new Entry
-                {
-                    Margin = new Thickness(-5, 0, 0, 0),
-                    Placeholder = "Search by title",
-                    Text = SearchByTitleTerm,
-                };
-                searchTermEntry.TextChanged += (_, _) =>
-                {
-                    SearchByTitleTerm = searchTermEntry.Text;
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                // Max results
-                Entry maxResultsEntry = new Entry
-                {
-                    HorizontalOptions = LayoutOptions.End,
-                    Text = CountLimit?.ToString(),
-                    IsEnabled = EnableCountLimit
-                };
-                maxResultsEntry.TextChanged += (_, _) =>
-                {
-                    if (int.TryParse(maxResultsEntry.Text, out int maxResults))
-                    {
-                        CountLimit = maxResults;
-                    }
-                    else
-                    {
-                        maxResultsEntry.Text = null;
-                        CountLimit = null;
-                    }
-
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                CheckBox enableMaxResultsCheckBox = new CheckBox
-                {
-                    Margin = new Thickness(-10, 0, 0, 0),
-                    IsChecked = EnableCountLimit
-                };
-                enableMaxResultsCheckBox.CheckedChanged += (_, _) =>
-                {
-                    maxResultsEntry.IsEnabled = EnableCountLimit = enableMaxResultsCheckBox.IsChecked;
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                Label enableMaxResultsLabel = new Label
-                {
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalOptions = LayoutOptions.Center,
-                    Text = "Maximum number of results"
-                };
-
-                BoxView spacer1 = new BoxView
-                {
-                    HeightRequest = 20,
-                    Color = Colors.Transparent
-                };
-
-                HorizontalStackLayout maxResultsOptionsLayout = new HorizontalStackLayout
-                {
-                    Children =
-                    {
-                        enableMaxResultsCheckBox,
-                        enableMaxResultsLabel,
-                        maxResultsEntry
-                    },
-                    VerticalOptions = LayoutOptions.Center
-                };
-
-                // Date range
-                DatePicker dateRangeLimitDatePicker = new DatePicker
-                {
-                    HorizontalOptions = LayoutOptions.End,
-                    Date = Channel!.DateRangeLimit ?? DateTime.Now.Date,
-                    IsEnabled = Channel!.EnableDateRangeLimit
-                };
-                dateRangeLimitDatePicker.DateSelected += (_, _) =>
-                {
-                    Channel.DateRangeLimit = dateRangeLimitDatePicker.Date;
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                CheckBox enableDateRangeLimitCheckBox = new CheckBox
-                {
-                    Margin = new Thickness(-10, 0, 0, 0),
-                    IsChecked = Channel!.EnableDateRangeLimit
-                };
-                enableDateRangeLimitCheckBox.CheckedChanged += (_, _) =>
-                {
-                    dateRangeLimitDatePicker.IsEnabled = Channel.EnableDateRangeLimit = enableDateRangeLimitCheckBox.IsChecked;
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                Label enableDataRangeLimitLabel = new Label
-                {
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalOptions = LayoutOptions.Center,
-                    Text = "Do not show videos before"
-                };
-
-                BoxView spacer2 = new BoxView
-                {
-                    HeightRequest = 20,
-                    Color = Colors.Transparent
-                };
-
-                HorizontalStackLayout dateRangeOptionsLayout = new HorizontalStackLayout
-                {
-                    Children =
-                    {
-                        enableDateRangeLimitCheckBox,
-                        enableDataRangeLimitLabel,
-                        dateRangeLimitDatePicker
-                    },
-                    VerticalOptions = LayoutOptions.Center
-                };
-
-                // Time limit
-                Entry videoLengthMinimumEntry = new Entry
-                {
-                    HorizontalOptions = LayoutOptions.End,
-                    Text = Channel?.VideoLengthMinimumInSeconds?.ToString(),
-                    IsEnabled = Channel!.EnableVideoLengthMinimum
-                };
-                videoLengthMinimumEntry.TextChanged += (_, _) =>
-                {
-                    if (int.TryParse(videoLengthMinimumEntry.Text, out int videoLengthMinimum))
-                    {
-                        Channel.VideoLengthMinimum = TimeSpan.FromSeconds(videoLengthMinimum);
-                    }
-                    else
-                    {
-                        videoLengthMinimumEntry.Text = null;
-                        Channel.VideoLengthMinimum = null;
-                    }
-
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                CheckBox enableVideoLengthMinimumCheckBox = new CheckBox
-                {
-                    Margin = new Thickness(-10, 0, 0, 0),
-                    IsChecked = Channel!.EnableVideoLengthMinimum
-                };
-                enableVideoLengthMinimumCheckBox.CheckedChanged += (_, _) =>
-                {
-                    videoLengthMinimumEntry.IsEnabled = Channel.EnableVideoLengthMinimum = enableVideoLengthMinimumCheckBox.IsChecked;
-                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
-                };
-
-                Label enableVideoLengthMinimumLabel = new Label
-                {
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalOptions = LayoutOptions.Center,
-                    Text = "Do not show videos shorter than"
-                };
-
-                BoxView spacer3 = new BoxView
-                {
-                    HeightRequest = 20,
-                    Color = Colors.Transparent
-                };
-
-                HorizontalStackLayout videoLengthMinimumOptionsLayout = new HorizontalStackLayout
-                {
-                    Children =
-                    {
-                        enableVideoLengthMinimumCheckBox,
-                        enableVideoLengthMinimumLabel,
-                        videoLengthMinimumEntry
-                    },
-                    VerticalOptions = LayoutOptions.Center
-                };
-
-                BoxView spacer4 = new BoxView
-                {
-                    HeightRequest = 20,
-                    Color = Colors.Transparent
-                };
-
-                contentLayout.Add(channelNameLabel);
-                contentLayout.Add(spacer0);
-                contentLayout.Add(searchTermEntry);
-                contentLayout.Add(spacer1);
-                contentLayout.Add(maxResultsOptionsLayout);
-                contentLayout.Add(spacer2);
-                contentLayout.Add(dateRangeOptionsLayout);
-                contentLayout.Add(spacer3);
-                contentLayout.Add(videoLengthMinimumOptionsLayout);
-                contentLayout.Add(spacer4);
-                contentLayout.Add(searchOptionsSummaryLabel);
-
-                popup.Content = contentLayout;
-
-                await Page.ShowPopupAsync(popup);
+                await Page.ShowPopupAsync(new FilterOptionsPopup(this));
             }
             finally
             {

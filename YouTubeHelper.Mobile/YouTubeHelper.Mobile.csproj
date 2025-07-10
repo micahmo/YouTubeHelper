@@ -109,6 +109,9 @@
     <MauiXaml Update="Views\ChannelView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
+    <MauiXaml Update="Views\FilterOptionsPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
     <MauiXaml Update="Views\VideoView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
