@@ -298,6 +298,7 @@
 
                                                         <ComboBox
                                                             Grid.Column="6"
+                                                            Margin="10,0,0,0"
                                                             DisplayMemberPath="Description"
                                                             ItemsSource="{Binding MainControlViewModel.ExclusionReasonValues}"
                                                             SelectedIndex="{Binding MainControlViewModel.SelectedExclusionFilterIndex}"
