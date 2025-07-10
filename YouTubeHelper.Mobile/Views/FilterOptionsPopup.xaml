@@ -15,13 +15,21 @@
 
         <BoxView HeightRequest="20" Color="Transparent" />
 
+        <Label
+            Margin="-5,0,0,0"
+            FontAttributes="Bold"
+            FontSize="14"
+            Text="Advanced filters" />
+
+        <BoxView HeightRequest="10" Color="Transparent" />
+
         <!--  Search Term Entry  -->
         <Entry
-            Margin="-5,0,0,0"
+            Margin="-7,0,0,0"
             Placeholder="Search by title"
             Text="{Binding SearchByTitleTerm}" />
 
-        <BoxView HeightRequest="20" Color="Transparent" />
+        <BoxView HeightRequest="10" Color="Transparent" />
 
         <!--  Max Results Options  -->
         <Grid>
@@ -51,6 +59,14 @@
 
         <BoxView HeightRequest="20" Color="Transparent" />
 
+        <Label
+            Margin="-5,0,0,0"
+            FontAttributes="Bold"
+            FontSize="14"
+            Text="Channel filters" />
+
+        <BoxView HeightRequest="10" Color="Transparent" />
+
         <!--  Date Range Options  -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -76,7 +92,7 @@
                 IsEnabled="{Binding Channel.EnableDateRangeLimit}" />
         </Grid>
 
-        <BoxView HeightRequest="20" Color="Transparent" />
+        <BoxView HeightRequest="10" Color="Transparent" />
 
         <!--  Video Minimum Length Options  -->
         <Grid>
@@ -106,6 +122,9 @@
         <BoxView HeightRequest="20" Color="Transparent" />
 
         <!--  Search Options Summary  -->
-        <Label Text="{Binding SearchOptionsSummary}" TextColor="Gray" />
+        <Label
+            Margin="-5,0,0,0"
+            Text="{Binding SearchOptionsSummary}"
+            TextColor="Gray" />
     </VerticalStackLayout>
 </toolkit:Popup>
