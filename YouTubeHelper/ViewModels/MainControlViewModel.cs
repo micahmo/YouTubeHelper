@@ -14,6 +14,7 @@ using System.Windows.Shell;
 using System.Windows.Threading;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Utilities;
 
 namespace YouTubeHelper.ViewModels
 {
@@ -312,12 +313,14 @@ namespace YouTubeHelper.ViewModels
         public ICommand ToggleShowAdvancedFiltersCommand => _toggleShowAdvancedFiltersCommand ??= new RelayCommand(() =>
         {
             AdvancedFiltersHeight = AdvancedFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+            AdvancedFiltersGlyph = AdvancedFiltersGlyph == Icons.Filter ? Icons.X : Icons.Filter;
         });
         private ICommand? _toggleShowAdvancedFiltersCommand;
 
         public ICommand ToggleShowChannelFiltersCommand => _toggleShowChannelFiltersCommand ??= new RelayCommand(() =>
         {
             ChannelFiltersHeight = ChannelFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+            ChannelFiltersGlyph = ChannelFiltersGlyph == Icons.List ? Icons.X : Icons.List;
         });
         private ICommand? _toggleShowChannelFiltersCommand;
 
@@ -334,6 +337,20 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _channelFiltersHeight, value);
         }
         private GridLength _channelFiltersHeight = new(0, GridUnitType.Pixel);
+
+        public string ChannelFiltersGlyph
+        {
+            get => _channelFiltersGlyph;
+            set => SetProperty(ref _channelFiltersGlyph, value);
+        }
+        private string _channelFiltersGlyph = Icons.List;
+
+        public string AdvancedFiltersGlyph
+        {
+            get => _advancedFiltersGlyph;
+            set => SetProperty(ref _advancedFiltersGlyph, value);
+        }
+        private string _advancedFiltersGlyph = Icons.Filter;
 
         #endregion
 

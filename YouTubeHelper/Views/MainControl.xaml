@@ -318,7 +318,7 @@
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
 
-                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xE71C;" />
+                                                                <ui:FontIcon Grid.Column="0" Glyph="{Binding MainControlViewModel.AdvancedFiltersGlyph}" />
                                                                 <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.AdvancedFilters}" />
                                                             </Grid>
                                                         </Button>
@@ -335,7 +335,7 @@
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
 
-                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEA37;" />
+                                                                <ui:FontIcon Grid.Column="0" Glyph="{Binding MainControlViewModel.ChannelFiltersGlyph}" />
                                                                 <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.ChannelFilters}" />
                                                             </Grid>
                                                         </Button>
