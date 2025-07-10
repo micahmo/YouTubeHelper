@@ -9,8 +9,9 @@
     <VerticalStackLayout Padding="20" BackgroundColor="White">
         <!--  Channel Name  -->
         <Label
+            Margin="-5,0,0,0"
             FontAttributes="Bold"
-            FontSize="16"
+            FontSize="20"
             Text="{Binding Channel.VanityName}" />
 
         <BoxView HeightRequest="20" Color="Transparent" />
