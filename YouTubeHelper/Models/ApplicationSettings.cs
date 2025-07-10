@@ -62,21 +62,21 @@ namespace YouTubeHelper.Models
             get => _selectedSortMode;
             set => SetProperty(ref _selectedSortMode, value);
         }
-        private SortMode _selectedSortMode;
+        private SortMode _selectedSortMode = SortMode.AgeDesc;
 
         public ExclusionsMode SelectedExclusionsMode
         {
             get => _selectedExclusionsMode;
             set => SetProperty(ref _selectedExclusionsMode, value);
         }
-        private ExclusionsMode _selectedExclusionsMode;
+        private ExclusionsMode _selectedExclusionsMode = ExclusionsMode.ShowNonExcluded;
 
         public ExclusionReason SelectedExclusionReason
         {
             get => _selectedExclusionReason;
             set => SetProperty(ref _selectedExclusionReason, value);
         }
-        private ExclusionReason _selectedExclusionReason;
+        private ExclusionReason _selectedExclusionReason = ExclusionReason.None;
 
         public byte[]? ServerAddress
         {

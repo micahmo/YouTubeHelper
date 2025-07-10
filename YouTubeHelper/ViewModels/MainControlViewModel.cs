@@ -250,7 +250,7 @@ namespace YouTubeHelper.ViewModels
             get => _selectedSortModeIndex;
             set => SetProperty(ref _selectedSortModeIndex, value);
         }
-        private int _selectedSortModeIndex;
+        private int _selectedSortModeIndex = 4;
 
         public IEnumerable<ExclusionsModeExtended> ExclusionsModeValues { get; } = Enum.GetValues(typeof(ExclusionsMode)).OfType<ExclusionsMode>().Select(m => new ExclusionsModeExtended(m)).ToList();
 
@@ -270,7 +270,6 @@ namespace YouTubeHelper.ViewModels
                 OnPropertyChanged(nameof(ShowExclusions));
             }
         }
-
         private ExclusionsModeExtended? _selectedExclusionsMode;
 
         public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
@@ -287,7 +286,7 @@ namespace YouTubeHelper.ViewModels
             get => _selectedExclusionFilterIndex;
             set => SetProperty(ref _selectedExclusionFilterIndex, value);
         }
-        private int _selectedExclusionFilterIndex;
+        private int _selectedExclusionFilterIndex = 4;
 
         public string? SearchByTitleTerm
         {
