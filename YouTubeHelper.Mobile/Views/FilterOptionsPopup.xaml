@@ -48,7 +48,11 @@
                 Grid.Column="1"
                 Margin="0,0,10,0"
                 Text="Maximum number of results"
-                VerticalOptions="Center" />
+                VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleEnableCountLimitCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
             <Entry
                 Grid.Column="3"
                 HorizontalOptions="End"
@@ -84,7 +88,11 @@
                 Grid.Column="1"
                 Margin="0,0,10,0"
                 Text="Do not show videos before"
-                VerticalOptions="Center" />
+                VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
             <DatePicker
                 Grid.Column="3"
                 Date="{Binding Channel.DateRangeLimit}"
@@ -111,7 +119,11 @@
                 Grid.Column="1"
                 Margin="0,0,10,0"
                 Text="Do not show videos shorter than"
-                VerticalOptions="Center" />
+                VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleEnableVideoLengthMinimumCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
             <Entry
                 Grid.Column="3"
                 HorizontalOptions="End"

@@ -110,6 +110,18 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
+        public ICommand ToggleEnableCountLimitCommand => _toggleEnableCountLimitCommand ??= new RelayCommand(() =>
+        {
+            EnableCountLimit = !EnableCountLimit;
+        });
+        private RelayCommand? _toggleEnableCountLimitCommand;
+
+        public ICommand ToggleEnableVideoLengthMinimumCommand => _toggleEnableVideoLengthMinimumCommand ??= new RelayCommand(() =>
+        {
+            Channel!.EnableVideoLengthMinimum = !Channel.EnableVideoLengthMinimum;
+        });
+        private RelayCommand? _toggleEnableVideoLengthMinimumCommand;
+
         public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() =>
         {
             Channel!.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
