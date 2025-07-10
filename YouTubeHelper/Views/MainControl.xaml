@@ -218,8 +218,8 @@
 
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="33" />
-                                                        <RowDefinition Height="{Binding AdvancedFiltersHeight}" />
-                                                        <RowDefinition Height="{Binding ChannelFiltersHeight}" />
+                                                        <RowDefinition Height="{Binding MainControlViewModel.AdvancedFiltersHeight}" />
+                                                        <RowDefinition Height="{Binding MainControlViewModel.ChannelFiltersHeight}" />
                                                     </Grid.RowDefinitions>
 
                                                     <!--  First row (base filters)  -->
@@ -308,7 +308,7 @@
 
                                                         <Button
                                                             Grid.Column="8"
-                                                            Command="{Binding ToggleShowAdvancedFiltersCommand}"
+                                                            Command="{Binding MainControlViewModel.ToggleShowAdvancedFiltersCommand}"
                                                             Visibility="{c:Binding ChannelMode,
                                                                                    FalseToVisibility=Collapsed}">
                                                             <Grid>
@@ -325,7 +325,7 @@
 
                                                         <Button
                                                             Grid.Column="10"
-                                                            Command="{Binding ToggleShowChannelFiltersCommand}"
+                                                            Command="{Binding MainControlViewModel.ToggleShowChannelFiltersCommand}"
                                                             Visibility="{c:Binding ChannelMode,
                                                                                    FalseToVisibility=Collapsed}">
                                                             <Grid>

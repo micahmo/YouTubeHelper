@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
-using System.Windows;
-using System.Windows.Shell;
-using System.Windows.Threading;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Shell;
+using System.Windows.Threading;
 using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 
@@ -308,6 +308,32 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _countLimit, value);
         }
         private int? _countLimit;
+
+        public ICommand ToggleShowAdvancedFiltersCommand => _toggleShowAdvancedFiltersCommand ??= new RelayCommand(() =>
+        {
+            AdvancedFiltersHeight = AdvancedFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+        });
+        private ICommand? _toggleShowAdvancedFiltersCommand;
+
+        public ICommand ToggleShowChannelFiltersCommand => _toggleShowChannelFiltersCommand ??= new RelayCommand(() =>
+        {
+            ChannelFiltersHeight = ChannelFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+        });
+        private ICommand? _toggleShowChannelFiltersCommand;
+
+        public GridLength AdvancedFiltersHeight
+        {
+            get => _advancedFiltersHeight;
+            set => SetProperty(ref _advancedFiltersHeight, value);
+        }
+        private GridLength _advancedFiltersHeight = new(0, GridUnitType.Pixel);
+
+        public GridLength ChannelFiltersHeight
+        {
+            get => _channelFiltersHeight;
+            set => SetProperty(ref _channelFiltersHeight, value);
+        }
+        private GridLength _channelFiltersHeight = new(0, GridUnitType.Pixel);
 
         #endregion
 

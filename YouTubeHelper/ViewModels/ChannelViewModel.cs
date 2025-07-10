@@ -239,32 +239,6 @@ namespace YouTubeHelper.ViewModels
             }
         }
 
-        public ICommand ToggleShowAdvancedFiltersCommand => _toggleShowAdvancedFiltersCommand ??= new RelayCommand(() =>
-        {
-            AdvancedFiltersHeight = AdvancedFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
-        });
-        private ICommand? _toggleShowAdvancedFiltersCommand;
-
-        public ICommand ToggleShowChannelFiltersCommand => _toggleShowChannelFiltersCommand ??= new RelayCommand(() =>
-        {
-            ChannelFiltersHeight = ChannelFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
-        });
-        private ICommand? _toggleShowChannelFiltersCommand;
-
-        public GridLength AdvancedFiltersHeight
-        {
-            get => _advancedFiltersHeight;
-            set => SetProperty(ref _advancedFiltersHeight, value);
-        }
-        private GridLength _advancedFiltersHeight = new(0, GridUnitType.Pixel);
-
-        public GridLength ChannelFiltersHeight
-        {
-            get => _channelFiltersHeight;
-            set => SetProperty(ref _channelFiltersHeight, value);
-        }
-        private GridLength _channelFiltersHeight = new(0, GridUnitType.Pixel);
-
         public string SearchGlyph
         {
             get => _searchGlyph;
