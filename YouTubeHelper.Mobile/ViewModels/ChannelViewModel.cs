@@ -499,7 +499,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 OnPropertyChanged();
             }
         }
-        private int _selectedExclusionsModeIndex = 2;
+        private int _selectedExclusionsModeIndex = 1;
 
         public ExclusionReasonExtended SelectedExclusionFilter => ExclusionReasonValues.ElementAt(SelectedExclusionFilterIndex);
 
@@ -514,7 +514,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 OnPropertyChanged(nameof(SelectedExclusionFilterIndex));
             }
         }
-        private int _selectedExclusionFilterIndex;
+        private int _selectedExclusionFilterIndex = 0;
 
         public string? SearchByTitleTerm
         {
