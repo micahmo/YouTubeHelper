@@ -10,15 +10,9 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public AppShellViewModel(AppShell appShell) => _appShell = appShell;
 
-        public bool WatchTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.WatchTab;
-
-        public bool SearchTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.SearchTab;
-
-        public bool ExclusionsTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.ExclusionsTab;
+        public bool ChannelTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.ChannelTab;
 
         public bool QueueTabSelected => _appShell.CurrentItem?.CurrentItem == _appShell.QueueTab;
-
-        public bool NotQueueTabSelected => _appShell.CurrentItem?.CurrentItem != _appShell.QueueTab;
 
         public List<ChannelViewModel> ChannelViewModels { get; } = new();
 
@@ -79,9 +73,9 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
 
-        public void SelectWatchTab()
+        public void SelectChannelTab()
         {
-            _appShell.CurrentItem.CurrentItem = _appShell.WatchTab;
+            _appShell.CurrentItem.CurrentItem = _appShell.ChannelTab;
         }
 
         private string? _currentNotificationText;

@@ -261,7 +261,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = true;
             await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
 
-            if (MainControlViewModel is { WatchMode: true, ShowExcludedVideos: false })
+            if (MainControlViewModel is { ChannelMode: true, ShowExclusions: false })
             {
                 _channelViewModel.Videos.Remove(this);
             }

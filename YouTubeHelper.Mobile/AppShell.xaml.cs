@@ -29,7 +29,7 @@ namespace YouTubeHelper.Mobile
             InitializeComponent();
             BindingContext = new AppShellViewModel(this);
             Instance = this;
-            _currentTab = WatchTab;
+            _currentTab = ChannelTab;
         }
 
         protected override bool OnBackButtonPressed()
@@ -71,9 +71,9 @@ namespace YouTubeHelper.Mobile
             }
 
             // Or, re-select the main/watch tab
-            if (!AppShellViewModel.WatchTabSelected)
+            if (!AppShellViewModel.ChannelTabSelected)
             {
-                AppShellViewModel.SelectWatchTab();
+                AppShellViewModel.SelectChannelTab();
                 return true;
             }
 
@@ -137,12 +137,11 @@ namespace YouTubeHelper.Mobile
 
             busyIndicator.Text = Mobile.Resources.Resources.LoadingChannels;
 
-            WatchTab.Items.Clear();
-            SearchTab.Items.Clear();
-            ExclusionsTab.Items.Clear();
+            ChannelTab.Items.Clear();
             QueueTab.Items.Clear();
 
             int selectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4);
+            int selectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 0);
             int selectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
 
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
@@ -157,15 +156,14 @@ namespace YouTubeHelper.Mobile
                 {
                     Channel = channel,
                     SelectedSortModeIndex = selectedSortModeIndex,
+                    SelectedExclusionsModeIndex = selectedExclusionsModeIndex,
                     SelectedExclusionFilterIndex = selectedExclusionFilterIndex
                 };
                 AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
                 var channelView = new ChannelView { BindingContext = channelViewModel };
 
-                WatchTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
-                SearchTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
-                ExclusionsTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
+                ChannelTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
             }
 
             // Add one placeholder to the queue tab
@@ -177,6 +175,7 @@ namespace YouTubeHelper.Mobile
                     {
                         Loading = false,
                         SelectedSortModeIndex = selectedSortModeIndex,
+                        SelectedExclusionsModeIndex = selectedExclusionsModeIndex,
                         SelectedExclusionFilterIndex = selectedExclusionFilterIndex
                     }
                 }
@@ -221,7 +220,7 @@ namespace YouTubeHelper.Mobile
 
         private void SyncSelectedChannel()
         {
-            foreach (Tab tab in new[] { WatchTab, SearchTab, ExclusionsTab, QueueTab })
+            foreach (Tab tab in new[] { ChannelTab, QueueTab })
             {
                 tab.PropertyChanged += (s, e) =>
                 {
@@ -448,7 +447,7 @@ namespace YouTubeHelper.Mobile
             ChannelViewModel? newlyAddedChannelViewModel = null;
 
             // Look for the channel
-            foreach (Tab tab in new List<Tab> { WatchTab, SearchTab, ExclusionsTab })
+            foreach (Tab tab in new List<Tab> { ChannelTab })
             {
                 bool found = false;
                 foreach (ShellContent? content in tab.Items.ToList())
@@ -507,6 +506,7 @@ namespace YouTubeHelper.Mobile
                         {
                             Channel = updatedChannel,
                             SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+                            SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 0),
                             SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0),
                             Loading = false
                         };
@@ -532,11 +532,8 @@ namespace YouTubeHelper.Mobile
 
         private void Shell_Navigated(object _, ShellNavigatedEventArgs __)
         {
-            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.WatchTabSelected));
-            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.SearchTabSelected));
-            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.ExclusionsTabSelected));
+            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.ChannelTabSelected));
             AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.QueueTabSelected));
-            AppShellViewModel.RaisePropertyChanged(nameof(AppShellViewModel.NotQueueTabSelected));
 
             // Clear video lists when switching bottom tabs (NOT top tabs)
             if (CurrentItem.CurrentItem != _currentTab)
@@ -612,13 +609,13 @@ namespace YouTubeHelper.Mobile
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
             {
                 // We successfully identified a channel, so navigate to the watch tab
-                if (!AppShellViewModel.WatchTabSelected)
+                if (!AppShellViewModel.ChannelTabSelected)
                 {
-                    AppShellViewModel.SelectWatchTab();
+                    AppShellViewModel.SelectChannelTab();
                 }
 
                 ChannelViewModel? foundChannelViewModel = default;
-                foreach (var content in WatchTab.Items)
+                foreach (var content in ChannelTab.Items)
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
                         && channelViewModel.Channel?.ChannelPlaylist == channelPlaylist)
@@ -627,7 +624,7 @@ namespace YouTubeHelper.Mobile
 
                         try
                         {
-                            WatchTab.CurrentItem = content;
+                            ChannelTab.CurrentItem = content;
                         }
                         catch
                         {
@@ -651,6 +648,7 @@ namespace YouTubeHelper.Mobile
                             ChannelId = channelId
                         },
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+                        SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 0),
                         SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)
                     };
                     AppShellViewModel.ChannelViewModels.Add(foundChannelViewModel);
@@ -658,11 +656,8 @@ namespace YouTubeHelper.Mobile
                     var channelView = new ChannelView { BindingContext = foundChannelViewModel };
 
                     ShellContent watchTabContent = new ShellContent { Title = channelName, Content = channelView };
-                    WatchTab.Items.Insert(0, watchTabContent);
-                    SearchTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
-                    ExclusionsTab.Items.Insert(0, new ShellContent { Title = channelName, Content = channelView });
-
-                    WatchTab.CurrentItem = watchTabContent;
+                    ChannelTab.Items.Insert(0, watchTabContent);
+                    ChannelTab.CurrentItem = watchTabContent;
 
                     foundChannelViewModel.Loading = false;
                 }

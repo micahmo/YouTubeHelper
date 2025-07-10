@@ -200,7 +200,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = true;
                     await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
 
-                    if (_page.AppShellViewModel.WatchTabSelected && !_channelViewModel.ShowExcludedVideos)
+                    if (!_channelViewModel.ShowExclusions)
                     {
                         _channelViewModel.Videos.Remove(this);
                     }

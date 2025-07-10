@@ -39,6 +39,7 @@ namespace YouTubeHelper.Models
             Tracker.Configure<ApplicationSettings>()
                 .Property(a => a.SelectedTabIndex)
                 .Property(a => a.SelectedSortMode)
+                .Property(a => a.SelectedExclusionsMode)
                 .Property(a => a.SelectedExclusionReason)
                 .Property(a => a.ServerAddress)
                 .Track(this);
@@ -62,6 +63,13 @@ namespace YouTubeHelper.Models
             set => SetProperty(ref _selectedSortMode, value);
         }
         private SortMode _selectedSortMode;
+
+        public ExclusionsMode SelectedExclusionsMode
+        {
+            get => _selectedExclusionsMode;
+            set => SetProperty(ref _selectedExclusionsMode, value);
+        }
+        private ExclusionsMode _selectedExclusionsMode;
 
         public ExclusionReason SelectedExclusionReason
         {

@@ -24,22 +24,12 @@
 
     <TabBar x:Name="TabBar">
         <Tab
-            x:Name="WatchTab"
-            Title="Watch"
+            x:Name="ChannelTab"
+            Title="Channel"
             x:FieldModifier="public"
             Icon="watch.svg">
             <ShellContent Title="New Channel" ContentTemplate="{DataTemplate views:ChannelView}" />
         </Tab>
-        <Tab
-            x:Name="SearchTab"
-            Title="Search"
-            x:FieldModifier="public"
-            Icon="search.svg" />
-        <Tab
-            x:Name="ExclusionsTab"
-            Title="Exclusions"
-            x:FieldModifier="public"
-            Icon="exclusions.svg" />
         <Tab
             x:Name="QueueTab"
             Title="Queue"

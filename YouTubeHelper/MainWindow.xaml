@@ -37,19 +37,9 @@
             ItemInvoked="NavigationView_ItemInvoked"
             Loaded="NavigationView_Loaded">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem x:Name="WatchNavigationItem" Content="{x:Static properties:Resources.Watch}">
+                <ui:NavigationViewItem x:Name="ChannelNavigationItem" Content="{x:Static properties:Resources.Channel}">
                     <ui:NavigationViewItem.Icon>
                         <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7F4;" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem x:Name="SearchNavigationITem" Content="{x:Static properties:Resources.Search}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem x:Name="ExclusionsNavigationItem" Content="{x:Static properties:Resources.Exclusions}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA39;" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem x:Name="QueueNavigationItem" Content="{x:Static properties:Resources.Queue}">

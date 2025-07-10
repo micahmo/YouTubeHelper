@@ -155,17 +155,9 @@ namespace YouTubeHelper
 
         private void HandleNavigationItemChanged(string? name, bool isSettingsInvoked)
         {
-            if (name == Properties.Resources.Watch)
+            if (name == Properties.Resources.Channel)
             {
-                MainControlViewModel!.Mode = MainControlMode.Watch;
-            }
-            else if (name == Properties.Resources.Search)
-            {
-                MainControlViewModel!.Mode = MainControlMode.Search;
-            }
-            else if (name == Properties.Resources.Exclusions)
-            {
-                MainControlViewModel!.Mode = MainControlMode.Exclusions;
+                MainControlViewModel!.Mode = MainControlMode.Channel;
             }
             else if (name == Properties.Resources.Queue)
             {
@@ -199,6 +191,7 @@ namespace YouTubeHelper
             }
 
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
+            ApplicationSettings.Instance.SelectedExclusionsMode = MainControlViewModel.SelectedExclusionsMode.Value;
             ApplicationSettings.Instance.SelectedExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value;
         }
 
@@ -374,10 +367,10 @@ namespace YouTubeHelper
                 {
                     MainControlViewModel.SelectedChannel = MainControlViewModel.Channels.FirstOrDefault();
                 }
-                else if ((NavigationViewItem)NavigationView.SelectedItem != WatchNavigationItem)
+                else if ((NavigationViewItem)NavigationView.SelectedItem != ChannelNavigationItem)
                 {
-                    NavigationView.SelectedItem = WatchNavigationItem;
-                    HandleNavigationItemChanged(Properties.Resources.Watch, false);
+                    NavigationView.SelectedItem = ChannelNavigationItem;
+                    HandleNavigationItemChanged(Properties.Resources.Channel, false);
                 }
                 else
                 {
@@ -416,17 +409,13 @@ namespace YouTubeHelper
 
         private static void ExecuteMainCommand()
         {
-            if (MainControlViewModel!.ExclusionsMode)
+            if (MainControlViewModel!.QueueMode)
             {
-                MainControlViewModel.SelectedChannel?.FindExclusionsCommand?.Execute(null);
-            }
-            else if (MainControlViewModel.QueueMode)
-            {
-                MainControlViewModel.SelectedChannel?.LoadQueueCommand?.Execute(null);
+                MainControlViewModel.SelectedChannel?.LoadQueueCommand.Execute(null);
             }
             else
             {
-                MainControlViewModel.SelectedChannel?.FindVideosCommand?.Execute(null);
+                MainControlViewModel.SelectedChannel?.FindVideosCommand.Execute(null);
             }
         }
 
@@ -496,10 +485,10 @@ namespace YouTubeHelper
             if (!string.IsNullOrEmpty(channelId) && !string.IsNullOrEmpty(channelPlaylist))
             {
                 // Navigate to the watch tab if we're on the queue tab
-                if ((NavigationViewItem)NavigationView.SelectedItem != WatchNavigationItem)
+                if ((NavigationViewItem)NavigationView.SelectedItem != ChannelNavigationItem)
                 {
-                    NavigationView.SelectedItem = WatchNavigationItem;
-                    HandleNavigationItemChanged(Properties.Resources.Watch, false);
+                    NavigationView.SelectedItem = ChannelNavigationItem;
+                    HandleNavigationItemChanged(Properties.Resources.Channel, false);
                 }
 
                 ChannelViewModel? foundChannelViewModel = default;

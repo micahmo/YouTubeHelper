@@ -101,8 +101,11 @@
   <data name="ApplicationName" xml:space="preserve">
     <value>YouTubeHelper</value>
   </data>
-  <data name="Watch" xml:space="preserve">
-    <value>Watch</value>
+  <data name="Channel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="ChannelFilters" xml:space="preserve">
+    <value>Channel Filters</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
@@ -157,9 +160,6 @@
   </data>
   <data name="ShowExcludedVideos" xml:space="preserve">
     <value>Show excluded videos</value>
-  </data>
-  <data name="Exclusions" xml:space="preserve">
-    <value>Exclusions</value>
   </data>
   <data name="View" xml:space="preserve">
     <value>View</value>
@@ -308,5 +308,11 @@ Updated the status of {1} video(s).</value>
   </data>
   <data name="OpenExternally" xml:space="preserve">
     <value>Open Externally</value>
+  </data>
+  <data name="AdvancedFilters" xml:space="preserve">
+    <value>Advanced Filters</value>
+  </data>
+  <data name="MaxResults" xml:space="preserve">
+    <value>Maximum number of results</value>
   </data>
 </root>

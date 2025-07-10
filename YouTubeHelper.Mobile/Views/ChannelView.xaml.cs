@@ -78,6 +78,7 @@ public partial class ChannelView : ContentPage
         {
             Channel = channel,
             SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 0),
+            SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 0),
             SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0),
             Loading = false
         };
@@ -85,7 +86,7 @@ public partial class ChannelView : ContentPage
         AppShell.Instance.AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
         // Now create a view for it and add it to each section
-        foreach (Tab tab in new List<Tab> { AppShell.Instance.WatchTab, AppShell.Instance.SearchTab, AppShell.Instance.ExclusionsTab })
+        foreach (Tab tab in new List<Tab> { AppShell.Instance.ChannelTab })
         {
             ChannelView channelView = new ChannelView { BindingContext = channelViewModel };
             tab.Items.Add(new ShellContent { Title = channel.VanityName, Content = channelView });
@@ -104,7 +105,7 @@ public partial class ChannelView : ContentPage
         {
             channelViewModel.IsFabOpen = false;
 
-            foreach (Tab tab in new List<Tab> { AppShell.Instance!.WatchTab, AppShell.Instance.SearchTab, AppShell.Instance.ExclusionsTab })
+            foreach (Tab tab in new List<Tab> { AppShell.Instance!.ChannelTab })
             {
                 foreach (ShellContent? content in tab.Items)
                 {

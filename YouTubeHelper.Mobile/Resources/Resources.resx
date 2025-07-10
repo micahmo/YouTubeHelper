@@ -190,9 +190,6 @@
 
 {0}</value>
   </data>
-  <data name="SearchWithLimit" xml:space="preserve">
-    <value>Search with limit</value>
-  </data>
   <data name="SearchLimit" xml:space="preserve">
     <value>Search limit</value>
   </data>
@@ -210,9 +207,6 @@
   </data>
   <data name="Clear" xml:space="preserve">
     <value>Clear</value>
-  </data>
-  <data name="SearchNoLimit" xml:space="preserve">
-    <value>Search (no limit)</value>
   </data>
   <data name="ActiveDownloads" xml:space="preserve">
           <value>Active Downloads</value>

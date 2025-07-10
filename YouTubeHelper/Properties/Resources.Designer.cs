@@ -97,6 +97,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced Filters.
+        /// </summary>
+        public static string AdvancedFilters {
+            get {
+                return ResourceManager.GetString("AdvancedFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to YouTubeHelper.
         /// </summary>
         public static string ApplicationName {
@@ -111,6 +120,24 @@ namespace YouTubeHelper.Properties {
         public static string Cancel {
             get {
                 return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel.
+        /// </summary>
+        public static string Channel {
+            get {
+                return ResourceManager.GetString("Channel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel Filters.
+        /// </summary>
+        public static string ChannelFilters {
+            get {
+                return ResourceManager.GetString("ChannelFilters", resourceCulture);
             }
         }
         
@@ -288,15 +315,6 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exclusions.
-        /// </summary>
-        public static string Exclusions {
-            get {
-                return ResourceManager.GetString("Exclusions", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to Download.
         /// </summary>
         public static string FailedToDownload {
@@ -377,6 +395,15 @@ namespace YouTubeHelper.Properties {
         public static string MarkedAsWontWatch {
             get {
                 return ResourceManager.GetString("MarkedAsWontWatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum number of results.
+        /// </summary>
+        public static string MaxResults {
+            get {
+                return ResourceManager.GetString("MaxResults", resourceCulture);
             }
         }
         
@@ -628,15 +655,6 @@ namespace YouTubeHelper.Properties {
         public static string View {
             get {
                 return ResourceManager.GetString("View", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Watch.
-        /// </summary>
-        public static string Watch {
-            get {
-                return ResourceManager.GetString("Watch", resourceCulture);
             }
         }
         

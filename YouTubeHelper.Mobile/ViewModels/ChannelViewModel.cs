@@ -1,5 +1,4 @@
-﻿using System.Windows.Input;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Views;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
@@ -8,6 +7,7 @@ using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
+using System.Windows.Input;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared.Utilities;
 
@@ -26,15 +26,21 @@ namespace YouTubeHelper.Mobile.ViewModels
                     return;
                 }
 
-                if (args.PropertyName is nameof(ShowExcludedVideos) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(SearchByTitleTerm))
+                if (args.PropertyName is nameof(SelectedExclusionsModeIndex) or nameof(SelectedSortModeIndex) or nameof(SelectedExclusionFilterIndex) or nameof(SearchByTitleTerm) or nameof(EnableCountLimit) or nameof(CountLimit))
                 {
                     Preferences.Default.Set(nameof(SelectedSortModeIndex), SelectedSortModeIndex);
+                    Preferences.Default.Set(nameof(SelectedExclusionsModeIndex), SelectedExclusionsModeIndex);
                     Preferences.Default.Set(nameof(SelectedExclusionFilterIndex), SelectedExclusionFilterIndex);
 
                     _listeningToPropertyChanges = false;
                     Page.AppShellViewModel.ChannelViewModels.ForEach(c =>
                     {
-                        c.ShowExcludedVideos = ShowExcludedVideos;
+                        if (args.PropertyName == nameof(SelectedExclusionsModeIndex))
+                        {
+                            c.SelectedExclusionsModeIndex = SelectedExclusionsModeIndex;
+                            c.OnPropertyChanged(nameof(ShowExclusions));
+                            OnPropertyChanged(nameof(ShowExclusions));
+                        }
 
                         if (args.PropertyName is nameof(SelectedSortModeIndex))
                         {
@@ -44,6 +50,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                         if (args.PropertyName is nameof(SelectedExclusionFilterIndex))
                         {
                             c.SelectedExclusionFilterIndex = SelectedExclusionFilterIndex;
+                        }
+
+                        if (args.PropertyName is nameof(EnableCountLimit) or nameof(CountLimit))
+                        {
+                            c.EnableCountLimit = EnableCountLimit;
+                            c.CountLimit = CountLimit;
                         }
 
                         c.SearchByTitleTerm = SearchByTitleTerm;
@@ -69,12 +81,6 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
-        public ICommand ToggleShowExcludedVideosCommand => _toggleShowExcludedVideosCommand ??= new RelayCommand(() =>
-        {
-            ShowExcludedVideos = !ShowExcludedVideos;
-        });
-        private ICommand? _toggleShowExcludedVideosCommand;
-
         public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() =>
         {
             Channel!.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
@@ -84,12 +90,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
         private ICommand? _findVideosCommand;
 
-        public void FindVideos()
-        {
-            FindVideos(count: 10);
-        }
-
-        public async void FindVideos(int count)
+        public async void FindVideos()
         {
             if (_findInProgress)
             {
@@ -126,75 +127,60 @@ namespace YouTubeHelper.Mobile.ViewModels
                             _hasSearchedAtLeastOnce = true;
 
                             // FindVideos
-                            if (Page.AppShellViewModel.WatchTabSelected || Page.AppShellViewModel.SearchTabSelected)
+                            if (Page.AppShellViewModel.ChannelTabSelected)
                             {
                                 List<string>? searchTerms = null;
 
-                                if (Page.AppShellViewModel.SearchTabSelected)
+
+                                if (!string.IsNullOrEmpty(SearchByTitleTerm))
                                 {
-                                    if (!string.IsNullOrEmpty(SearchByTitleTerm))
+                                    string searchByTitleTermTrimmed = SearchByTitleTerm.Trim();
+
+                                    if (searchByTitleTermTrimmed.StartsWith('"')
+                                        && searchByTitleTermTrimmed.EndsWith('"')
+                                        && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')))
                                     {
-                                        string searchByTitleTermTrimmed = SearchByTitleTerm.Trim();
-
-                                        if (searchByTitleTermTrimmed.StartsWith('"')
-                                            && searchByTitleTermTrimmed.EndsWith('"')
-                                            && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')))
-                                        {
-                                            searchTerms = new List<string> { searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"') };
-                                        }
-                                        else
-                                        {
-                                            searchTerms = searchByTitleTermTrimmed.Split().ToList();
-                                        }
-
-                                        // Update the history
-                                        string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
-                                        List<string> searchTermHistoryList;
-                                        try
-                                        {
-                                            searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
-                                        }
-                                        catch
-                                        {
-                                            searchTermHistoryList = new();
-                                        }
-
-                                        searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
-                                        searchTermHistoryList.Insert(0, searchByTitleTermTrimmed);
-                                        searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
-                                        Preferences.Default.Set(nameof(SearchByTitleTerm), JsonConvert.SerializeObject(searchTermHistoryList));
+                                        searchTerms = new List<string> { searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"') };
                                     }
+                                    else
+                                    {
+                                        searchTerms = searchByTitleTermTrimmed.Split().ToList();
+                                    }
+
+                                    // Update the history
+                                    string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
+                                    List<string> searchTermHistoryList;
+                                    try
+                                    {
+                                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+                                    }
+                                    catch
+                                    {
+                                        searchTermHistoryList = new();
+                                    }
+
+                                    searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
+                                    searchTermHistoryList.Insert(0, searchByTitleTermTrimmed);
+                                    searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
+                                    Preferences.Default.Set(nameof(SearchByTitleTerm), JsonConvert.SerializeObject(searchTermHistoryList));
                                 }
 
                                 List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                 {
                                     Channel = Channel,
-                                    ShowExclusions = ShowExcludedVideos,
+                                    ShowExclusions = ShowExclusions,
+                                    ExclusionReasonFilter = SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowNonExcluded) ? null : SelectedExclusionFilter.Value,
                                     SortMode = SelectedSortMode.Value,
                                     SearchTerms = searchTerms,
-                                    Count = count,
-                                    DateRangeLimit = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
-                                    VideoLengthMinimum = Page.AppShellViewModel.WatchTabSelected && Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
+                                    Count = EnableCountLimit && CountLimit.HasValue ? CountLimit.Value : int.MaxValue,
+                                    DateRangeLimit = Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
+                                    VideoLengthMinimum = Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
                                 });
 
                                 List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                 Videos.AddRange(videoViewModels);
 
                                 await QueueUtils.TryJoinDownloadGroup(videoViewModels);
-                            }
-                            // FindExclusions
-                            else if (Page.AppShellViewModel.ExclusionsTabSelected)
-                            {
-                                List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                {
-                                    ShowExclusions = true,
-                                    ExclusionReasonFilter = SelectedExclusionFilter.Value,
-                                    Channel = Channel,
-                                    SortMode = SelectedSortMode.Value,
-                                    Count = int.MaxValue
-                                });
-                                List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
-                                Videos.AddRange(videoViewModels);
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
@@ -248,67 +234,229 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                List<string> options = new();
+                Popup popup = new Popup();
 
-                if (Page.AppShellViewModel.WatchTabSelected)
+                VerticalStackLayout contentLayout = new VerticalStackLayout
                 {
-                    //options.Add(Resources.Resources.SearchWithLimit);
-                    options.Add(Resources.Resources.SearchNoLimit);
-                }
+                    Padding = 20,
+                    BackgroundColor = Colors.White
+                };
 
-                if (Page.AppShellViewModel.SearchTabSelected)
+                Label channelNameLabel = new Label
                 {
-                    options.Add(Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null) is null 
-                        ? Resources.Resources.SearchHistoryNone 
-                        : Resources.Resources.SearchHistory);
-                }
-                
-                var action = await Page.DisplayActionSheet(Channel?.VanityName, Resources.Resources.Cancel, null, options.ToArray());
+                    Text = Channel?.VanityName,
+                    FontAttributes = FontAttributes.Bold,
+                    FontSize = 16
+                };
 
-                if (action == Resources.Resources.SearchWithLimit)
+                BoxView spacer0 = new BoxView
                 {
-                    int initialValue = Preferences.Default.Get("SearchLimit", 250);
-                    var res = await Page.DisplayPromptAsync(Resources.Resources.SearchLimit, Resources.Resources.EnterDesiredLimit, initialValue: initialValue.ToString(), keyboard: Keyboard.Numeric);
+                    HeightRequest = 20,
+                    Color = Colors.Transparent
+                };
 
-                    if (int.TryParse(res, out int limit))
-                    {
-                        FindVideos(limit);
-                        Preferences.Default.Set("SearchLimit", limit);
-                    }
-                    else if (res is not null)
-                    {
-                        await Toast.Make(Resources.Resources.EnterNumericalLimit).Show();
-                    }
-                }
-                else if (action == Resources.Resources.SearchNoLimit)
+                Label searchOptionsSummaryLabel = new Label
                 {
-                    FindVideos(int.MaxValue);
-                }
-                else if (action == Resources.Resources.SearchHistory)
+                    Text = SearchOptionsSummary,
+                    TextColor = Colors.Gray,
+                };
+
+                // Search term
+                Entry searchTermEntry = new Entry
                 {
-                    string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
-                    List<string> searchTermHistoryList;
-                    try
+                    Margin = new Thickness(-5, 0, 0, 0),
+                    Placeholder = "Search by title",
+                    Text = SearchByTitleTerm,
+                };
+                searchTermEntry.TextChanged += (_, _) =>
+                {
+                    SearchByTitleTerm = searchTermEntry.Text;
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                // Max results
+                Entry maxResultsEntry = new Entry
+                {
+                    HorizontalOptions = LayoutOptions.End,
+                    Text = CountLimit?.ToString(),
+                    IsEnabled = EnableCountLimit
+                };
+                maxResultsEntry.TextChanged += (_, _) =>
+                {
+                    if (int.TryParse(maxResultsEntry.Text, out int maxResults))
                     {
-                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+                        CountLimit = maxResults;
                     }
-                    catch
+                    else
                     {
-                        searchTermHistoryList = new();
+                        maxResultsEntry.Text = null;
+                        CountLimit = null;
                     }
 
-                    var res = await Page.DisplayActionSheet(Channel?.VanityName, Resources.Resources.Cancel, Resources.Resources.Clear, searchTermHistoryList.ToArray());
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
 
-                    if (res == Resources.Resources.Clear)
+                CheckBox enableMaxResultsCheckBox = new CheckBox
+                {
+                    Margin = new Thickness(-10, 0, 0, 0),
+                    IsChecked = EnableCountLimit
+                };
+                enableMaxResultsCheckBox.CheckedChanged += (_, _) =>
+                {
+                    maxResultsEntry.IsEnabled = EnableCountLimit = enableMaxResultsCheckBox.IsChecked;
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                Label enableMaxResultsLabel = new Label
+                {
+                    Margin = new Thickness(0, 0, 10, 0),
+                    VerticalOptions = LayoutOptions.Center,
+                    Text = "Maximum number of results"
+                };
+
+                BoxView spacer1 = new BoxView
+                {
+                    HeightRequest = 20,
+                    Color = Colors.Transparent
+                };
+
+                HorizontalStackLayout maxResultsOptionsLayout = new HorizontalStackLayout
+                {
+                    Children =
                     {
-                        Preferences.Default.Set<string?>(nameof(SearchByTitleTerm), null);
-                    }
-                    else if (res is not null && res != Resources.Resources.Cancel)
+                        enableMaxResultsCheckBox,
+                        enableMaxResultsLabel,
+                        maxResultsEntry
+                    },
+                    VerticalOptions = LayoutOptions.Center
+                };
+
+                // Date range
+                DatePicker dateRangeLimitDatePicker = new DatePicker
+                {
+                    HorizontalOptions = LayoutOptions.End,
+                    Date = Channel!.DateRangeLimit ?? DateTime.Now.Date,
+                    IsEnabled = Channel!.EnableDateRangeLimit
+                };
+                dateRangeLimitDatePicker.DateSelected += (_, _) =>
+                {
+                    Channel.DateRangeLimit = dateRangeLimitDatePicker.Date;
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                CheckBox enableDateRangeLimitCheckBox = new CheckBox
+                {
+                    Margin = new Thickness(-10, 0, 0, 0),
+                    IsChecked = Channel!.EnableDateRangeLimit
+                };
+                enableDateRangeLimitCheckBox.CheckedChanged += (_, _) =>
+                {
+                    dateRangeLimitDatePicker.IsEnabled = Channel.EnableDateRangeLimit = enableDateRangeLimitCheckBox.IsChecked;
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                Label enableDataRangeLimitLabel = new Label
+                {
+                    Margin = new Thickness(0, 0, 10, 0),
+                    VerticalOptions = LayoutOptions.Center,
+                    Text = "Do not show videos before"
+                };
+
+                BoxView spacer2 = new BoxView
+                {
+                    HeightRequest = 20,
+                    Color = Colors.Transparent
+                };
+
+                HorizontalStackLayout dateRangeOptionsLayout = new HorizontalStackLayout
+                {
+                    Children =
                     {
-                        SearchByTitleTerm = res;
-                        FindVideos();
+                        enableDateRangeLimitCheckBox,
+                        enableDataRangeLimitLabel,
+                        dateRangeLimitDatePicker
+                    },
+                    VerticalOptions = LayoutOptions.Center
+                };
+
+                // Time limit
+                Entry videoLengthMinimumEntry = new Entry
+                {
+                    HorizontalOptions = LayoutOptions.End,
+                    Text = Channel?.VideoLengthMinimumInSeconds?.ToString(),
+                    IsEnabled = Channel!.EnableVideoLengthMinimum
+                };
+                videoLengthMinimumEntry.TextChanged += (_, _) =>
+                {
+                    if (int.TryParse(videoLengthMinimumEntry.Text, out int videoLengthMinimum))
+                    {
+                        Channel.VideoLengthMinimum = TimeSpan.FromSeconds(videoLengthMinimum);
                     }
-                }
+                    else
+                    {
+                        videoLengthMinimumEntry.Text = null;
+                        Channel.VideoLengthMinimum = null;
+                    }
+
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                CheckBox enableVideoLengthMinimumCheckBox = new CheckBox
+                {
+                    Margin = new Thickness(-10, 0, 0, 0),
+                    IsChecked = Channel!.EnableVideoLengthMinimum
+                };
+                enableVideoLengthMinimumCheckBox.CheckedChanged += (_, _) =>
+                {
+                    videoLengthMinimumEntry.IsEnabled = Channel.EnableVideoLengthMinimum = enableVideoLengthMinimumCheckBox.IsChecked;
+                    searchOptionsSummaryLabel.Text = SearchOptionsSummary;
+                };
+
+                Label enableVideoLengthMinimumLabel = new Label
+                {
+                    Margin = new Thickness(0, 0, 10, 0),
+                    VerticalOptions = LayoutOptions.Center,
+                    Text = "Do not show videos shorter than"
+                };
+
+                BoxView spacer3 = new BoxView
+                {
+                    HeightRequest = 20,
+                    Color = Colors.Transparent
+                };
+
+                HorizontalStackLayout videoLengthMinimumOptionsLayout = new HorizontalStackLayout
+                {
+                    Children =
+                    {
+                        enableVideoLengthMinimumCheckBox,
+                        enableVideoLengthMinimumLabel,
+                        videoLengthMinimumEntry
+                    },
+                    VerticalOptions = LayoutOptions.Center
+                };
+
+                BoxView spacer4 = new BoxView
+                {
+                    HeightRequest = 20,
+                    Color = Colors.Transparent
+                };
+
+                contentLayout.Add(channelNameLabel);
+                contentLayout.Add(spacer0);
+                contentLayout.Add(searchTermEntry);
+                contentLayout.Add(spacer1);
+                contentLayout.Add(maxResultsOptionsLayout);
+                contentLayout.Add(spacer2);
+                contentLayout.Add(dateRangeOptionsLayout);
+                contentLayout.Add(spacer3);
+                contentLayout.Add(videoLengthMinimumOptionsLayout);
+                contentLayout.Add(spacer4);
+                contentLayout.Add(searchOptionsSummaryLabel);
+
+                popup.Content = contentLayout;
+
+                await Page.ShowPopupAsync(popup);
             }
             finally
             {
@@ -318,6 +466,8 @@ namespace YouTubeHelper.Mobile.ViewModels
         private static bool _isOptionsOpen;
 
         public IEnumerable<SortModeExtended> SortModeValues { get; } = Enum.GetValues(typeof(SortMode)).OfType<SortMode>().Select(m => new SortModeExtended(m)).ToList();
+
+        public IEnumerable<ExclusionsModeExtended> ExclusionsModeValues { get; } = Enum.GetValues(typeof(ExclusionsMode)).OfType<ExclusionsMode>().Select(m => new ExclusionsModeExtended(m)).ToList();
 
         public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
 
@@ -335,6 +485,21 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
         private int _selectedSortModeIndex = 4;
+
+        public ExclusionsModeExtended SelectedExclusionsMode => ExclusionsModeValues.ElementAt(SelectedExclusionsModeIndex);
+
+        public int SelectedExclusionsModeIndex
+        {
+            get => _selectedExclusionsModeIndex;
+            set
+            {
+                _selectedExclusionsModeIndex = value;
+
+                // Have to do an explicit raise here since setting to 0 doesn't.
+                OnPropertyChanged();
+            }
+        }
+        private int _selectedExclusionsModeIndex = 2;
 
         public ExclusionReasonExtended SelectedExclusionFilter => ExclusionReasonValues.ElementAt(SelectedExclusionFilterIndex);
 
@@ -358,12 +523,21 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private string? _searchByTitleTerm;
 
-        public bool ShowExcludedVideos
+        public bool EnableCountLimit
         {
-            get => _showExcludedVideos;
-            set => SetProperty(ref _showExcludedVideos, value);
+            get => _enableCountLimit;
+            set => SetProperty(ref _enableCountLimit, value);
         }
-        private bool _showExcludedVideos;
+        private bool _enableCountLimit;
+
+        public int? CountLimit
+        {
+            get => _countLimit;
+            set => SetProperty(ref _countLimit, value);
+        }
+        private int? _countLimit;
+
+        public bool ShowExclusions => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded);
 
         public bool IsRefreshing
         {
@@ -422,5 +596,69 @@ namespace YouTubeHelper.Mobile.ViewModels
         /// A reference to the view control
         /// </summary>
         public ChannelView? ChannelView { get; set; }
+
+        public string SearchOptionsSummary
+        {
+            get
+            {
+                List<string> parts = new List<string>
+                {
+                    // Sort order
+                    $"Sort: {SelectedSortMode.Description}"
+                };
+
+                // Exclusions mode
+                ExclusionsMode mode = SelectedExclusionsMode.Value;
+
+                if (mode == ExclusionsMode.ShowAll)
+                {
+                    parts.Add("Showing: All videos");
+                }
+                else if (mode == ExclusionsMode.ShowExcluded)
+                {
+                    parts.Add($"Showing: Excluded videos");
+                }
+                else if (mode == ExclusionsMode.ShowNonExcluded)
+                {
+                    parts.Add("Showing: Non-excluded videos");
+                }
+
+                if (ShowExclusions)
+                {
+                    parts.Add($"Filtering exclusions: \"{SelectedExclusionFilter.Description}\"");
+                }
+
+                // Search term
+                if (!string.IsNullOrWhiteSpace(SearchByTitleTerm))
+                {
+                    parts.Add($"Search term: \"{SearchByTitleTerm}\"");
+                }
+
+                // Max results
+                if (EnableCountLimit && CountLimit.HasValue)
+                {
+                    parts.Add($"Max results: {CountLimit}");
+                }
+                else
+                {
+                    parts.Add("Max results: Unlimited");
+                }
+
+                // Date range
+                if (Channel is { EnableDateRangeLimit: true, DateRangeLimit: { } })
+                {
+                    parts.Add($"Since: {Channel.DateRangeLimit.Value:yyyy-MM-dd}");
+                }
+
+                // Min length
+                if (Channel is { EnableVideoLengthMinimum: true, VideoLengthMinimum: { } })
+                {
+                    TimeSpan length = Channel.VideoLengthMinimum.Value;
+                    parts.Add($"Min length: {length.TotalSeconds}s");
+                }
+
+                return string.Join(Environment.NewLine, parts);
+            }
+        }
     }
 }

@@ -508,24 +508,6 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search (no limit).
-        /// </summary>
-        internal static string SearchNoLimit {
-            get {
-                return ResourceManager.GetString("SearchNoLimit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search with limit.
-        /// </summary>
-        internal static string SearchWithLimit {
-            get {
-                return ResourceManager.GetString("SearchWithLimit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Server.
         /// </summary>
         internal static string Server {

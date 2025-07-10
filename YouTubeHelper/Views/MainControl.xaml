@@ -31,11 +31,20 @@
 
                     <Grid Grid.Row="1" Background="{DynamicResource SystemControlBackgroundListLowBrush}">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="20" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Label
+                            Grid.Column="0"
+                            Margin="10,0,0,0"
+                            Content="{Binding SelectedChannel.SearchOptionsSummary}" />
+
+                        <StackPanel
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
                             <Label Margin="0,0,5,0" Content="{Binding CurrentDownloadDirectoryLabel}" />
                             <Label Margin="5,0,5,0" Content="•" />
                             <Label Margin="5,0,5,0" Content="{Binding ActiveDownloadsCountLabel}" />
@@ -204,173 +213,221 @@
                                             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
                                                 <Grid Margin="0,0,30,15">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="10" />
-                                                        <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="5" />
-                                                        <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
 
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="33" />
+                                                        <RowDefinition Height="{Binding AdvancedFiltersHeight}" />
+                                                        <RowDefinition Height="{Binding ChannelFiltersHeight}" />
                                                     </Grid.RowDefinitions>
 
-                                                    <Button
-                                                        Grid.Column="0"
-                                                        Margin="15,0,0,0"
-                                                        VerticalAlignment="Stretch"
-                                                        Command="{Binding FindVideosCommand}"
-                                                        Visibility="{c:Binding '!ExclusionsMode and !QueueMode',
-                                                                               FalseToVisibility=Collapsed}">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="5" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
+                                                    <!--  First row (base filters)  -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="10" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="10" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="0" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="10" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="10" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="10" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
 
-                                                            <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
-                                                            <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Search}" />
-                                                        </Grid>
-                                                    </Button>
+                                                        <Button
+                                                            Grid.Column="0"
+                                                            Margin="15,0,0,0"
+                                                            Command="{Binding FindVideosCommand}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="5" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <Button
-                                                        Grid.Column="0"
-                                                        Margin="15,0,0,0"
-                                                        VerticalAlignment="Stretch"
-                                                        Command="{Binding FindExclusionsCommand}"
-                                                        Visibility="{c:Binding 'ExclusionsMode and !QueueMode',
-                                                                               FalseToVisibility=Collapsed}">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="5" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
+                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
+                                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Search}" />
+                                                            </Grid>
+                                                        </Button>
 
-                                                            <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
-                                                            <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.View}" />
-                                                        </Grid>
-                                                    </Button>
+                                                        <Button
+                                                            Grid.Column="0"
+                                                            Margin="15,0,0,0"
+                                                            Command="{Binding LoadQueueCommand}"
+                                                            Visibility="{c:Binding QueueMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="5" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <Button
-                                                        Grid.Column="0"
-                                                        Margin="15,0,0,0"
-                                                        VerticalAlignment="Stretch"
-                                                        Command="{Binding LoadQueueCommand}"
-                                                        Visibility="{c:Binding 'QueueMode',
-                                                                               FalseToVisibility=Collapsed}">
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="5" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
+                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
+                                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Load}" />
+                                                            </Grid>
+                                                        </Button>
 
-                                                            <ui:FontIcon Grid.Column="0" Glyph="&#xEBE7;" />
-                                                            <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.Load}" />
-                                                        </Grid>
-                                                    </Button>
+                                                        <ComboBox
+                                                            Grid.Column="2"
+                                                            DisplayMemberPath="Description"
+                                                            ItemsSource="{Binding MainControlViewModel.SortModeValues}"
+                                                            SelectedIndex="{Binding MainControlViewModel.SelectedSortModeIndex}"
+                                                            SelectedItem="{Binding MainControlViewModel.SelectedSortMode}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}" />
 
-                                                    <ComboBox
-                                                        Grid.Column="2"
-                                                        VerticalAlignment="Stretch"
-                                                        DisplayMemberPath="Description"
-                                                        ItemsSource="{Binding MainControlViewModel.SortModeValues}"
-                                                        SelectedIndex="{Binding MainControlViewModel.SelectedSortModeIndex}"
-                                                        SelectedItem="{Binding MainControlViewModel.SelectedSortMode}"
-                                                        Visibility="{c:Binding '!QueueMode',
-                                                                               FalseToVisibility=Collapsed}" />
+                                                        <ComboBox
+                                                            Grid.Column="4"
+                                                            DisplayMemberPath="Description"
+                                                            ItemsSource="{Binding MainControlViewModel.ExclusionsModeValues}"
+                                                            SelectedIndex="{Binding MainControlViewModel.SelectedExclusionsModeIndex}"
+                                                            SelectedItem="{Binding MainControlViewModel.SelectedExclusionsMode}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}" />
 
-                                                    <CheckBox
-                                                        Grid.Column="4"
-                                                        Content="{x:Static properties:Resources.ShowExcludedVideos}"
-                                                        IsChecked="{Binding MainControlViewModel.ShowExcludedVideos}"
-                                                        Visibility="{c:Binding '!ExclusionsMode and !QueueMode',
-                                                                               FalseToVisibility=Collapsed}" />
+                                                        <ComboBox
+                                                            Grid.Column="6"
+                                                            DisplayMemberPath="Description"
+                                                            ItemsSource="{Binding MainControlViewModel.ExclusionReasonValues}"
+                                                            SelectedIndex="{Binding MainControlViewModel.SelectedExclusionFilterIndex}"
+                                                            SelectedItem="{Binding MainControlViewModel.SelectedExclusionFilter}"
+                                                            Visibility="{c:Binding 'ChannelMode and MainControlViewModel.ShowExclusions',
+                                                                                   FalseToVisibility=Collapsed}" />
 
-                                                    <ComboBox
-                                                        Grid.Column="4"
-                                                        DisplayMemberPath="Description"
-                                                        ItemsSource="{Binding MainControlViewModel.ExclusionReasonValues}"
-                                                        SelectedIndex="{Binding MainControlViewModel.SelectedExclusionFilterIndex}"
-                                                        SelectedItem="{Binding MainControlViewModel.SelectedExclusionFilter}"
-                                                        Visibility="{c:Binding ExclusionsMode,
-                                                                               FalseToVisibility=Collapsed}" />
+                                                        <Button
+                                                            Grid.Column="8"
+                                                            Command="{Binding ToggleShowAdvancedFiltersCommand}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="5" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <CheckBox
-                                                        Grid.Column="6"
-                                                        Content="{x:Static properties:Resources.DoNotShowVideosBefore}"
-                                                        IsChecked="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
-                                                        Visibility="{c:Binding WatchMode,
-                                                                               FalseToVisibility=Collapsed}" />
+                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xE71C;" />
+                                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.AdvancedFilters}" />
+                                                            </Grid>
+                                                        </Button>
 
-                                                    <TextBox
-                                                        Grid.Column="6"
-                                                        MinWidth="250"
-                                                        Padding="10,5,10,5"
-                                                        VerticalAlignment="Stretch"
-                                                        VerticalContentAlignment="Center"
-                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.SearchByTitle}"
-                                                        KeyDown="Search_KeyDown"
-                                                        Text="{Binding MainControlViewModel.SearchByTitleTerm, UpdateSourceTrigger=PropertyChanged}"
-                                                        Visibility="{c:Binding 'SearchMode',
-                                                                               FalseToVisibility=Collapsed}" />
+                                                        <Button
+                                                            Grid.Column="10"
+                                                            Command="{Binding ToggleShowChannelFiltersCommand}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="5" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
 
-                                                    <DatePicker
-                                                        Grid.Column="8"
-                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.DateRangeLimit}"
-                                                        IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
-                                                        SelectedDate="{Binding MainControlViewModel.SelectedChannel.Channel.DateRangeLimit}"
-                                                        Visibility="{c:Binding WatchMode,
-                                                                               FalseToVisibility=Collapsed}" />
+                                                                <ui:FontIcon Grid.Column="0" Glyph="&#xEA37;" />
+                                                                <TextBlock Grid.Column="2" Text="{x:Static properties:Resources.ChannelFilters}" />
+                                                            </Grid>
+                                                        </Button>
 
-                                                    <CheckBox
-                                                        Grid.Column="10"
-                                                        Content="{x:Static properties:Resources.DoNotShowVideosShorterThan}"
-                                                        IsChecked="{Binding MainControlViewModel.SelectedChannel.Channel.EnableVideoLengthMinimum}"
-                                                        Visibility="{c:Binding WatchMode,
-                                                                               FalseToVisibility=Collapsed}" />
+                                                        <Button
+                                                            Grid.Column="12"
+                                                            Margin="15,0,0,0"
+                                                            Command="{Binding MoveLeftCommand}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <ui:FontIcon Glyph="&#xE760;" />
+                                                        </Button>
 
-                                                    <ui:NumberBox
-                                                        Grid.Column="12"
-                                                        ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.VideoLengthMinimum}"
-                                                        IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableVideoLengthMinimum}"
-                                                        Visibility="{c:Binding WatchMode,
-                                                                               FalseToVisibility=Collapsed}"
-                                                        Value="{Binding MainControlViewModel.SelectedChannel.Channel.VideoLengthMinimumInSeconds}" />
+                                                        <Button
+                                                            Grid.Column="14"
+                                                            Command="{Binding MoveRightCommand}"
+                                                            Visibility="{c:Binding ChannelMode,
+                                                                                   FalseToVisibility=Collapsed}">
+                                                            <ui:FontIcon Glyph="&#xE761;" />
+                                                        </Button>
+                                                    </Grid>
 
-                                                    <Button
-                                                        Grid.Column="14"
-                                                        Margin="15,0,0,0"
-                                                        VerticalAlignment="Stretch"
-                                                        Command="{Binding MoveLeftCommand}"
-                                                        Visibility="{c:Binding '!QueueMode',
-                                                                               FalseToVisibility=Collapsed}">
-                                                        <ui:FontIcon Glyph="&#xE760;" />
-                                                    </Button>
+                                                    <!--  Second row (advanced filters)  -->
+                                                    <StackPanel
+                                                        Grid.Row="1"
+                                                        Margin="0,10,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Orientation="Horizontal">
 
-                                                    <Button
-                                                        Grid.Column="16"
-                                                        Margin="0,0,0,0"
-                                                        VerticalAlignment="Stretch"
-                                                        Command="{Binding MoveRightCommand}"
-                                                        Visibility="{c:Binding '!QueueMode',
-                                                                               FalseToVisibility=Collapsed}">
-                                                        <ui:FontIcon Glyph="&#xE761;" />
-                                                    </Button>
+                                                        <Border Width="15" />
+
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontWeight="SemiBold"
+                                                            Text="Advanced filters:" />
+
+                                                        <Border Width="15" />
+
+                                                        <TextBox
+                                                            MinWidth="250"
+                                                            VerticalContentAlignment="Center"
+                                                            ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.SearchByTitle}"
+                                                            KeyDown="Search_KeyDown"
+                                                            Text="{Binding MainControlViewModel.SearchByTitleTerm, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                        <Border Width="15" />
+
+                                                        <CheckBox Content="{x:Static properties:Resources.MaxResults}" IsChecked="{Binding MainControlViewModel.EnableCountLimit}" />
+
+                                                        <Border Width="15" />
+
+                                                        <TextBox
+                                                            VerticalContentAlignment="Center"
+                                                            ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.MaxResults}"
+                                                            IsEnabled="{Binding MainControlViewModel.EnableCountLimit}"
+                                                            Text="{Binding MainControlViewModel.CountLimit, UpdateSourceTrigger=PropertyChanged}" />
+                                                    </StackPanel>
+
+                                                    <!--  Second row (channel filters)  -->
+                                                    <StackPanel
+                                                        Grid.Row="2"
+                                                        Margin="0,10,0,10"
+                                                        VerticalAlignment="Center"
+                                                        Orientation="Horizontal">
+                                                        <Border Width="15" />
+
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontWeight="SemiBold"
+                                                            Text="Channel filters:" />
+
+                                                        <Border Width="10" />
+
+                                                        <CheckBox Content="{x:Static properties:Resources.DoNotShowVideosBefore}" IsChecked="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}" />
+
+                                                        <Border Width="10" />
+
+                                                        <DatePicker
+                                                            ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.DateRangeLimit}"
+                                                            IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableDateRangeLimit}"
+                                                            SelectedDate="{Binding MainControlViewModel.SelectedChannel.Channel.DateRangeLimit}" />
+
+                                                        <Border Width="10" />
+
+                                                        <CheckBox Content="{x:Static properties:Resources.DoNotShowVideosShorterThan}" IsChecked="{Binding MainControlViewModel.SelectedChannel.Channel.EnableVideoLengthMinimum}" />
+
+                                                        <Border Width="10" />
+
+                                                        <ui:NumberBox
+                                                            ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.VideoLengthMinimum}"
+                                                            IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableVideoLengthMinimum}"
+                                                            Value="{Binding MainControlViewModel.SelectedChannel.Channel.VideoLengthMinimumInSeconds}" />
+                                                    </StackPanel>
                                                 </Grid>
                                             </ScrollViewer>
 

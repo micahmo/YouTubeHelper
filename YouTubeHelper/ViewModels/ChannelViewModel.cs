@@ -8,6 +8,7 @@ using System.Windows.Shell;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Polly;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -28,16 +29,34 @@ namespace YouTubeHelper.ViewModels
             {
                 if (args.PropertyName == nameof(MainControlViewModel.Mode))
                 {
-                    OnPropertyChanged(nameof(SearchMode));
-                    OnPropertyChanged(nameof(WatchMode));
-                    OnPropertyChanged(nameof(ExclusionsMode));
+                    OnPropertyChanged(nameof(ChannelMode));
                     OnPropertyChanged(nameof(QueueMode));
+                }
+
+                if (args.PropertyName is nameof(MainControlViewModel.SelectedSortMode)
+                    or nameof(MainControlViewModel.SelectedExclusionsMode)
+                    or nameof(MainControlViewModel.SelectedExclusionFilter)
+                    or nameof(MainControlViewModel.SearchByTitleTerm)
+                    or nameof(MainControlViewModel.EnableCountLimit)
+                    or nameof(MainControlViewModel.CountLimit))
+                {
+                    OnPropertyChanged(nameof(SearchOptionsSummary));
                 }
             };
 
             Videos.CollectionChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(CountLabel));
+            };
+
+            Channel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(Channel.EnableDateRangeLimit)
+                    or nameof(Channel.DateRangeLimit)
+                    or nameof(Channel.EnableVideoLengthMinimum) or nameof(Channel.VideoLengthMinimum))
+                {
+                    OnPropertyChanged(nameof(SearchOptionsSummary));
+                }
             };
         }
 
@@ -77,9 +96,6 @@ namespace YouTubeHelper.ViewModels
 
         private async void FindVideos()
         {
-            bool noLimit = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                           && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl);
-
             MainControlViewModel.IsPlayerExpanded = false;
 
             Videos.Clear();
@@ -97,32 +113,30 @@ namespace YouTubeHelper.ViewModels
 
                         List<string>? searchTerms = null;
 
-                        if (MainControlViewModel.Mode == MainControlMode.Search)
+                        if (!string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm))
                         {
-                            if (!string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm))
+                            if (MainControlViewModel.SearchByTitleTerm.StartsWith('"')
+                                && MainControlViewModel.SearchByTitleTerm.EndsWith('"')
+                                && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')))
                             {
-                                if (MainControlViewModel.SearchByTitleTerm.StartsWith('"')
-                                    && MainControlViewModel.SearchByTitleTerm.EndsWith('"')
-                                    && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')))
-                                {
-                                    searchTerms = new List<string> { MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"') };
-                                }
-                                else
-                                {
-                                    searchTerms = MainControlViewModel.SearchByTitleTerm.Split().ToList();
-                                }
+                                searchTerms = new List<string> { MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"') };
+                            }
+                            else
+                            {
+                                searchTerms = MainControlViewModel.SearchByTitleTerm.Split().ToList();
                             }
                         }
 
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                         {
                             Channel = Channel,
-                            ShowExclusions = MainControlViewModel.ShowExcludedVideos,
+                            ShowExclusions = MainControlViewModel.ShowExclusions,
+                            ExclusionReasonFilter = MainControlViewModel.SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowNonExcluded) ? null : MainControlViewModel.SelectedExclusionFilter.Value,
                             SortMode = MainControlViewModel.SelectedSortMode.Value,
                             SearchTerms = searchTerms,
-                            Count = noLimit ? int.MaxValue : 10,
-                            DateRangeLimit = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
-                            VideoLengthMinimum = MainControlViewModel.Mode == MainControlMode.Watch && Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null
+                            Count = MainControlViewModel is { EnableCountLimit: true, CountLimit: { } } ? MainControlViewModel.CountLimit.Value : int.MaxValue,
+                            DateRangeLimit = Channel.EnableDateRangeLimit ? Channel.DateRangeLimit : null,
+                            VideoLengthMinimum = Channel.EnableVideoLengthMinimum ? Channel.VideoLengthMinimum : null
                         });
 
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
@@ -132,45 +146,6 @@ namespace YouTubeHelper.ViewModels
 
                         MainControlViewModel.Progress = 0;
                         MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;
-                    }
-                    finally
-                    {
-                        MainControlViewModel.IsBusy = false;
-                    }
-                });
-        }
-
-        public ICommand FindExclusionsCommand => _findExclusionsCommand ??= new RelayCommand(FindExclusions);
-        private ICommand? _findExclusionsCommand;
-
-        private async void FindExclusions()
-        {
-            Videos.Clear();
-
-            await Policy
-                .Handle<Exception>().RetryAsync(5, (_, _) =>
-                {
-                    // Nothing to do
-                })
-                .ExecuteAsync(async () =>
-                {
-                    try
-                    {
-                        MainControlViewModel.IsBusy = true;
-
-                        IEnumerable<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                        {
-                            ShowExclusions = true,
-                            ExclusionReasonFilter = MainControlViewModel.SelectedExclusionFilter.Value,
-                            Channel = Channel,
-                            SortMode = MainControlViewModel.SelectedSortMode.Value,
-                            Count = int.MaxValue
-                        });
-                        List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            Videos.AddRange(videoViewModels);
-                        });
                     }
                     finally
                     {
@@ -264,6 +239,32 @@ namespace YouTubeHelper.ViewModels
             }
         }
 
+        public ICommand ToggleShowAdvancedFiltersCommand => _toggleShowAdvancedFiltersCommand ??= new RelayCommand(() =>
+        {
+            AdvancedFiltersHeight = AdvancedFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+        });
+        private ICommand? _toggleShowAdvancedFiltersCommand;
+
+        public ICommand ToggleShowChannelFiltersCommand => _toggleShowChannelFiltersCommand ??= new RelayCommand(() =>
+        {
+            ChannelFiltersHeight = ChannelFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+        });
+        private ICommand? _toggleShowChannelFiltersCommand;
+
+        public GridLength AdvancedFiltersHeight
+        {
+            get => _advancedFiltersHeight;
+            set => SetProperty(ref _advancedFiltersHeight, value);
+        }
+        private GridLength _advancedFiltersHeight = new(0, GridUnitType.Pixel);
+
+        public GridLength ChannelFiltersHeight
+        {
+            get => _channelFiltersHeight;
+            set => SetProperty(ref _channelFiltersHeight, value);
+        }
+        private GridLength _channelFiltersHeight = new(0, GridUnitType.Pixel);
+
         public string SearchGlyph
         {
             get => _searchGlyph;
@@ -273,11 +274,7 @@ namespace YouTubeHelper.ViewModels
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
-        public bool WatchMode => MainControlViewModel.Mode == MainControlMode.Watch;
-
-        public bool SearchMode => MainControlViewModel.Mode == MainControlMode.Search;
-
-        public bool ExclusionsMode => MainControlViewModel.Mode == MainControlMode.Exclusions;
+        public bool ChannelMode => MainControlViewModel.Mode == MainControlMode.Channel;
 
         public bool QueueMode => MainControlViewModel.Mode == MainControlMode.Queue;
 
@@ -286,5 +283,69 @@ namespace YouTubeHelper.ViewModels
         public Channel Channel { get; }
 
         public MainControlViewModel MainControlViewModel { get; }
+
+        public string SearchOptionsSummary
+        {
+            get
+            {
+                List<string> parts = new List<string>
+                {
+                    // Sort order
+                    $"Sort: {MainControlViewModel.SelectedSortMode.Description}"
+                };
+
+                // Exclusions mode
+                ExclusionsMode mode = MainControlViewModel.SelectedExclusionsMode.Value;
+
+                if (mode == ExclusionsMode.ShowAll)
+                {
+                    parts.Add("Showing: All videos");
+                }
+                else if (mode == ExclusionsMode.ShowExcluded)
+                {
+                    parts.Add($"Showing: Excluded videos");
+                }
+                else if (mode == ExclusionsMode.ShowNonExcluded)
+                {
+                    parts.Add("Showing: Non-excluded videos");
+                }
+
+                if (MainControlViewModel.ShowExclusions)
+                {
+                    parts.Add($"Filtering exclusions: \"{MainControlViewModel.SelectedExclusionFilter.Description}\"");
+                }
+
+                // Search term
+                if (!string.IsNullOrWhiteSpace(MainControlViewModel.SearchByTitleTerm))
+                {
+                    parts.Add($"Search term: \"{MainControlViewModel.SearchByTitleTerm}\"");
+                }
+
+                // Max results
+                if (MainControlViewModel.EnableCountLimit && MainControlViewModel.CountLimit.HasValue)
+                {
+                    parts.Add($"Max results: {MainControlViewModel.CountLimit}");
+                }
+                else
+                {
+                    parts.Add("Max results: Unlimited");
+                }
+
+                // Date range
+                if (Channel is { EnableDateRangeLimit: true, DateRangeLimit: { } })
+                {
+                    parts.Add($"Since: {Channel.DateRangeLimit.Value:yyyy-MM-dd}");
+                }
+
+                // Min length
+                if (Channel is { EnableVideoLengthMinimum: true, VideoLengthMinimum: { } })
+                {
+                    TimeSpan length = Channel.VideoLengthMinimum.Value;
+                    parts.Add($"Min length: {length.TotalSeconds}s");
+                }
+
+                return string.Join(" | ", parts);
+            }
+        }
     }
 }

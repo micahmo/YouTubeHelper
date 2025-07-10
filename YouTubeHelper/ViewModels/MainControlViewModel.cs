@@ -55,21 +55,7 @@ namespace YouTubeHelper.ViewModels
 
                     switch (Mode)
                     {
-                        case MainControlMode.Search:
-                            Channels.ToList().ForEach(c =>
-                            {
-                                c.Videos.Clear();
-                            });
-                            break;
-                        case MainControlMode.Watch:
-                            SearchByTitleTerm = null;
-                            Channels.ToList().ForEach(c =>
-                            {
-                                c.Videos.Clear();
-                            });
-                            break;
-                        case MainControlMode.Exclusions:
-                            SearchByTitleTerm = null;
+                        case MainControlMode.Channel:
                             Channels.ToList().ForEach(c =>
                             {
                                 c.Videos.Clear();
@@ -112,21 +98,17 @@ namespace YouTubeHelper.ViewModels
             set
             {
                 SetProperty(ref _mode, value);
-                OnPropertyChanged(nameof(WatchMode));
-                OnPropertyChanged(nameof(SearchMode));
-                OnPropertyChanged(nameof(ExclusionsMode));
+                OnPropertyChanged(nameof(ChannelMode));
                 OnPropertyChanged(nameof(QueueMode));
             }
         }
         private MainControlMode _mode;
 
-        public bool WatchMode => Mode == MainControlMode.Watch;
-
-        public bool SearchMode => Mode == MainControlMode.Search;
-
-        public bool ExclusionsMode => Mode == MainControlMode.Exclusions;
+        public bool ChannelMode => Mode == MainControlMode.Channel;
 
         public bool QueueMode => Mode == MainControlMode.Queue;
+
+        public bool ShowExclusions => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded);
 
         public ObservableCollection<ChannelViewModel> Channels { get; } = new();
 
@@ -270,12 +252,26 @@ namespace YouTubeHelper.ViewModels
         }
         private int _selectedSortModeIndex;
 
-        public bool ShowExcludedVideos
+        public IEnumerable<ExclusionsModeExtended> ExclusionsModeValues { get; } = Enum.GetValues(typeof(ExclusionsMode)).OfType<ExclusionsMode>().Select(m => new ExclusionsModeExtended(m)).ToList();
+
+        public int SelectedExclusionsModeIndex
         {
-            get => _showExcludedVideos;
-            set => SetProperty(ref _showExcludedVideos, value);
+            get => _selectedExclusionsModeIndex;
+            set => SetProperty(ref _selectedExclusionsModeIndex, value);
         }
-        private bool _showExcludedVideos;
+        private int _selectedExclusionsModeIndex = 2;
+
+        public ExclusionsModeExtended SelectedExclusionsMode
+        {
+            get => _selectedExclusionsMode ?? ExclusionsModeValues.First();
+            set
+            {
+                SetProperty(ref _selectedExclusionsMode, value);
+                OnPropertyChanged(nameof(ShowExclusions));
+            }
+        }
+
+        private ExclusionsModeExtended? _selectedExclusionsMode;
 
         public IEnumerable<ExclusionReasonExtended> ExclusionReasonValues { get; } = Enum.GetValues(typeof(ExclusionReason)).OfType<ExclusionReason>().Select(m => new ExclusionReasonExtended(m)).ToList();
 
@@ -300,28 +296,19 @@ namespace YouTubeHelper.ViewModels
         }
         private string? _searchByTitleTerm;
 
-        public string? SearchByIdTerm
+        public bool EnableCountLimit
         {
-            get => _searchByIdTerm;
-            set
-            {
-                // See if this is a URL and try to parse it
-                if (Uri.TryCreate(value, new UriCreationOptions(), out Uri? uri))
-                {
-                    NameValueCollection queryString = HttpUtility.ParseQueryString(uri.Query);
-                    string? videoId = queryString["v"];
-                    if (!string.IsNullOrEmpty(videoId))
-                    {
-                        SetProperty(ref _searchByIdTerm, videoId);
-                        return;
-                    }
-                }
-
-                SetProperty(ref _searchByIdTerm, value);
-            }
+            get => _enableCountLimit;
+            set => SetProperty(ref _enableCountLimit, value);
         }
+        private bool _enableCountLimit;
 
-        private string? _searchByIdTerm;
+        public int? CountLimit
+        {
+            get => _countLimit;
+            set => SetProperty(ref _countLimit, value);
+        }
+        private int? _countLimit;
 
         #endregion
 
@@ -364,6 +351,7 @@ namespace YouTubeHelper.ViewModels
             try
             {
                 SelectedSortModeIndex = SortModeValues.ToList().IndexOf(SortModeValues.First(s => s.Value == ApplicationSettings.Instance.SelectedSortMode));
+                SelectedExclusionsModeIndex = ExclusionsModeValues.ToList().IndexOf(ExclusionsModeValues.First(m => m.Value == ApplicationSettings.Instance.SelectedExclusionsMode));
                 SelectedExclusionFilterIndex = ExclusionReasonValues.ToList().IndexOf(ExclusionReasonValues.First(s => s.Value == ApplicationSettings.Instance.SelectedExclusionReason));
                 if (Channels[ApplicationSettings.Instance.SelectedTabIndex] != _newChannelTab)
                 {
@@ -389,9 +377,7 @@ namespace YouTubeHelper.ViewModels
 
     public enum MainControlMode
     {
-        Watch,
-        Search,
-        Exclusions,
+        Channel,
         Queue
     }
 }
