@@ -7,15 +7,16 @@ namespace YouTubeHelper.Mobile.Views
     {
         public FilterOptionsPopup(ChannelViewModel vm)
         {
+            // Set width as a percentage of the device width
+            DisplayInfo displayInfo = DeviceDisplay.MainDisplayInfo;
+            double percent = 0.85;
+            Width = displayInfo.Width / displayInfo.Density * percent;
+
             InitializeComponent();
 
             BindingContext = vm;
-
-            //// Set width as a percentage of the device width
-            //DisplayInfo displayInfo = DeviceDisplay.MainDisplayInfo;
-            //double percent = 0.85;
-            //double width = displayInfo.Width / displayInfo.Density * percent;
-            //Size = new Size(width, -1);
         }
+
+        public double Width { get; set; }
     }
 }
