@@ -77,7 +77,10 @@ namespace YouTubeHelper.ViewModels
 
             _loginWindow.Loaded += async (_, _) =>
             {
-                await webView.EnsureCoreWebView2Async();
+                string userDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "YTH");
+                CoreWebView2Environment? coreWebView2Environment = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+                await webView.EnsureCoreWebView2Async(coreWebView2Environment);
+                
                 webView.CoreWebView2.Navigate("https://accounts.google.com/ServiceLogin?service=youtube");
                 webView.CoreWebView2.NavigationCompleted += HandleWebViewNavigation;
             };
