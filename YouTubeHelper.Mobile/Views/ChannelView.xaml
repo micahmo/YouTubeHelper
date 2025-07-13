@@ -58,7 +58,7 @@
                     Title="Exclusion reason"
                     Grid.Row="2"
                     Margin="10,-5,10,0"
-                    IsVisible="{Binding ShowExclusions}"
+                    IsVisible="{Binding ShowExclusionReasonFilter}"
                     ItemDisplayBinding="{Binding Description}"
                     ItemsSource="{Binding ExclusionReasonValues}"
                     SelectedIndex="{Binding SelectedExclusionFilterIndex}" />

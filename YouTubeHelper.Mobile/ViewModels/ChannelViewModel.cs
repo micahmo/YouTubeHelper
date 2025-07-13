@@ -45,6 +45,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                             c.SelectedExclusionsModeIndex = SelectedExclusionsModeIndex;
                             c.OnPropertyChanged(nameof(ShowExclusions));
                             OnPropertyChanged(nameof(ShowExclusions));
+
+                            OnPropertyChanged(nameof(ShowExclusionReasonFilter));
                         }
 
                         if (args.PropertyName is nameof(SelectedSortModeIndex))
@@ -79,6 +81,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     OnPropertyChanged(nameof(ShowFab));
                 }
+
+                OnPropertyChanged(nameof(ShowExclusionReasonFilter));
             };
         }
 
@@ -415,6 +419,8 @@ namespace YouTubeHelper.Mobile.ViewModels
         /// A reference to the view control
         /// </summary>
         public ChannelView? ChannelView { get; set; }
+
+        public bool ShowExclusionReasonFilter => ShowExclusions && Page.AppShellViewModel.ChannelTabSelected;
 
         public string SearchOptionsSummary
         {
