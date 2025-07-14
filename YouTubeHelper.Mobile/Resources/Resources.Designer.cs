@@ -378,6 +378,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No search history found.
+        /// </summary>
+        internal static string NoSearchHistoryFound {
+            get {
+                return ResourceManager.GetString("NoSearchHistoryFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         internal static string OK {

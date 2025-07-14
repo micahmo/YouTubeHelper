@@ -293,4 +293,7 @@
   <data name="VideoNotFoundInPlex" xml:space="preserve">
     <value>Video not found in Plex</value>
   </data>
+  <data name="NoSearchHistoryFound" xml:space="preserve">
+    <value>No search history found</value>
+  </data>
 </root>

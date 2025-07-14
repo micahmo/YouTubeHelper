@@ -8,6 +8,8 @@ using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using System.Windows.Input;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared.Utilities;
 
@@ -421,6 +423,48 @@ namespace YouTubeHelper.Mobile.ViewModels
         public ChannelView? ChannelView { get; set; }
 
         public bool ShowExclusionReasonFilter => ShowExclusions && Page.AppShellViewModel.ChannelTabSelected;
+
+        public ICommand ShowSearchHistoryCommand => _showSearchHistoryCommand ??= new RelayCommand(async () =>
+        {
+            string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
+            List<string> searchTermHistoryList;
+            try
+            {
+                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+            }
+            catch
+            {
+                searchTermHistoryList = new();
+            }
+
+            if (!searchTermHistoryList.Any())
+            {
+                await Snackbar.Make(
+                    Resources.Resources.NoSearchHistoryFound,
+                    duration: TimeSpan.FromSeconds(3),
+                    action: null,
+                    visualOptions: new SnackbarOptions
+                    {
+                        BackgroundColor = Colors.Black,
+                        TextColor = Colors.White
+                    }
+                ).Show();
+
+                return;
+            }
+
+            string? res = await Page.DisplayActionSheet(Channel?.VanityName, Resources.Resources.Cancel, Resources.Resources.Clear, searchTermHistoryList.ToArray());
+
+            if (res == Resources.Resources.Clear)
+            {
+                Preferences.Default.Set<string?>(nameof(SearchByTitleTerm), null);
+            }
+            else if (res is not null && res != Resources.Resources.Cancel)
+            {
+                SearchByTitleTerm = res;
+            }
+        });
+        private ICommand? _showSearchHistoryCommand;
 
         public string SearchOptionsSummary
         {
