@@ -273,20 +273,15 @@ namespace YouTubeHelper.ViewModels
 
                 if (mode == ExclusionsMode.ShowAll)
                 {
-                    parts.Add("Showing: All videos");
+                    parts.Add($"Showing all videos (exclusions filtered by {MainControlViewModel.SelectedExclusionFilter.Description})");
                 }
                 else if (mode == ExclusionsMode.ShowExcluded)
                 {
-                    parts.Add($"Showing: Excluded videos");
+                    parts.Add($"Showing excluded videos ({MainControlViewModel.SelectedExclusionFilter.Description})");
                 }
                 else if (mode == ExclusionsMode.ShowNonExcluded)
                 {
-                    parts.Add("Showing: Non-excluded videos");
-                }
-
-                if (MainControlViewModel.ShowExclusions)
-                {
-                    parts.Add($"Filtering exclusions: \"{MainControlViewModel.SelectedExclusionFilter.Description}\"");
+                    parts.Add("Showing non-excluded videos");
                 }
 
                 // Search term
