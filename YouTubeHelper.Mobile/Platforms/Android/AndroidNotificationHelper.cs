@@ -18,11 +18,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? navigateToVideoPendingIntent = null;
             PendingIntent? navigateToQueuePendingIntent = null;
             PendingIntent? openInPlexPendingIntent = null;
+            PendingIntent? launchPendingIntent = null;
 
             int dismissIntentId = notificationId * 10 + 0;
             int navigateToVideoIntentId = notificationId * 10 + 1;
             int navigateToQueueIntentId = notificationId * 10 + 2;
             int openInPlexIntentId = notificationId * 10 + 3;
+            int launchIntentId = notificationId * 10 + 4;
 
             if (context.PackageName != null)
             {
@@ -79,6 +81,16 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     openInPlexIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+
+                // Just launch app
+                Intent launchIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                launchIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                launchPendingIntent = PendingIntent.GetActivity(
+                    context,
+                    launchIntentId,
+                    launchIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
             }
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
@@ -90,7 +102,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDone)
                 .SetAutoCancel(isDone)
-                //.SetContentIntent(navigateToVideoPendingIntent)
+                .SetContentIntent(launchPendingIntent!)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
 
