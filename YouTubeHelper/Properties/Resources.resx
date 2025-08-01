@@ -315,4 +315,7 @@ Updated the status of {1} video(s).</value>
   <data name="MaxResults" xml:space="preserve">
     <value>Maximum number of results</value>
   </data>
+  <data name="ResetFilters" xml:space="preserve">
+    <value>Reset Filters</value>
+  </data>
 </root>

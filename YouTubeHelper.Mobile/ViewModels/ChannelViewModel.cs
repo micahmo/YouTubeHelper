@@ -466,6 +466,15 @@ namespace YouTubeHelper.Mobile.ViewModels
         });
         private ICommand? _showSearchHistoryCommand;
 
+        public ICommand ResetFiltersCommand => _resetFiltersCommand ??= new RelayCommand(() =>
+        {
+            SelectedSortModeIndex = 4;
+            SelectedExclusionsModeIndex = 1;
+            SearchByTitleTerm = null;
+            EnableCountLimit = false;
+        });
+        private ICommand? _resetFiltersCommand;
+
         public string SearchOptionsSummary
         {
             get

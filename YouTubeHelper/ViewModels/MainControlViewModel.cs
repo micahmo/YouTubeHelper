@@ -260,7 +260,7 @@ namespace YouTubeHelper.ViewModels
             get => _selectedExclusionsModeIndex;
             set => SetProperty(ref _selectedExclusionsModeIndex, value);
         }
-        private int _selectedExclusionsModeIndex = 2;
+        private int _selectedExclusionsModeIndex = 1;
 
         public ExclusionsModeExtended SelectedExclusionsMode
         {
@@ -351,6 +351,15 @@ namespace YouTubeHelper.ViewModels
             set => SetProperty(ref _advancedFiltersGlyph, value);
         }
         private string _advancedFiltersGlyph = Icons.Filter;
+
+        public ICommand ResetFiltersCommand => _resetFiltersCommand ??= new RelayCommand(() =>
+        {
+            SelectedSortModeIndex = 4;
+            SelectedExclusionsModeIndex = 1;
+            SearchByTitleTerm = null;
+            EnableCountLimit = false;
+        });
+        private ICommand? _resetFiltersCommand;
 
         #endregion
 

@@ -12,11 +12,31 @@
         BackgroundColor="White"
         WidthRequest="{Binding Width, Source={x:Reference This}}">
         <!--  Channel Name  -->
-        <Label
-            Margin="-5,0,0,0"
-            FontAttributes="Bold"
-            FontSize="20"
-            Text="{Binding Channel.VanityName}" />
+
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Label
+                Grid.Column="0"
+                Margin="-5,0,0,0"
+                FontAttributes="Bold"
+                FontSize="20"
+                Text="{Binding Channel.VanityName}" />
+
+            <Button
+                Grid.Column="2"
+                Padding="0"
+                Command="{Binding ResetFiltersCommand}"
+                HeightRequest="32"
+                Text="Reset Filters"
+                WidthRequest="120">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="{OnPlatform Android=ionicons.ttf#}"
+                        Glyph="&#xf49c;"
+                        Size="20"
+                        Color="White" />
+                </Button.ImageSource>
+            </Button>
+        </Grid>
 
         <BoxView HeightRequest="20" Color="Transparent" />
 

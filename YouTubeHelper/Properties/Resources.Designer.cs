@@ -511,6 +511,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reset Filters.
+        /// </summary>
+        public static string ResetFilters {
+            get {
+                return ResourceManager.GetString("ResetFilters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
         public static string Search {
