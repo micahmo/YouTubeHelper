@@ -26,6 +26,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool isDone = bool.TryParse(doneStr, out bool done) && done;
             data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
+            data.TryGetValue("availableInPlex", out string? availableInPlexStr);
+            bool availableInPlex = bool.TryParse(availableInPlexStr, out bool available) && available;
 
             if (title is not null && body is not null && tag is not null)
             {
@@ -47,7 +49,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     notificationId: int.Parse(tag),
                     isDone: isDone,
                     hasProgress: hasProgress,
-                    progress: progress
+                    progress: progress,
+                    availableInPlex: availableInPlex
                 );
 #endif
 

@@ -10,7 +10,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress, bool availableInPlex)
         {
             Context context = global::Android.App.Application.Context;
 
@@ -102,7 +102,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDone)
                 .SetAutoCancel(isDone)
-                .SetContentIntent(launchPendingIntent!)
+                .SetContentIntent(availableInPlex ? openInPlexPendingIntent : launchPendingIntent!)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
 
