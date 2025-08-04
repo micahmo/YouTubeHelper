@@ -315,7 +315,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             // Mark as downloading
             Video.Excluded = false;
-            Video.Status = string.Format(Resources.Resources.DownloadingProgress, "0%");
+            Video.Status = string.Format(Resources.Resources.DownloadingProgress, "0.0%");
             Video.ExclusionReason = ExclusionReason.None;
             Video.Progress = 0;
         }
@@ -332,7 +332,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
             _previousRequestId = requestId;
 
-            Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress}%");
+            Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress:F1}%");
             Video.Progress = result.Progress;
 
             if (result.Status == DownloadStatus.InProgress)

@@ -157,7 +157,7 @@ namespace YouTubeHelper.ViewModels
 
             // Mark as downloading
             Video.Excluded = false;
-            Video.Status = string.Format(Resources.DownloadingProgress, "0%");
+            Video.Status = string.Format(Resources.DownloadingProgress, "0.0%");
             Video.ExclusionReason = ExclusionReason.None;
             Video.Progress = 1;
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
@@ -177,7 +177,7 @@ namespace YouTubeHelper.ViewModels
 
             _previousRequestId = requestId;
 
-            Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress}%");
+            Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress:F1}%");
             Video.Progress = result.Progress == 0 ? 1 : result.Progress;
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
