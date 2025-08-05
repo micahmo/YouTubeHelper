@@ -405,6 +405,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Opening in Plex....
+        /// </summary>
+        internal static string OpeningInPlex {
+            get {
+                return ResourceManager.GetString("OpeningInPlex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open in Plex.
         /// </summary>
         internal static string OpenInPlex {

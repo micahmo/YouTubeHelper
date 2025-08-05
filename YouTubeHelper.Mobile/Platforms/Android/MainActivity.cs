@@ -50,7 +50,13 @@ namespace YouTubeHelper.Mobile
             if (intent?.GetStringExtra("navigateTo") == "queue")
             {
                 _ = AppShell.Instance?.NavigateToQueueTab();
-            } 
+            }
+
+            // See if we got an intent to open in Plex
+            if (intent?.GetStringExtra("plexRatingKey") is { } plexRatingKey)
+            {
+                _ = AppShell.Instance?.HandleOpenInPlex(plexRatingKey);
+            }
         }
     }
 }

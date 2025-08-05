@@ -689,5 +689,28 @@ namespace YouTubeHelper.Mobile
                 TabBar.CurrentItem.CurrentItem = QueueTab.Items.FirstOrDefault();
             });
         }
+
+        public async Task HandleOpenInPlex(string plexRatingKey)
+        {
+            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.OpeningInPlex);
+
+            try
+            {
+                string plexUri = $"plex://server://8316eb530162c189b29f3250d4734700515fc5f8/com.plexapp.plugins.library/library/metadata/{plexRatingKey}";
+                await Launcher.Default.OpenAsync(new Uri(plexUri));
+            }
+            catch (Exception ex)
+            {
+                // Show message box for any errors instead of toast so we can see the full error
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await DisplayAlert("Error opening Plex", ex.ToString(), "OK");
+                });
+            }
+            finally
+            {
+                busyIndicator.Dispose();
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress, bool availableInPlex)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress, string? plexRatingKey)
         {
             Context context = global::Android.App.Application.Context;
 
@@ -68,14 +68,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 );
 
                 // Open In Plex Action
-                Intent openInPlexIntent = new Intent(ActionNotification);
-                openInPlexIntent.SetPackage(context.PackageName);
-                openInPlexIntent.PutExtra("actionType", "openInPlex");
-                openInPlexIntent.PutExtra("videoTitle", title);
-                openInPlexIntent.PutExtra("videoUrl", videoUrl);
+                Intent openInPlexIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                openInPlexIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                openInPlexIntent.PutExtra("plexRatingKey", plexRatingKey);
                 openInPlexIntent.PutExtra("notificationId", notificationId);
                 openInPlexIntent.PutExtra("isDone", isDone);
-                openInPlexPendingIntent = PendingIntent.GetBroadcast(
+                openInPlexPendingIntent = PendingIntent.GetActivity(
                     context,
                     openInPlexIntentId,
                     openInPlexIntent,
@@ -102,7 +100,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDone)
                 .SetAutoCancel(isDone)
-                .SetContentIntent(availableInPlex ? openInPlexPendingIntent : launchPendingIntent!)
+                .SetContentIntent(string.IsNullOrEmpty(plexRatingKey) ? launchPendingIntent! : openInPlexPendingIntent)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
                 .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
 
