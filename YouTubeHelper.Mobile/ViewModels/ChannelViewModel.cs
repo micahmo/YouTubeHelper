@@ -227,7 +227,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
                                 Videos.AddRange(videoViewModels);
 
-                                await QueueUtils.TryJoinDownloadGroup(videoViewModels);
+                                // Do not await this, as it slows the loading of the page
+                                Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
