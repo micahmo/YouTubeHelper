@@ -142,7 +142,7 @@ namespace YouTubeHelper.ViewModels
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                         Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
 
-                        await QueueUtils.TryJoinDownloadGroup(videoViewModels);
+                        Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
 
                         MainControlViewModel.Progress = 0;
                         MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;

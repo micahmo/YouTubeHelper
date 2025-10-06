@@ -669,7 +669,7 @@ namespace YouTubeHelper.Mobile
                     VideoViewModel videoViewModel = new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
                     foundChannelViewModel.Videos.Add(videoViewModel);
 
-                    await QueueUtils.TryJoinDownloadGroup(videoViewModel);
+                    Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
                 }
             }
 
