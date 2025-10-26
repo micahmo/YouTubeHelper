@@ -215,8 +215,8 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                 {
                                     Channel = Channel,
-                                    ShowExclusions = ShowExclusions,
-                                    ExclusionReasonFilter = SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowNonExcluded) ? null : SelectedExclusionFilter.Value,
+                                    ExclusionsMode = SelectedExclusionsMode.Value,
+                                    ExclusionReasonFilter = SelectedExclusionFilter.Value,
                                     SortMode = SelectedSortMode.Value,
                                     SearchTerms = searchTerms,
                                     Count = EnableCountLimit && CountLimit.HasValue ? CountLimit.Value : int.MaxValue,
@@ -237,7 +237,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                                 List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                     {
-                                        ShowExclusions = true,
+                                        ExclusionsMode = ExclusionsMode.ShowAll,
                                         VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
                                         Count = int.MaxValue
                                     }))
@@ -363,6 +363,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private int? _countLimit;
 
+        [Obsolete("This should ONLY be used for XAML binding")]
         public bool ShowExclusions => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded);
 
         public bool IsRefreshing
@@ -423,7 +424,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         /// </summary>
         public ChannelView? ChannelView { get; set; }
 
-        public bool ShowExclusionReasonFilter => ShowExclusions && Page.AppShellViewModel.ChannelTabSelected;
+        public bool ShowExclusionReasonFilter => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded) && Page.AppShellViewModel.ChannelTabSelected;
 
         public ICommand ShowSearchHistoryCommand => _showSearchHistoryCommand ??= new RelayCommand(async () =>
         {

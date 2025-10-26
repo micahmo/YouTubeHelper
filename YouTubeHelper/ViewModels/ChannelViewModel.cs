@@ -130,8 +130,8 @@ namespace YouTubeHelper.ViewModels
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                         {
                             Channel = Channel,
-                            ShowExclusions = MainControlViewModel.ShowExclusions,
-                            ExclusionReasonFilter = MainControlViewModel.SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowNonExcluded) ? null : MainControlViewModel.SelectedExclusionFilter.Value,
+                            ExclusionsMode = MainControlViewModel.SelectedExclusionsMode.Value,
+                            ExclusionReasonFilter = MainControlViewModel.SelectedExclusionFilter.Value,
                             SortMode = MainControlViewModel.SelectedSortMode.Value,
                             SearchTerms = searchTerms,
                             Count = MainControlViewModel is { EnableCountLimit: true, CountLimit: { } } ? MainControlViewModel.CountLimit.Value : int.MaxValue,
@@ -170,7 +170,7 @@ namespace YouTubeHelper.ViewModels
 
                 List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                     {
-                        ShowExclusions = true,
+                        ExclusionsMode = ExclusionsMode.ShowAll,
                         VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
                         Count = int.MaxValue
                     }))

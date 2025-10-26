@@ -463,7 +463,7 @@ namespace YouTubeHelper
             {
                 video = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                 {
-                    ShowExclusions = true,
+                    ExclusionsMode = ExclusionsMode.ShowAll,
                     VideoIds = new List<string> { videoId },
                     SortMode = SortMode.AgeDesc,
                     Count = int.MaxValue
@@ -558,7 +558,7 @@ namespace YouTubeHelper
                     {
                         if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                             {
-                                ShowExclusions = true,
+                                ExclusionsMode = ExclusionsMode.ShowAll,
                                 VideoIds = new List<string> { requestData.VideoId },
                                 SortMode = SortMode.AgeDesc,
                                 Count = int.MaxValue

@@ -6,6 +6,7 @@ using Microsoft.Toolkit.Mvvm.Input;
 using System.Windows.Input;
 using Android.Util;
 using Flurl;
+using ServerStatusBot.Definitions;
 using YouTubeHelper.Mobile.Views;
 using ServerStatusBot.Definitions.Models;
 using ServerStatusBot.Definitions.Database.Models;
@@ -200,7 +201,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = true;
                     await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
 
-                    if (!_channelViewModel.ShowExclusions && AppShell.Instance?.AppShellViewModel.QueueTabSelected != true)
+                    if (AppShell.Instance?.AppShellViewModel.ChannelTabSelected == true && !_channelViewModel.SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded))
                     {
                         _channelViewModel.Videos.Remove(this);
                     }

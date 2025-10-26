@@ -109,6 +109,7 @@ namespace YouTubeHelper.ViewModels
 
         public bool QueueMode => Mode == MainControlMode.Queue;
 
+        [Obsolete("This should ONLY be used for XAML binding")]
         public bool ShowExclusions => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded);
 
         public ObservableCollection<ChannelViewModel> Channels { get; } = new();
