@@ -13,16 +13,20 @@
         WidthRequest="{Binding Width, Source={x:Reference This}}">
         <!--  Channel Name  -->
 
-        <Grid ColumnDefinitions="Auto,*,Auto">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
             <Label
                 Grid.Column="0"
                 Margin="-5,0,0,0"
                 FontAttributes="Bold"
                 FontSize="20"
-                Text="{Binding Channel.VanityName}" />
+                HorizontalOptions="StartAndExpand"
+                LineBreakMode="TailTruncation"
+                MaxLines="1"
+                Text="{Binding Channel.VanityName}"
+                VerticalTextAlignment="Center" />
 
             <Button
-                Grid.Column="2"
+                Grid.Column="1"
                 Padding="0"
                 Command="{Binding ResetFiltersCommand}"
                 HeightRequest="32"
