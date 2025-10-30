@@ -45,8 +45,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                         if (args.PropertyName == nameof(SelectedExclusionsModeIndex))
                         {
                             c.SelectedExclusionsModeIndex = SelectedExclusionsModeIndex;
+#pragma warning disable CS0618
                             c.OnPropertyChanged(nameof(ShowExclusions));
                             OnPropertyChanged(nameof(ShowExclusions));
+#pragma warning restore CS0618
 
                             OnPropertyChanged(nameof(ShowExclusionReasonFilter));
                         }

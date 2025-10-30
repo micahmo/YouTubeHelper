@@ -269,7 +269,9 @@ namespace YouTubeHelper.ViewModels
             set
             {
                 SetProperty(ref _selectedExclusionsMode, value);
+#pragma warning disable CS0618
                 OnPropertyChanged(nameof(ShowExclusions));
+#pragma warning restore CS0618
             }
         }
         private ExclusionsModeExtended? _selectedExclusionsMode;
