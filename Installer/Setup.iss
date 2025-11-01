@@ -35,6 +35,8 @@ WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64
 ; .NET Desktop Runtime install can trigger this, but it doesn't actually require a restart
 RestartIfNeededByRun=no
+; Let the user manually restart apps
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
