@@ -175,7 +175,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.GoToChannel)
                 {
-                    AppShell.Instance?.HandleSharedLink(Video.Id, null);
+                    AppShell.Instance?.HandleSharedLink(Video.Id, null, null, null);
                 }
                 else if (action == Resources.Resources.OpenInPlex)
                 {
