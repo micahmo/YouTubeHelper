@@ -457,6 +457,14 @@ namespace YouTubeHelper
                 {
                     channelHandle = cid;
                 }
+
+                if (url.PathSegments.Count >= 2 
+                    && url.PathSegments[0].Equals("channel", StringComparison.OrdinalIgnoreCase)
+                    && url.PathSegments[1].StartsWith("UC", StringComparison.OrdinalIgnoreCase))
+                {
+                    channelId = url.PathSegments[1];
+                    channelPlaylist = YouTubeUtils.ToChannelPlaylist(channelId);
+                }
             }
 
             if (!string.IsNullOrEmpty(videoId))

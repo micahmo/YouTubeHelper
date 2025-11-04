@@ -558,17 +558,24 @@ namespace YouTubeHelper.Mobile
             string? videoId = YouTubeUtils.GetVideoIdFromUrl(rawUrl);
             if (!string.IsNullOrEmpty(YouTubeUtils.GetVideoIdFromUrl(rawUrl)))
             {
-                await HandleSharedLink(videoId, null);
+                await HandleSharedLink(videoId, null, null, null);
             }
 
             Url url = new Url(rawUrl);
             if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
             {
-                await HandleSharedLink(null, channelHandle);
+                await HandleSharedLink(null, channelHandle, null, null);
+            }
+
+            if (url.PathSegments.Count >= 2
+                && url.PathSegments[0].Equals("channel", StringComparison.OrdinalIgnoreCase)
+                && url.PathSegments[1].StartsWith("UC", StringComparison.OrdinalIgnoreCase))
+            {
+                await HandleSharedLink(null, null, url.PathSegments[1], YouTubeUtils.ToChannelPlaylist(url.PathSegments[1]));
             }
         }
 
-        public async Task HandleSharedLink(string? videoId, string? channelHandle)
+        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist)
         {
             while (!_loaded)
             {
@@ -578,8 +585,6 @@ namespace YouTubeHelper.Mobile
             BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.HandlingSharedLink);
 
             Video? video = default;
-            string? channelId = default;
-            string? channelPlaylist = default;
 
             if (!string.IsNullOrEmpty(videoId))
             {
