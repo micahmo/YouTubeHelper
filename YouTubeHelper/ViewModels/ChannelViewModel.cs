@@ -196,48 +196,12 @@ namespace YouTubeHelper.ViewModels
         public ICommand MoveRightCommand => _moveRightCommand ??= new RelayCommand(MoveRight);
         private ICommand? _moveRightCommand;
 
-        private async void MoveRight()
-        {
-            MainControlViewModel.AllowCreateNewChannel = false;
-            int previousIndex = MainControlViewModel.Channels.IndexOf(this);
-            MainControlViewModel.Channels.Remove(this);
-            MainControlViewModel.Channels.Insert(Math.Min(MainControlViewModel.Channels.Count - 1, previousIndex + 1), this);
-            MainControlViewModel.SelectedChannel = this;
-            MainControlViewModel.AllowCreateNewChannel = true;
-
-            // Fix up the "real" channels list
-            MainControlViewModel.RealChannels.Clear();
-            MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
-
-            foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
-            {
-                c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await ServerApiClient.Instance.UpdateChannel(c.Channel, MainWindow.ClientId);
-            }
-        }
+        private async void MoveRight() => await MoveRelativeAsync(+1);
 
         public ICommand MoveLeftCommand => _moveLeftCommand ??= new RelayCommand(MoveLeft);
         private ICommand? _moveLeftCommand;
 
-        private async void MoveLeft()
-        {
-            MainControlViewModel.AllowCreateNewChannel = false;
-            int previousIndex = MainControlViewModel.Channels.IndexOf(this);
-            MainControlViewModel.Channels.Remove(this);
-            MainControlViewModel.Channels.Insert(Math.Max(0, previousIndex - 1), this);
-            MainControlViewModel.SelectedChannel = this;
-            MainControlViewModel.AllowCreateNewChannel = true;
-
-            // Fix up the "real" channels list
-            MainControlViewModel.RealChannels.Clear();
-            MainControlViewModel.RealChannels.AddRange(MainControlViewModel.Channels);
-
-            foreach (ChannelViewModel c in MainControlViewModel.Channels.Where(c => c.Channel.Persistent).ToList())
-            {
-                c.Channel.Index = MainControlViewModel.Channels.IndexOf(c);
-                await ServerApiClient.Instance.UpdateChannel(c.Channel, MainWindow.ClientId);
-            }
-        }
+        private async void MoveLeft() => await MoveRelativeAsync(-1);
 
         public string SearchGlyph
         {
@@ -315,6 +279,33 @@ namespace YouTubeHelper.ViewModels
 
                 return string.Join(" | ", parts);
             }
+        }
+
+        private async Task MoveRelativeAsync(int delta)
+        {
+            int currentIndex = MainControlViewModel.Channels.IndexOf(this);
+            int targetIndex = currentIndex + delta;
+
+            if (currentIndex < 0 || targetIndex < 0 || targetIndex >= MainControlViewModel.Channels.Count)
+            {
+                // Can't go anywhere
+                return;
+            }
+
+            ChannelViewModel targetChannelViewModel = MainControlViewModel.Channels[targetIndex];
+
+            if (!Channel.Persistent || !targetChannelViewModel.Channel.Persistent)
+            {
+                // Don't edit temp channels
+                return;
+            }
+
+            // Persist-only: swap indices based on desired new tab order
+            Channel.Index = targetIndex;
+            targetChannelViewModel.Channel.Index = currentIndex;
+
+            await ServerApiClient.Instance.UpdateChannel(Channel, Guid.Empty.ToString());
+            await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
         }
     }
 }

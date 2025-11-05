@@ -617,61 +617,91 @@ namespace YouTubeHelper
             }
         }
 
+        private static readonly object ChannelUpdatesLock = new();
+
         private void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
         {
-            if (updatedChannelArgs.Originator == ClientId) return;
-
-            if (MainControlViewModel == null) return;
-
-            Channel updatedChannel = updatedChannelArgs.Obj;
-
-            // Look for the channel
-            bool found = false;
-            foreach (ChannelViewModel channelViewModel in MainControlViewModel.Channels.ToList())
+            lock (ChannelUpdatesLock)
             {
-                if (channelViewModel.Channel.Id == updatedChannel.Id)
+                if (updatedChannelArgs.Originator == ClientId) return;
+
+                if (MainControlViewModel == null) return;
+
+                Channel updatedChannel = updatedChannelArgs.Obj;
+
+                // Look for the channel
+                bool found = false;
+                foreach (ChannelViewModel channelViewModel in MainControlViewModel.Channels.ToList())
                 {
-                    // We have it, but it's marked for deletion. Remove it!
-                    if (updatedChannel.MarkForDeletion)
+                    if (channelViewModel.Channel.Id == updatedChannel.Id)
                     {
-                        if (MainControlViewModel.SelectedChannel == channelViewModel)
+                        found = true;
+
+                        // We have it, but it's marked for deletion. Remove it!
+                        if (updatedChannel.MarkForDeletion)
                         {
-                            Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
+                            if (MainControlViewModel.SelectedChannel == channelViewModel)
+                            {
+                                Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
+                            }
+                            Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
+                            channelViewModel.Channel.Persistent = false;
                         }
-                        Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
-                        channelViewModel.Channel.Persistent = false;
-                    }
-                    else
-                    {
-                        // We have it, update the properties
-                        channelViewModel.Channel.Persistent = false; // stop doing updates
-                        channelViewModel.Channel.Identifier = updatedChannel.Identifier;
-                        channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
-                        channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
-                        channelViewModel.Channel.VanityName = updatedChannel.VanityName;
-                        channelViewModel.Channel.Description = updatedChannel.Description;
-                        channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
-                        channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
-                        channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
-                        channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
-                        channelViewModel.Channel.Persistent = true; // resume updates
-                    }
+                        else
+                        {
+                            // We have it, update the properties
+                            channelViewModel.Channel.Persistent = false; // stop doing updates
+                            channelViewModel.Channel.Identifier = updatedChannel.Identifier;
+                            channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
+                            channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
+                            channelViewModel.Channel.VanityName = updatedChannel.VanityName;
+                            channelViewModel.Channel.Description = updatedChannel.Description;
+                            channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
+                            channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
+                            channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
+                            channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                            channelViewModel.Channel.Index = updatedChannel.Index;
+                            channelViewModel.Channel.Persistent = true; // resume updates
 
-                    found = true;
+                            // If server index changed, reorder locally to that position
+                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                lock (ChannelUpdatesLock)
+                                {
+                                    MainControlViewModel.AllowCreateNewChannel = false;
+
+                                    ChannelViewModel? previouslySelectedChannel = MainControlViewModel.SelectedChannel;
+
+                                    int currentIndex = MainControlViewModel.Channels.IndexOf(channelViewModel);
+                                    int desiredIndex = Math.Clamp(updatedChannel.Index, 0, MainControlViewModel.Channels.Count - 1);
+
+                                    if (currentIndex != desiredIndex)
+                                    {
+                                        MainControlViewModel.Channels.RemoveAt(currentIndex);
+                                        MainControlViewModel.Channels.Insert(desiredIndex, channelViewModel);
+
+                                        MainControlViewModel.SelectedChannel = previouslySelectedChannel;
+                                    }
+
+                                    MainControlViewModel.AllowCreateNewChannel = true;
+                                }
+                            });
+                        }
+                    }
                 }
-            }
 
-            // We don't have it, and it's not marked for deletion, so it must be new. Add it!
-            if (!found && !updatedChannel.MarkForDeletion)
-            {
-                ChannelViewModel channelViewModel = new(updatedChannel, MainControlViewModel);
-                Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
-
-                // Listen for changes
-                updatedChannel.Changed += async (_, _) =>
+                // We don't have it, and it's not marked for deletion, so it must be new. Add it!
+                if (!found && !updatedChannel.MarkForDeletion)
                 {
-                    await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
-                };
+                    ChannelViewModel channelViewModel = new(updatedChannel, MainControlViewModel);
+                    Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
+
+                    // Listen for changes
+                    updatedChannel.Changed += async (_, _) =>
+                    {
+                        await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
+                    };
+                }
             }
         }
 
