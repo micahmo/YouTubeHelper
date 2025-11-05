@@ -24,6 +24,8 @@ namespace YouTubeHelper.Mobile
 
         private int _selectedChannelTabIndex;
 
+        private static readonly object _notificationLock = new();
+
         public AppShell()
         {
             InitializeComponent();
@@ -440,90 +442,108 @@ namespace YouTubeHelper.Mobile
 
         private async void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
         {
-            if (updatedChannelArgs.Originator == ClientId) return;
-
-            Channel updatedChannel = updatedChannelArgs.Obj;
-
-            ChannelViewModel? newlyAddedChannelViewModel = null;
-
-            // Look for the channel
-            foreach (Tab tab in new List<Tab> { ChannelTab })
+            lock (_notificationLock)
             {
-                bool found = false;
-                foreach (ShellContent? content in tab.Items.ToList())
+                if (updatedChannelArgs.Originator == ClientId) return;
+
+                Channel updatedChannel = updatedChannelArgs.Obj;
+
+                ChannelViewModel? newlyAddedChannelViewModel = null;
+
+                // Look for the channel
+                foreach (Tab tab in new List<Tab> { ChannelTab })
                 {
-                    if (content.Content is ChannelView { BindingContext: ChannelViewModel channelViewModel } channelView && channelViewModel.Channel?.Id == updatedChannel.Id)
+                    bool found = false;
+                    foreach (ShellContent? content in tab.Items.ToList())
                     {
-                        // We have it, but it's marked for deletion. Remove it!
-                        if (updatedChannel.MarkForDeletion)
+                        if (content.Content is ChannelView { BindingContext: ChannelViewModel channelViewModel } channelView && channelViewModel.Channel?.Id == updatedChannel.Id)
                         {
-                            await MainThread.InvokeOnMainThreadAsync(() =>
+                            string currentTitle = string.Empty;
+                            int currentIndex = default;
+                            int newIndex = default;
+                            MainThread.InvokeOnMainThreadAsync(() =>
                             {
-                                try
+                                currentTitle = content.Title;
+                                currentIndex = tab.Items.IndexOf(content);
+                                newIndex = updatedChannel.Index;
+                            }).GetAwaiter().GetResult();
+
+
+                            // We have it, but it's marked for deletion. Remove it!
+                            if (updatedChannel.MarkForDeletion)
+                            {
+                                MainThread.InvokeOnMainThreadAsync(() =>
                                 {
-                                    tab.Items.Remove(content);
-                                }
-                                catch
+                                    try
+                                    {
+                                        tab.Items.Remove(content);
+                                    }
+                                    catch
+                                    {
+                                        // This throws an exception, but it gets far enough.
+                                    }
+                                }).GetAwaiter().GetResult();
+
+                                AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
+                                channelViewModel.Channel!.MarkForDeletion = true;
+                                channelViewModel.Channel!.Persistent = false;
+                            }
+                            else
+                            {
+                                // We have it! Update it
+                                channelViewModel.Channel!.Persistent = false; // stop doing updates
+                                channelViewModel.Channel.Identifier = updatedChannel.Identifier;
+                                channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
+                                channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
+                                channelViewModel.Channel.VanityName = updatedChannel.VanityName;
+                                channelViewModel.Channel.Description = updatedChannel.Description;
+                                channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
+                                channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
+                                channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
+                                channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                                channelViewModel.Channel.Persistent = true; // resume updates
+
+                                // Force the UI to update my "moving" the channel.
+                                // This can be if the title updates (which doesn't work with binding, so we have to remove and re-add)
+                                // Or if the user does actually change the index, then we'll handle that here as well
+                                if (currentIndex != newIndex || updatedChannel.VanityName != currentTitle)
                                 {
-                                    // This throws an exception, but it gets far enough.
+                                    MainThread.InvokeOnMainThreadAsync(() => MoveChannel(tab, content, channelView, updatedChannel.VanityName, newIndex)).GetAwaiter().GetResult();
                                 }
-                            });
+                            }
 
-                            AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
-                            channelViewModel.Channel!.MarkForDeletion = true;
-                            channelViewModel.Channel!.Persistent = false;
+                            found = true;
                         }
-                        else
-                        {
-                            // We have it! First update the UI
-                            content.Title = updatedChannel.VanityName;
-                            channelView.Title = updatedChannel.VanityName;
-                            
-                            // Then update the properties
-                            channelViewModel.Channel!.Persistent = false; // stop doing updates
-                            channelViewModel.Channel.Identifier = updatedChannel.Identifier;
-                            channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
-                            channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
-                            channelViewModel.Channel.VanityName = updatedChannel.VanityName;
-                            channelViewModel.Channel.Description = updatedChannel.Description;
-                            channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
-                            channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
-                            channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
-                            channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
-                            channelViewModel.Channel.Persistent = true; // resume updates
-                        }
-
-                        found = true;
-                    }
-                }
-
-                // We don't have it, and it's not marked for deletion, so it must be new. Add it!
-                if (!found && !updatedChannel.MarkForDeletion)
-                {
-                    if (newlyAddedChannelViewModel is null)
-                    {
-                        newlyAddedChannelViewModel = new(this)
-                        {
-                            Channel = updatedChannel,
-                            SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4),
-                            SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1),
-                            SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0),
-                            Loading = false
-                        };
-
-                        AppShellViewModel.ChannelViewModels.Add(newlyAddedChannelViewModel);
-
-                        updatedChannel.Changed += async (_, _) =>
-                        {
-                            await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
-                        };
                     }
 
-                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    // We don't have it, and it's not marked for deletion, so it must be new. Add it!
+                    if (!found && !updatedChannel.MarkForDeletion)
                     {
-                        ChannelView channelView = new ChannelView { BindingContext = newlyAddedChannelViewModel };
-                        tab.Items.Add(new ShellContent { Title = updatedChannel.VanityName, Content = channelView });
-                    });
+                        if (newlyAddedChannelViewModel is null)
+                        {
+                            newlyAddedChannelViewModel = new(this)
+                            {
+                                Channel = updatedChannel,
+                                SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4),
+                                SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1),
+                                SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0),
+                                Loading = false
+                            };
+
+                            AppShellViewModel.ChannelViewModels.Add(newlyAddedChannelViewModel);
+
+                            updatedChannel.Changed += async (_, _) =>
+                            {
+                                await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
+                            };
+                        }
+
+                        MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            ChannelView channelView = new ChannelView { BindingContext = newlyAddedChannelViewModel };
+                            tab.Items.Add(new ShellContent { Title = updatedChannel.VanityName, Content = channelView });
+                        }).GetAwaiter().GetResult();
+                    }
                 }
             }
         }
@@ -715,6 +735,42 @@ namespace YouTubeHelper.Mobile
             finally
             {
                 busyIndicator.Dispose();
+            }
+        }
+
+        private static void MoveChannel(Tab tab, ShellContent content, ChannelView channelView, string? title, int newIndex)
+        {
+            ShellContent? previousCurrent = tab.CurrentItem;
+            bool wasCurrent = tab.CurrentItem == content;
+            int previousCurrentIndex = tab.Items.IndexOf(previousCurrent);
+
+            int index = tab.Items.IndexOf(content);
+
+            // Remove existing
+            tab.Items.RemoveAt(index);
+
+            // Create replacement with same content/binding, new title
+            ShellContent replacement = new ShellContent { Title = title, Content = channelView };
+
+            // Insert back at same index and keep selection
+            tab.Items.Insert(newIndex, replacement);
+
+            // If the page we just removed was the selected page, then the UI will default to selecting the first page, so we have to fix that.
+            // Also if the previously selected page was the last page, that will also mess things up (because the index of the last page no longer exists)
+            // And finally, if this is a real move (different indexes, then we ALWAYS fix it
+            if (wasCurrent || previousCurrentIndex == tab.Items.Count - 1 || newIndex != index)
+            {
+                ShellContent? toRestore = wasCurrent ? replacement : previousCurrent;
+
+                Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(100));
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        tab.CurrentItem = null;
+                        tab.CurrentItem = toRestore;
+                    });
+                });
             }
         }
     }
