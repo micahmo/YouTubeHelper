@@ -43,6 +43,16 @@ public partial class ChannelView : ContentPage
         }
     }
 
+    private async void OnMoveLeftTapped(object? sender, TappedEventArgs e)
+    {
+        await MoveChannelRelativeAsync(-1);
+    }
+
+    private async void OnMoveRightTapped(object? sender, TappedEventArgs e)
+    {
+        await MoveChannelRelativeAsync(1);
+    }
+
     private async void OnAddChannelTapped(object? sender, TappedEventArgs e)
     {
         (BindingContext as ChannelViewModel)!.IsFabOpen = false;
@@ -366,4 +376,37 @@ public partial class ChannelView : ContentPage
         VideosCollectionView.Footer = AppShell.Instance!.AppShellViewModel.QueueTabSelected ? null : new Grid { HeightRequest = 90 };
     }
 
+    private async Task MoveChannelRelativeAsync(int delta)
+    {
+        Tab tab = AppShell.Instance!.ChannelTab;
+
+        foreach (ShellContent? content in tab.Items.ToList())
+        {
+            if (content.Content is ChannelView { BindingContext: ChannelViewModel channelViewModel } && content.Content == this)
+            {
+                // Determine current and target positions
+                int currentIndex = tab.Items.IndexOf(content);
+                int targetIndex = currentIndex + delta;
+
+                if (targetIndex < 0 || targetIndex >= tab.Items.Count)
+                {
+                    // Can't move, do nothing
+                    return;
+                }
+
+                // Find the target page that we want to swap with (either on the left or right of us)
+                ShellContent targetShellContent = tab.Items[targetIndex];
+                ChannelView? targetChannelView = targetShellContent?.Content as ChannelView;
+                ChannelViewModel? targetChannelViewModel = targetChannelView?.BindingContext as ChannelViewModel;
+
+                // Swap the indices and persist
+                channelViewModel.Channel!.Index = targetIndex;
+                targetChannelViewModel!.Channel!.Index = currentIndex;
+
+                // Use an empty GUID so that this message comes back to us and is processed
+                await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, Guid.Empty.ToString());
+                await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
+            }
+        }
+    }
 }

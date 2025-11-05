@@ -180,6 +180,54 @@
                             VerticalOptions="End">
 
                             <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMoveLeftTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Label
+                                FontFamily="ionicons"
+                                FontSize="15"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="Move left"
+                                TextColor="Black"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Frame>
+                        <Frame
+                            Padding="10"
+                            BackgroundColor="White"
+                            BorderColor="White"
+                            CornerRadius="16"
+                            HasShadow="True"
+                            HeightRequest="40"
+                            HorizontalOptions="End"
+                            VerticalOptions="End">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMoveRightTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Label
+                                FontFamily="ionicons"
+                                FontSize="15"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                Text="Move right"
+                                TextColor="Black"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Frame>
+                        <Frame
+                            Padding="10"
+                            BackgroundColor="White"
+                            BorderColor="White"
+                            CornerRadius="16"
+                            HasShadow="True"
+                            HeightRequest="40"
+                            HorizontalOptions="End"
+                            VerticalOptions="End">
+
+                            <Frame.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnAddChannelTapped" />
                             </Frame.GestureRecognizers>
 

@@ -440,7 +440,7 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        private async void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
+        private void HandleChannelObjectUpdates(ObjectChangedEventArgs<Channel> updatedChannelArgs)
         {
             lock (_notificationLock)
             {
