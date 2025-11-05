@@ -399,9 +399,15 @@ public partial class ChannelView : ContentPage
                 ChannelView? targetChannelView = targetShellContent?.Content as ChannelView;
                 ChannelViewModel? targetChannelViewModel = targetChannelView?.BindingContext as ChannelViewModel;
 
+                if (!channelViewModel.Channel!.Persistent || !targetChannelViewModel!.Channel!.Persistent)
+                {
+                    // Don't move temporary channels
+                    return;
+                }
+
                 // Swap the indices and persist
                 channelViewModel.Channel!.Index = targetIndex;
-                targetChannelViewModel!.Channel!.Index = currentIndex;
+                targetChannelViewModel.Channel!.Index = currentIndex;
 
                 // Use an empty GUID so that this message comes back to us and is processed
                 await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, Guid.Empty.ToString());
