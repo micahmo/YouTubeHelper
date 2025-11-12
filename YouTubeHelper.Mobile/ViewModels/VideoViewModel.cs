@@ -333,7 +333,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
             _previousRequestId = requestId;
 
-            Video.Status = string.Format(Resources.Resources.DownloadingProgress, $"{result.Progress:F1}%");
+            Video.Status = string.Format(Resources.Resources.DownloadingProgress, Utils.FormatProgressPercentage(result.Progress));
             Video.Progress = result.Progress;
 
             if (result.Status == DownloadStatus.InProgress)

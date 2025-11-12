@@ -15,6 +15,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using ModernWpf.Controls;
 using Notification.Wpf;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
@@ -177,7 +178,7 @@ namespace YouTubeHelper.ViewModels
 
             _previousRequestId = requestId;
 
-            Video.Status = string.Format(Resources.DownloadingProgress, $"{result.Progress:F1}%");
+            Video.Status = string.Format(Resources.DownloadingProgress, Utils.FormatProgressPercentage(result.Progress));
             Video.Progress = result.Progress == 0 ? 1 : result.Progress;
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.ActiveDownloadsCountLabel));
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
