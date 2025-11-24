@@ -16,6 +16,11 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public ChannelViewModel? QueueChannelViewModel { get; set; }
 
+        /// <summary>
+        /// Returns all current <see cref="VideoViewModel"/>s from all <see cref="ChannelViewModels"/> and the <see cref="QueueChannelViewModel"/>.
+        /// </summary>
+        public List<VideoViewModel> AllVideos => ChannelViewModels.SelectMany(c => c.Videos).Union(QueueChannelViewModel?.Videos ?? Enumerable.Empty<VideoViewModel>()).ToList();
+
         public void RaisePropertyChanged(string propertyName)
         {
             OnPropertyChanged(propertyName);

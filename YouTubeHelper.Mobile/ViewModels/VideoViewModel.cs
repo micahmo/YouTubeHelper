@@ -93,13 +93,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                         //_channelViewModel.ShowPlayer = true;
                         //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
 
-                    _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
-                    {
-                        c.Videos.ToList().ForEach(v =>
+                        _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
                         {
                             v.IsPlaying = false;
                         });
-                    });
 
                         IsPlaying = true;
 
@@ -115,12 +112,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     try
                     {
-                        _page.AppShellViewModel.ChannelViewModels.ToList().ForEach(c =>
+                        _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
                         {
-                            c.Videos.ToList().ForEach(v =>
-                            {
-                                v.IsPlaying = false;
-                            });
+                            v.IsPlaying = false;
                         });
 
                         IsPlaying = true;

@@ -389,7 +389,7 @@ namespace YouTubeHelper.Mobile
 
             // If any videos that are currently being displayed match the ID in the request data, then start listening for updates
             // This will include the queue
-            foreach (VideoViewModel videoViewModel in AppShellViewModel.ChannelViewModels.SelectMany(c => c.Videos).Union(AppShellViewModel.QueueChannelViewModel?.Videos ?? Enumerable.Empty<VideoViewModel>()).ToList())
+            foreach (VideoViewModel videoViewModel in AppShellViewModel.AllVideos)
             {
                 if (videoViewModel.Video.Id == requestData.VideoId)
                 {
@@ -411,7 +411,7 @@ namespace YouTubeHelper.Mobile
 
             // If any videos that are currently being displayed match the ID in the updated video, then update it in the UI
             // This will include the queue
-            foreach (VideoViewModel videoViewModel in AppShellViewModel.ChannelViewModels.SelectMany(c => c.Videos).Union(AppShellViewModel.QueueChannelViewModel?.Videos ?? Enumerable.Empty<VideoViewModel>()).ToList())
+            foreach (VideoViewModel videoViewModel in AppShellViewModel.AllVideos)
             {
                 if (videoViewModel.Video.Id == updatedVideo.Id)
                 {
