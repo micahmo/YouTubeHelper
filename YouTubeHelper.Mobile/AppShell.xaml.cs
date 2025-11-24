@@ -191,25 +191,6 @@ namespace YouTubeHelper.Mobile
                 c.Loading = false;
             });
 
-            // Don't do any local notifications while we experiment with FCM
-#pragma warning disable CS0162
-            if (false)
-            {
-                _ = Task.Run(async () =>
-                {
-                    while (true)
-                    {
-                        await MainThread.InvokeOnMainThreadAsync(async () =>
-                        {
-                            await AppShellViewModel.UpdateNotification();
-                        });
-
-                        await Task.Delay(TimeSpan.FromSeconds(1));
-                    }
-                });
-            }
-#pragma warning restore CS0162
-
             busyIndicator.Dispose();
 
             // Check for battery restrictions
