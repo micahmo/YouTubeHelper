@@ -406,8 +406,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             set
             {
                 SetProperty(ref _isFabOpen, value);
-                ChannelView?.AnimateDimBackground(_isFabOpen);
-                ChannelView?.UpdateFabIcon(_isFabOpen);
+                _ = ChannelView!.ToggleFabExpander(_isFabOpen);
             }
         }
         private bool _isFabOpen;

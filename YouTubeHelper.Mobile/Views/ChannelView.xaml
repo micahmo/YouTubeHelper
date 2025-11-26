@@ -134,9 +134,9 @@
             </BoxView>
 
             <toolkit:Expander
+                x:Name="FabExpander"
                 Margin="20"
                 Direction="Up"
-                ExpandedChanged="OnExpanderExpandedChanged"
                 HorizontalOptions="End"
                 IsExpanded="{Binding IsFabOpen, Mode=TwoWay}"
                 IsVisible="{Binding ShowFab}"

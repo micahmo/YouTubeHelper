@@ -227,69 +227,85 @@ public partial class ChannelView : ContentPage
         }
     }
 
-    private async void OnExpanderExpandedChanged(object? sender, EventArgs e)
+    private static readonly SemaphoreSlim FabLock = new(1, 1);
+
+    public async Task ToggleFabExpander(bool isExpanded)
     {
-        if (sender is Expander { Content: Layout layout } expander)
+        await FabLock.WaitAsync();
+
+        try
         {
-            if (expander.IsExpanded)
+            // --- Update the icon --- //
+            if (FabIconLabel == null)
             {
-                // Opening animation
-                layout.IsVisible = true;
-                layout.TranslationY = 50;
-                layout.Opacity = 0;
-
-                await Task.WhenAll(
-                    layout.TranslateTo(0, 0, 250, Easing.SinOut),
-                    layout.FadeTo(1)
-                );
+                return;
             }
-            else
+
+            FabIconLabel.Text = isExpanded ? "\uF406" : "•••"; // \uF406 is the Ionicons "close" or "X" glyph
+            FabIconLabel.FontSize = isExpanded ? 35 : 23;
+
+            // --- Dim the background --- //
+            Task dimTask = Task.Run(async () =>
             {
-                // Closing animation
-                await Task.WhenAll(
-                    layout.TranslateTo(0, 50, 200, Easing.SinIn),
-                    layout.FadeTo(0, 200)
-                );
+                if (BoxViewDim == null)
+                {
+                    return;
+                }
 
-                layout.IsVisible = false;
+                if (isExpanded)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        BoxViewDim.Opacity = 0;
+                        BoxViewDim.IsVisible = true;
+                    });
+
+                    await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
+                }
+                else
+                {
+                    await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
+
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        BoxViewDim.IsVisible = false;
+                    });
+                }
+            });
+
+            // --- Animate the Items --- //
+            if (FabExpander is { Content: Layout layout })
+            {
+                if (isExpanded)
+                {
+                    // Opening animation
+                    layout.IsVisible = true;
+                    layout.TranslationY = 50;
+                    layout.Opacity = 0;
+
+                    await Task.WhenAll(
+                        layout.TranslateTo(0, 0, 250, Easing.SinOut),
+                        layout.FadeTo(1)
+                    );
+                }
+                else
+                {
+                    // Closing animation
+                    await Task.WhenAll(
+                        layout.TranslateTo(0, 50, 200, Easing.SinIn),
+                        layout.FadeTo(0, 200)
+                    );
+
+                    layout.IsVisible = false;
+                }
             }
+
+            await dimTask;
         }
-    }
-
-    public async void AnimateDimBackground(bool show)
-    {
-        if (BoxViewDim == null)
-            return;
-
-        if (_currentlyDimmingBackground)
-            return;
-
-        _currentlyDimmingBackground = true;
-
-        if (show)
+        finally
         {
-            BoxViewDim.Opacity = 0;
-            BoxViewDim.IsVisible = true;
-
-            await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
+            FabLock.Release();
         }
-        else
-        {
-            await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
-            BoxViewDim.IsVisible = false;
-        }
-
-        _currentlyDimmingBackground = false;
-    }
-    bool _currentlyDimmingBackground;
-
-    public void UpdateFabIcon(bool isOpen)
-    {
-        if (FabIconLabel == null)
-            return;
-
-        FabIconLabel.Text = isOpen ? "\uF406" : "•••"; // \uF406 is the Ionicons "close" or "X" glyph
-        FabIconLabel.FontSize = isOpen ? 35 : 23;
     }
 
     /// <summary>
