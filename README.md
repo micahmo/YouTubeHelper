@@ -1,4 +1,4 @@
-<img src="https://files.catbox.moe/0k37l0.ico" width="100"/>
+<img src="https://raw.githubusercontent.com/micahmo/YouTubeHelper/refs/heads/main/YouTubeHelper/Images/logo.ico" width="100"/>
 
 # YouTubeHelper
 An app for searching and tracking YouTube
