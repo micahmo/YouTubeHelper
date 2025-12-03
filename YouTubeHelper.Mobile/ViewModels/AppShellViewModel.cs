@@ -30,8 +30,5 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             _appShell.CurrentItem.CurrentItem = _appShell.ChannelTab;
         }
-
-        private string? _currentNotificationText;
-        private int? _currentProgress;
     }
 }
