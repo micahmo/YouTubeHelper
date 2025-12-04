@@ -475,7 +475,6 @@ namespace YouTubeHelper.Mobile
                                 channelViewModel.Channel!.Persistent = false; // stop doing updates
                                 channelViewModel.Channel.Identifier = updatedChannel.Identifier;
                                 channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
-                                channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
                                 channelViewModel.Channel.VanityName = updatedChannel.VanityName;
                                 channelViewModel.Channel.Description = updatedChannel.Description;
                                 channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
@@ -650,8 +649,7 @@ namespace YouTubeHelper.Mobile
                         Channel = new Channel(persistent: false)
                         {
                             VanityName = channelName,
-                            ChannelPlaylist = channelPlaylist, 
-                            ChannelId = channelId
+                            ChannelPlaylist = channelPlaylist
                         },
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4),
                         SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1),

@@ -518,8 +518,7 @@ namespace YouTubeHelper
                     foundChannelViewModel = new(new Channel(persistent: false)
                     {
                         VanityName = channelName,
-                        ChannelPlaylist = channelPlaylist,
-                        ChannelId = channelId
+                        ChannelPlaylist = channelPlaylist
                     }, MainControlViewModel);
                     MainControlViewModel.Channels.Insert(0, foundChannelViewModel);
                     MainControlViewModel.RealChannels.Insert(0, foundChannelViewModel);
@@ -653,7 +652,6 @@ namespace YouTubeHelper
                             channelViewModel.Channel.Persistent = false; // stop doing updates
                             channelViewModel.Channel.Identifier = updatedChannel.Identifier;
                             channelViewModel.Channel.ChannelPlaylist = updatedChannel.ChannelPlaylist;
-                            channelViewModel.Channel.ChannelId = updatedChannel.ChannelId;
                             channelViewModel.Channel.VanityName = updatedChannel.VanityName;
                             channelViewModel.Channel.Description = updatedChannel.Description;
                             channelViewModel.Channel.DateRangeLimit = updatedChannel.DateRangeLimit;
