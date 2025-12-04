@@ -23,6 +23,8 @@
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">33.0</SupportedOSPlatformVersion>
+
+    <CheckEolWorkloads>false</CheckEolWorkloads>
   </PropertyGroup>
 
   <PropertyGroup>
