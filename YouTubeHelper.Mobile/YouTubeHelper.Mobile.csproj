@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0-android34.0</TargetFrameworks>
+    <TargetFrameworks>net8.0-android</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>YouTubeHelper.Mobile</RootNamespace>
     <UseMaui>true</UseMaui>
@@ -23,8 +23,6 @@
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">33.0</SupportedOSPlatformVersion>
-
-    <CheckEolWorkloads>false</CheckEolWorkloads>
   </PropertyGroup>
 
   <PropertyGroup>
