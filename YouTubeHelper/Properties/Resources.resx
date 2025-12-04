@@ -318,4 +318,13 @@ Updated the status of {1} video(s).</value>
   <data name="ResetFilters" xml:space="preserve">
     <value>Reset Filters</value>
   </data>
+  <data name="UserSuppliedIdentifier" xml:space="preserve">
+    <value>User-supplied identifier (or search term)</value>
+  </data>
+  <data name="Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="VanityName" xml:space="preserve">
+    <value>Vanity Name</value>
+  </data>
 </root>

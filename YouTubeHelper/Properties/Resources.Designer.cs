@@ -491,6 +491,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Playlist.
+        /// </summary>
+        public static string Playlist {
+            get {
+                return ResourceManager.GetString("Playlist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to register for progress updates &apos;{0}&apos;.
         ///
         ///{1}.
@@ -606,6 +615,24 @@ namespace YouTubeHelper.Properties {
         public static string Unknown {
             get {
                 return ResourceManager.GetString("Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User-supplied identifier (or search term).
+        /// </summary>
+        public static string UserSuppliedIdentifier {
+            get {
+                return ResourceManager.GetString("UserSuppliedIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vanity Name.
+        /// </summary>
+        public static string VanityName {
+            get {
+                return ResourceManager.GetString("VanityName", resourceCulture);
             }
         }
         

@@ -129,7 +129,7 @@ namespace YouTubeHelper.ViewModels
 
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                         {
-                            Playlists = new List<string> { Channel.ChannelPlaylist! },
+                            Playlists = Channel.ChannelPlaylist!.Split(',').ToList(),
                             ExclusionsMode = MainControlViewModel.SelectedExclusionsMode.Value,
                             ExclusionReasonFilter = MainControlViewModel.SelectedExclusionFilter.Value,
                             SortMode = MainControlViewModel.SelectedSortMode.Value,

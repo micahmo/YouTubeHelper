@@ -37,7 +37,7 @@
                     FontAttributes="Bold"
                     LineBreakMode="TailTruncation"
                     MaxLines="5"
-                    Text="{Binding Video.Title}" />
+                    Text="{Binding VideoTitle}" />
 
                 <Grid Grid.Row="1" Grid.Column="0">
                     <BoxView HeightRequest="112.5" Color="LightGray">

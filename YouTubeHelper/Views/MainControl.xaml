@@ -178,21 +178,24 @@
                                                         Grid.Column="0"
                                                         HorizontalAlignment="Stretch"
                                                         VerticalAlignment="Center"
-                                                        Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}" />
+                                                        Text="{Binding Channel.Identifier, UpdateSourceTrigger=PropertyChanged, Delay=10}"
+                                                        ToolTip="{x:Static properties:Resources.UserSuppliedIdentifier}" />
                                                     <TextBox
                                                         Grid.Row="1"
                                                         Grid.Column="1"
                                                         Margin="10,0,0,0"
                                                         HorizontalAlignment="Stretch"
                                                         VerticalAlignment="Center"
-                                                        Text="{Binding Channel.ChannelPlaylist}" />
+                                                        Text="{Binding Channel.ChannelPlaylist}"
+                                                        ToolTip="{x:Static properties:Resources.Playlist}" />
                                                     <TextBox
                                                         Grid.Row="1"
                                                         Grid.Column="2"
                                                         Margin="10,0,0,0"
                                                         HorizontalAlignment="Stretch"
                                                         VerticalAlignment="Center"
-                                                        Text="{Binding Channel.VanityName}" />
+                                                        Text="{Binding Channel.VanityName}"
+                                                        ToolTip="{x:Static properties:Resources.VanityName}" />
                                                     <Button
                                                         Grid.Row="1"
                                                         Grid.Column="3"
@@ -533,12 +536,20 @@
                                                                         Text="{Binding Video.Title}"
                                                                         TextWrapping="Wrap" />
                                                                     <TextBlock
-                                                                        Padding="15,0,15,0"
+                                                                        Padding="15,0,7,0"
+                                                                        FontWeight="Light"
+                                                                        Text="{Binding Video.ChannelName}"
+                                                                        TextWrapping="Wrap"
+                                                                        Visibility="{c:Binding ShowChannelName,
+                                                                                               FalseToVisibility=Collapsed}" />
+                                                                    <TextBlock
+                                                                        Padding="7,0,15,0"
                                                                         Cursor="Hand"
                                                                         FontWeight="Light"
                                                                         MouseDown="TextBlock_MouseDown"
                                                                         Text="{Binding Video.Id}"
                                                                         TextWrapping="Wrap" />
+
                                                                 </StackPanel>
                                                                 <TextBlock
                                                                     Grid.Row="1"
