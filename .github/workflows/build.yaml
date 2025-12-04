@@ -52,8 +52,8 @@ jobs:
             --password "${{ secrets.GH_NUGET_PAT }}" `
             --store-password-in-clear-text
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore dependencies (Mobile)
+        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj
 
       - name: Build Android APK
         run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android -c Release -p:AndroidPackageFormat=apk
@@ -108,8 +108,8 @@ jobs:
             --password "${{ secrets.GH_NUGET_PAT }}" `
             --store-password-in-clear-text
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore dependencies (Desktop)
+        run: dotnet restore YouTubeHelper/YouTubeHelper.csproj
 
       - name: Build WPF Desktop App
         run: dotnet publish YouTubeHelper\YouTubeHelper.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net8.0-windows
