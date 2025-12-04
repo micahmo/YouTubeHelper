@@ -54,7 +54,7 @@ jobs:
             --store-password-in-clear-text
 
       - name: Restore dependencies (Mobile)
-        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android34.0
+        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj
 
       - name: Build Android APK
         run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android34.0 -c Release -p:AndroidPackageFormat=apk
