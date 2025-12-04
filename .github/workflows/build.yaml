@@ -26,6 +26,7 @@ jobs:
 
     env:
       VERSION_TAG: 1.0.${{ github.run_number }}
+      DOTNET_ROLL_FORWARD: Disable
 
     steps:
       - name: Checkout repository
@@ -53,10 +54,10 @@ jobs:
             --store-password-in-clear-text
 
       - name: Restore dependencies (Mobile)
-        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj
+        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android34.0
 
       - name: Build Android APK
-        run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android -c Release -p:AndroidPackageFormat=apk
+        run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android34.0 -c Release -p:AndroidPackageFormat=apk
 
       - name: Decode keystore
         run: |
@@ -66,8 +67,8 @@ jobs:
 
       - name: Sign APK manually
         run: |
-          $apkPath = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-Signed.apk"
-          $signedApk = "YouTubeHelper.Mobile\bin\Release\net8.0-android\com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk"
+          $apkPath = "YouTubeHelper.Mobile\bin\Release\net8.0-android34.0\com.micahmo.youtubehelper-Signed.apk"
+          $signedApk = "YouTubeHelper.Mobile\bin\Release\net8.0-android34.0\com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk"
 
           & "${env:ANDROID_HOME}\build-tools\34.0.0\apksigner.bat" sign `
             --ks my-release-key.keystore `
@@ -81,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: YouTubeHelper.Mobile/bin/Release/net8.0-android/com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk
+          path: YouTubeHelper.Mobile/bin/Release/net8.0-android34.0/com.micahmo.youtubehelper-${{ env.VERSION_TAG }}.apk
 
   build-desktop:
     name: Build Windows Installer
