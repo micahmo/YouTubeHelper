@@ -56,7 +56,7 @@ jobs:
         run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj
 
       - name: Build Android APK
-        run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -c Release -p:AndroidPackageFormat=apk
+        run: dotnet publish YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android -c Release -p:AndroidPackageFormat=apk
 
       - name: Decode keystore
         run: |
