@@ -136,6 +136,18 @@ namespace YouTubeHelper.Mobile.ViewModels
         });
         private ICommand? _toggleEnableDateRangeLimitCommand;
 
+        public ICommand ToggleSendNotificationsForNewVideosCommand => _toggleSendNotificationsForNewVideosCommand ??= new RelayCommand(() =>
+        {
+            Channel!.SendNotificationsForNewVideos = !Channel.SendNotificationsForNewVideos;
+        });
+        private ICommand? _toggleSendNotificationsForNewVideosCommand;
+
+        public ICommand ToggleAutoDownloadNewVideosCommand => _toggleAutoDownloadNewVideosCommand ??= new RelayCommand(() =>
+        {
+            Channel!.AutoDownloadNewVideos = !Channel.AutoDownloadNewVideos;
+        });
+        private ICommand? _toggleAutoDownloadNewVideosCommand;
+
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
         private ICommand? _findVideosCommand;
 

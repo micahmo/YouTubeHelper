@@ -210,6 +210,13 @@ namespace YouTubeHelper.ViewModels
         }
         private string _searchGlyph = Icons.Search;
 
+        public string DeleteGlyph
+        {
+            get => _deleteGlyph;
+            set => SetProperty(ref _deleteGlyph, value);
+        }
+        private string _deleteGlyph = Icons.Delete;
+
         public MyObservableCollection<VideoViewModel> Videos { get; } = new();
 
         public bool ChannelMode => MainControlViewModel.Mode == MainControlMode.Channel;

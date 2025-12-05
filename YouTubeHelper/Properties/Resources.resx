@@ -327,4 +327,10 @@ Updated the status of {1} video(s).</value>
   <data name="VanityName" xml:space="preserve">
     <value>Vanity Name</value>
   </data>
+  <data name="SendNotificationsForNewVideos" xml:space="preserve">
+    <value>Send notifications for new videos</value>
+  </data>
+  <data name="AutoDownloadNewVideos" xml:space="preserve">
+    <value>Automatically download new videos</value>
+  </data>
 </root>

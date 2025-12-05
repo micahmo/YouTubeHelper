@@ -481,6 +481,8 @@ namespace YouTubeHelper.Mobile
                                 channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
                                 channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
                                 channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                                channelViewModel.Channel.SendNotificationsForNewVideos = updatedChannel.SendNotificationsForNewVideos;
+                                channelViewModel.Channel.AutoDownloadNewVideos = updatedChannel.AutoDownloadNewVideos;
                                 channelViewModel.Channel.Persistent = true; // resume updates
 
                                 // Force the UI to update my "moving" the channel.

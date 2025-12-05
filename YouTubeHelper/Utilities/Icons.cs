@@ -7,5 +7,6 @@
         public static readonly string Check = "\xE73E";
         public static readonly string Filter = "\xE71C";
         public static readonly string List = "\xEA37";
+        public static readonly string Delete = "\xE74D";
     }
 }

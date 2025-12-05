@@ -190,5 +190,62 @@
             Margin="-5,0,0,0"
             Text="{Binding SearchOptionsSummary}"
             TextColor="Gray" />
+
+        <!--  Channel Settings  -->
+        <BoxView
+            Margin="0,15,0,15"
+            Color="LightGray"
+            HeightRequest="1"
+            HorizontalOptions="FillAndExpand" />
+
+        <Label
+            Margin="-5,0,0,0"
+            FontAttributes="Bold"
+            FontSize="14"
+            Text="Channel settings" />
+
+        <BoxView HeightRequest="10" Color="Transparent" />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox
+                Grid.Column="0"
+                Margin="-10,0,0,0"
+                IsChecked="{Binding Channel.SendNotificationsForNewVideos}" />
+            <Label
+                Grid.Column="1"
+                Margin="0,0,10,0"
+                Text="Send notifications for new videos"
+                VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleSendNotificationsForNewVideosCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox
+                Grid.Column="0"
+                Margin="-10,0,0,0"
+                IsChecked="{Binding Channel.AutoDownloadNewVideos}" />
+            <Label
+                Grid.Column="1"
+                Margin="0,0,10,0"
+                Text="Automatically download new videos"
+                VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleAutoDownloadNewVideosCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
     </VerticalStackLayout>
 </toolkit:Popup>

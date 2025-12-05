@@ -658,6 +658,8 @@ namespace YouTubeHelper
                             channelViewModel.Channel.EnableDateRangeLimit = updatedChannel.EnableDateRangeLimit;
                             channelViewModel.Channel.VideoLengthMinimum = updatedChannel.VideoLengthMinimum;
                             channelViewModel.Channel.EnableVideoLengthMinimum = updatedChannel.EnableVideoLengthMinimum;
+                            channelViewModel.Channel.SendNotificationsForNewVideos = updatedChannel.SendNotificationsForNewVideos;
+                            channelViewModel.Channel.AutoDownloadNewVideos = updatedChannel.AutoDownloadNewVideos;
                             channelViewModel.Channel.Index = updatedChannel.Index;
                             channelViewModel.Channel.Persistent = true; // resume updates
 

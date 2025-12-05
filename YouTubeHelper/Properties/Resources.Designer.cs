@@ -115,6 +115,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically download new videos.
+        /// </summary>
+        public static string AutoDownloadNewVideos {
+            get {
+                return ResourceManager.GetString("AutoDownloadNewVideos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -552,6 +561,15 @@ namespace YouTubeHelper.Properties {
         public static string Searching {
             get {
                 return ResourceManager.GetString("Searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send notifications for new videos.
+        /// </summary>
+        public static string SendNotificationsForNewVideos {
+            get {
+                return ResourceManager.GetString("SendNotificationsForNewVideos", resourceCulture);
             }
         }
         
