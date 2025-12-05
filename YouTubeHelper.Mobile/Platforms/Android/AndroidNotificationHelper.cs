@@ -10,8 +10,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool hasProgress, double progress, string? plexRatingKey)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey)
         {
+            bool isDismissable = isDone || isNewVideo;
+
             Context context = global::Android.App.Application.Context;
 
             PendingIntent? dismissPendingIntent = null;
@@ -19,12 +21,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? navigateToQueuePendingIntent = null;
             PendingIntent? openInPlexPendingIntent = null;
             PendingIntent? launchPendingIntent = null;
+            PendingIntent? downloadVideoPendingIntent = null;
 
             int dismissIntentId = notificationId * 10 + 0;
             int navigateToVideoIntentId = notificationId * 10 + 1;
             int navigateToQueueIntentId = notificationId * 10 + 2;
             int openInPlexIntentId = notificationId * 10 + 3;
             int launchIntentId = notificationId * 10 + 4;
+            int downloadVideoIntentId = notificationId * 10 + 5;
 
             if (context.PackageName != null)
             {
@@ -89,6 +93,21 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     launchIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+
+                // Download Video Action
+                Intent downloadVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                downloadVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                downloadVideoIntent.PutExtra("downloadVideo", true);
+                downloadVideoIntent.PutExtra("notificationId", notificationId);
+                downloadVideoIntent.PutExtra("isDone", isDone);
+                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                downloadVideoPendingIntent = PendingIntent.GetActivity(
+                    context,
+                    downloadVideoIntentId,
+                    downloadVideoIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
             }
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
@@ -98,13 +117,22 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetContentText(body)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
                 .SetLargeIcon(bitmap)
-                .SetOngoing(!isDone)
-                .SetAutoCancel(isDone)
+                .SetOngoing(!isDismissable)
+                .SetAutoCancel(isDismissable)
                 .SetContentIntent(string.IsNullOrEmpty(plexRatingKey) ? launchPendingIntent! : openInPlexPendingIntent)
-                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent)
-                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
+                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent);
 
-            if (isDone)
+            if (isNewVideo)
+            {
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", downloadVideoPendingIntent);
+            }
+
+            if (!isNewVideo)
+            {
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
+            }
+
+            if (isDismissable)
             {
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
             }

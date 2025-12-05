@@ -34,6 +34,7 @@ namespace YouTubeHelper.Mobile
             // See if we got an intent to load a video
             string? rawUrl = intent.GetStringExtra(Intent.ExtraText);
             bool isDone = intent.GetBooleanExtra("isDone", false);
+            bool downloadVideo = intent.GetBooleanExtra("downloadVideo", false);
             int notificationId = intent.GetIntExtra("notificationId", -1);
 
             if (isDone)
@@ -43,7 +44,7 @@ namespace YouTubeHelper.Mobile
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
-                _ = AppShell.Instance?.HandleSharedLink(rawUrl);
+                _ = AppShell.Instance?.HandleSharedLink(rawUrl, downloadVideo);
             }
 
             // See if we got an intent to navigate to the queue tab

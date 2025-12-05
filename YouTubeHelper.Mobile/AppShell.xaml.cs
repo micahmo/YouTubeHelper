@@ -555,29 +555,29 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        public async Task HandleSharedLink(string rawUrl)
+        public async Task HandleSharedLink(string rawUrl, bool downloadVideo = false)
         {
             string? videoId = YouTubeUtils.GetVideoIdFromUrl(rawUrl);
             if (!string.IsNullOrEmpty(YouTubeUtils.GetVideoIdFromUrl(rawUrl)))
             {
-                await HandleSharedLink(videoId, null, null, null);
+                await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo);
             }
 
             Url url = new Url(rawUrl);
             if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
             {
-                await HandleSharedLink(null, channelHandle, null, null);
+                await HandleSharedLink(null, channelHandle, null, null, downloadVideo: downloadVideo);
             }
 
             if (url.PathSegments.Count >= 2
                 && url.PathSegments[0].Equals("channel", StringComparison.OrdinalIgnoreCase)
                 && url.PathSegments[1].StartsWith("UC", StringComparison.OrdinalIgnoreCase))
             {
-                await HandleSharedLink(null, null, url.PathSegments[1], YouTubeUtils.ToChannelPlaylist(url.PathSegments[1]));
+                await HandleSharedLink(null, null, url.PathSegments[1], YouTubeUtils.ToChannelPlaylist(url.PathSegments[1]), downloadVideo: downloadVideo);
             }
         }
 
-        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist)
+        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist, bool downloadVideo = false)
         {
             while (!_loaded)
             {
@@ -676,6 +676,11 @@ namespace YouTubeHelper.Mobile
                     foundChannelViewModel.Videos.Add(videoViewModel);
 
                     Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
+
+                    if (downloadVideo)
+                    {
+                        Task __ = videoViewModel.DownloadVideo("plex");
+                    }
                 }
             }
 

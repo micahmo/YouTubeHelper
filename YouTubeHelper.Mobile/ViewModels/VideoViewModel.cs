@@ -258,7 +258,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
         }
 
-        private async Task DownloadVideo(string dataDirectorySubpath)
+        internal async Task DownloadVideo(string dataDirectorySubpath)
         {
             if (_previousRequestId != null)
             {

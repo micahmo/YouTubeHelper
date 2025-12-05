@@ -24,6 +24,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool hasProgress = double.TryParse(progressStr, out double progress);
             data.TryGetValue("done", out string? doneStr);
             bool isDone = bool.TryParse(doneStr, out bool done) && done;
+            data.TryGetValue("newVideo", out string? newVideoStr);
+            bool isNewVideo = bool.TryParse(newVideoStr, out bool newVideo) && newVideo;
             data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
             data.TryGetValue("plexRatingKey", out string? plexRatingKey);
@@ -47,6 +49,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     channelId: isDone ? "completion" : "progress",
                     notificationId: int.Parse(tag),
                     isDone: isDone,
+                    isNewVideo: isNewVideo,
                     hasProgress: hasProgress,
                     progress: progress,
                     plexRatingKey: plexRatingKey
