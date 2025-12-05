@@ -34,10 +34,13 @@ namespace YouTubeHelper.Mobile
             // See if we got an intent to load a video
             string? rawUrl = intent.GetStringExtra(Intent.ExtraText);
             bool isDone = intent.GetBooleanExtra("isDone", false);
+            bool isNewVideo = intent.GetBooleanExtra("isNewVideo", false);
             bool downloadVideo = intent.GetBooleanExtra("downloadVideo", false);
             int notificationId = intent.GetIntExtra("notificationId", -1);
 
-            if (isDone)
+            bool isDismissable = isDone || isNewVideo;
+
+            if (isDismissable)
             {
                 AndroidX.Core.App.NotificationManagerCompat.From(this).Cancel(notificationId);
             }
