@@ -46,7 +46,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     body: body,
                     videoUrl: videoUrl,
                     thumbnailPath: await Utilities.GetCachedImagePath(thumbnailUrl),
-                    channelId: isDone ? "completion" : "progress",
+                    notificationChannelId: isDone ? "completion" : "progress",
                     notificationId: int.Parse(tag),
                     isDone: isDone,
                     isNewVideo: isNewVideo,

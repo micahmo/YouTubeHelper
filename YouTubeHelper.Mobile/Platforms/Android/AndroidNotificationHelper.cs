@@ -10,7 +10,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string channelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey)
         {
             bool isDismissable = isDone || isNewVideo;
 
@@ -112,7 +112,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: isDone ? "completion" : "progress")
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: notificationChannelId)
                 .SetContentTitle(title)
                 .SetContentText(body)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
