@@ -464,6 +464,58 @@
                                                             ui:ControlHelper.PlaceholderText="{x:Static properties:Resources.VideoLengthMinimum}"
                                                             IsEnabled="{Binding MainControlViewModel.SelectedChannel.Channel.EnableVideoLengthMinimum}"
                                                             Value="{Binding MainControlViewModel.SelectedChannel.Channel.VideoLengthMinimumInSeconds}" />
+
+                                                        <Border Width="10" />
+
+                                                        <TextBlock VerticalAlignment="Center" Text="Exclude days of week" />
+
+                                                        <Button Margin="5,0,0,0" HorizontalAlignment="Left">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock VerticalAlignment="Center" Text="{Binding ExcludeDaysSummary}" />
+                                                                <ui:FontIcon Margin="5,0,0,0" Glyph="&#xE70D;" />
+                                                            </StackPanel>
+
+                                                            <ui:FlyoutService.Flyout>
+                                                                <ui:Flyout Placement="Bottom">
+                                                                    <ItemsControl ItemsSource="{Binding ExcludeDaysOfWeek}">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <CheckBox
+                                                                                    Padding="5,2"
+                                                                                    Content="{Binding DisplayName}"
+                                                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </ui:Flyout>
+                                                            </ui:FlyoutService.Flyout>
+                                                        </Button>
+
+                                                        <Border Width="10" />
+
+                                                        <TextBlock VerticalAlignment="Center" Text="Include days of week" />
+
+                                                        <Button Margin="5,0,0,0" HorizontalAlignment="Left">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock VerticalAlignment="Center" Text="{Binding IncludeDaysSummary}" />
+                                                                <ui:FontIcon Margin="5,0,0,0" Glyph="&#xE70D;" />
+                                                            </StackPanel>
+
+                                                            <ui:FlyoutService.Flyout>
+                                                                <ui:Flyout Placement="Bottom">
+                                                                    <ItemsControl ItemsSource="{Binding IncludeDaysOfWeek}">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <CheckBox
+                                                                                    Padding="5,2"
+                                                                                    Content="{Binding DisplayName}"
+                                                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </ui:Flyout>
+                                                            </ui:FlyoutService.Flyout>
+                                                        </Button>
                                                     </StackPanel>
                                                 </Grid>
                                             </ScrollViewer>

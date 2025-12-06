@@ -7,245 +7,337 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     x:Name="This">
 
-    <VerticalStackLayout
-        Padding="20"
-        BackgroundColor="White"
-        WidthRequest="{Binding Width, Source={x:Reference This}}">
-        <!--  Channel Name  -->
+    <ScrollView MaximumHeightRequest="600" WidthRequest="{Binding Width, Source={x:Reference This}}">
+        <VerticalStackLayout Padding="20" BackgroundColor="White">
 
-        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <!--  Channel Name  -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Label
+                    Grid.Column="0"
+                    Margin="-5,0,0,0"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    HorizontalOptions="StartAndExpand"
+                    LineBreakMode="TailTruncation"
+                    MaxLines="1"
+                    Text="{Binding Channel.VanityName}"
+                    VerticalTextAlignment="Center" />
+
+                <Button
+                    Grid.Column="1"
+                    Padding="0"
+                    Command="{Binding ResetFiltersCommand}"
+                    HeightRequest="32"
+                    Text="Reset Filters"
+                    WidthRequest="120">
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="{OnPlatform Android=ionicons.ttf#}"
+                            Glyph="&#xf49c;"
+                            Size="20"
+                            Color="White" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
             <Label
-                Grid.Column="0"
                 Margin="-5,0,0,0"
                 FontAttributes="Bold"
-                FontSize="20"
-                HorizontalOptions="StartAndExpand"
-                LineBreakMode="TailTruncation"
-                MaxLines="1"
-                Text="{Binding Channel.VanityName}"
-                VerticalTextAlignment="Center" />
+                FontSize="14"
+                Text="Advanced filters" />
 
-            <Button
-                Grid.Column="1"
-                Padding="0"
-                Command="{Binding ResetFiltersCommand}"
-                HeightRequest="32"
-                Text="Reset Filters"
-                WidthRequest="120">
-                <Button.ImageSource>
-                    <FontImageSource
-                        FontFamily="{OnPlatform Android=ionicons.ttf#}"
-                        Glyph="&#xf49c;"
-                        Size="20"
-                        Color="White" />
-                </Button.ImageSource>
-            </Button>
-        </Grid>
+            <BoxView HeightRequest="10" Color="Transparent" />
 
-        <BoxView HeightRequest="20" Color="Transparent" />
+            <!--  Search Term Entry  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Entry
+                    Grid.Column="0"
+                    Margin="-7,0,0,0"
+                    Placeholder="Search by title"
+                    Text="{Binding SearchByTitleTerm}" />
 
-        <Label
-            Margin="-5,0,0,0"
-            FontAttributes="Bold"
-            FontSize="14"
-            Text="Advanced filters" />
+                <Button
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Padding="0"
+                    Command="{Binding ShowSearchHistoryCommand}"
+                    HeightRequest="32"
+                    WidthRequest="32">
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="{OnPlatform Android=ionicons.ttf#}"
+                            Glyph="&#xF394;"
+                            Size="20"
+                            Color="White" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
 
-        <BoxView HeightRequest="10" Color="Transparent" />
+            <BoxView HeightRequest="10" Color="Transparent" />
 
-        <!--  Search Term Entry  -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Entry
-                Grid.Column="0"
-                Margin="-7,0,0,0"
-                Placeholder="Search by title"
-                Text="{Binding SearchByTitleTerm}" />
+            <!--  Max Results Options  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <Button
-                Grid.Column="1"
-                Margin="10,0,0,0"
-                Padding="0"
-                Command="{Binding ShowSearchHistoryCommand}"
-                HeightRequest="32"
-                WidthRequest="32">
-                <Button.ImageSource>
-                    <FontImageSource
-                        FontFamily="{OnPlatform Android=ionicons.ttf#}"
-                        Glyph="&#xF394;"
-                        Size="20"
-                        Color="White" />
-                </Button.ImageSource>
-            </Button>
-        </Grid>
+                <CheckBox
+                    Grid.Column="0"
+                    Margin="-10,0,0,0"
+                    IsChecked="{Binding EnableCountLimit}" />
+                <Label
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Text="Maximum number of results"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleEnableCountLimitCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Entry
+                    Grid.Column="3"
+                    HorizontalOptions="End"
+                    IsEnabled="{Binding EnableCountLimit}"
+                    Keyboard="Numeric"
+                    Text="{Binding CountLimit}" />
+            </Grid>
 
-        <BoxView HeightRequest="10" Color="Transparent" />
+            <BoxView HeightRequest="20" Color="Transparent" />
 
-        <!--  Max Results Options  -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <CheckBox
-                Grid.Column="0"
-                Margin="-10,0,0,0"
-                IsChecked="{Binding EnableCountLimit}" />
             <Label
-                Grid.Column="1"
-                Margin="0,0,10,0"
-                Text="Maximum number of results"
-                VerticalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleEnableCountLimitCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
-            <Entry
-                Grid.Column="3"
-                HorizontalOptions="End"
-                IsEnabled="{Binding EnableCountLimit}"
-                Keyboard="Numeric"
-                Text="{Binding CountLimit}" />
-        </Grid>
+                Margin="-5,0,0,0"
+                FontAttributes="Bold"
+                FontSize="14"
+                Text="Channel filters" />
 
-        <BoxView HeightRequest="20" Color="Transparent" />
+            <BoxView HeightRequest="10" Color="Transparent" />
 
-        <Label
-            Margin="-5,0,0,0"
-            FontAttributes="Bold"
-            FontSize="14"
-            Text="Channel filters" />
+            <!--  Date Range Options  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <BoxView HeightRequest="10" Color="Transparent" />
+                <CheckBox
+                    Grid.Column="0"
+                    Margin="-10,0,0,0"
+                    IsChecked="{Binding Channel.EnableDateRangeLimit}" />
+                <Label
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Text="Do not show videos before"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <DatePicker
+                    Grid.Column="3"
+                    Date="{Binding Channel.DateRangeLimit}"
+                    HorizontalOptions="End"
+                    IsEnabled="{Binding Channel.EnableDateRangeLimit}" />
+            </Grid>
 
-        <!--  Date Range Options  -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <BoxView HeightRequest="10" Color="Transparent" />
 
-            <CheckBox
-                Grid.Column="0"
-                Margin="-10,0,0,0"
-                IsChecked="{Binding Channel.EnableDateRangeLimit}" />
+            <!--  Video Minimum Length Options  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <CheckBox
+                    Grid.Column="0"
+                    Margin="-10,0,0,0"
+                    IsChecked="{Binding Channel.EnableVideoLengthMinimum}" />
+                <Label
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Text="Do not show videos shorter than"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleEnableVideoLengthMinimumCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Entry
+                    Grid.Column="3"
+                    HorizontalOptions="End"
+                    IsEnabled="{Binding Channel.EnableVideoLengthMinimum}"
+                    Text="{Binding Channel.VideoLengthMinimumInSeconds}" />
+            </Grid>
+
+            <BoxView HeightRequest="10" Color="Transparent" />
+
+            <!--  Day-of-week Filters  -->
+
+            <!--  Exclude days of week  -->
+            <toolkit:Expander>
+                <toolkit:Expander.Header>
+                    <Grid Padding="-3,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Exclude days of week"
+                            VerticalOptions="Center" />
+
+                        <HorizontalStackLayout
+                            Grid.Column="1"
+                            Spacing="4"
+                            VerticalOptions="Center">
+                            <!--  Summary text  -->
+                            <Label Text="{Binding ExcludeDaysSummary}" VerticalOptions="Center" />
+                            <Label Text="▼" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </toolkit:Expander.Header>
+
+                <toolkit:Expander.Content>
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding ExcludeDaysOfWeek}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,2,0,2">
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <HorizontalStackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                        </HorizontalStackLayout.GestureRecognizers>
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Text="{Binding DisplayName}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </toolkit:Expander.Content>
+            </toolkit:Expander>
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+            <!--  Include days of week  -->
+            <toolkit:Expander>
+                <toolkit:Expander.Header>
+                    <Grid Padding="-3,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Include days of week"
+                            VerticalOptions="Center" />
+
+                        <HorizontalStackLayout
+                            Grid.Column="1"
+                            Spacing="4"
+                            VerticalOptions="Center">
+                            <Label Text="{Binding IncludeDaysSummary}" VerticalOptions="Center" />
+                            <Label Text="▼" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </toolkit:Expander.Header>
+
+                <toolkit:Expander.Content>
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding IncludeDaysOfWeek}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,2,0,2">
+                                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                        <HorizontalStackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                        </HorizontalStackLayout.GestureRecognizers>
+                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalOptions="Center" />
+                                        <Label Text="{Binding DisplayName}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </toolkit:Expander.Content>
+            </toolkit:Expander>
+
+            <BoxView HeightRequest="20" Color="Transparent" />
+
+            <!--  Search Options Summary  -->
             <Label
-                Grid.Column="1"
-                Margin="0,0,10,0"
-                Text="Do not show videos before"
-                VerticalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleEnableDateRangeLimitCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
-            <DatePicker
-                Grid.Column="3"
-                Date="{Binding Channel.DateRangeLimit}"
-                HorizontalOptions="End"
-                IsEnabled="{Binding Channel.EnableDateRangeLimit}" />
-        </Grid>
+                Margin="-5,0,0,0"
+                Text="{Binding SearchOptionsSummary}"
+                TextColor="Gray" />
 
-        <BoxView HeightRequest="10" Color="Transparent" />
+            <!--  Channel Settings  -->
+            <BoxView
+                Margin="0,15,0,15"
+                HeightRequest="1"
+                HorizontalOptions="FillAndExpand"
+                Color="LightGray" />
 
-        <!--  Video Minimum Length Options  -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <CheckBox
-                Grid.Column="0"
-                Margin="-10,0,0,0"
-                IsChecked="{Binding Channel.EnableVideoLengthMinimum}" />
             <Label
-                Grid.Column="1"
-                Margin="0,0,10,0"
-                Text="Do not show videos shorter than"
-                VerticalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleEnableVideoLengthMinimumCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
-            <Entry
-                Grid.Column="3"
-                HorizontalOptions="End"
-                IsEnabled="{Binding Channel.EnableVideoLengthMinimum}"
-                Text="{Binding Channel.VideoLengthMinimumInSeconds}" />
-        </Grid>
+                Margin="-5,0,0,0"
+                FontAttributes="Bold"
+                FontSize="14"
+                Text="Channel settings" />
 
-        <BoxView HeightRequest="20" Color="Transparent" />
+            <BoxView HeightRequest="10" Color="Transparent" />
 
-        <!--  Search Options Summary  -->
-        <Label
-            Margin="-5,0,0,0"
-            Text="{Binding SearchOptionsSummary}"
-            TextColor="Gray" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <!--  Channel Settings  -->
-        <BoxView
-            Margin="0,15,0,15"
-            Color="LightGray"
-            HeightRequest="1"
-            HorizontalOptions="FillAndExpand" />
+                <CheckBox
+                    Grid.Column="0"
+                    Margin="-10,0,0,0"
+                    IsChecked="{Binding Channel.SendNotificationsForNewVideos}" />
+                <Label
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Text="Send notifications for new videos"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleSendNotificationsForNewVideosCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
 
-        <Label
-            Margin="-5,0,0,0"
-            FontAttributes="Bold"
-            FontSize="14"
-            Text="Channel settings" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-        <BoxView HeightRequest="10" Color="Transparent" />
-
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <CheckBox
-                Grid.Column="0"
-                Margin="-10,0,0,0"
-                IsChecked="{Binding Channel.SendNotificationsForNewVideos}" />
-            <Label
-                Grid.Column="1"
-                Margin="0,0,10,0"
-                Text="Send notifications for new videos"
-                VerticalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleSendNotificationsForNewVideosCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
-        </Grid>
-
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <CheckBox
-                Grid.Column="0"
-                Margin="-10,0,0,0"
-                IsChecked="{Binding Channel.AutoDownloadNewVideos}" />
-            <Label
-                Grid.Column="1"
-                Margin="0,0,10,0"
-                Text="Automatically download new videos"
-                VerticalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding ToggleAutoDownloadNewVideosCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
-        </Grid>
-    </VerticalStackLayout>
+                <CheckBox
+                    Grid.Column="0"
+                    Margin="-10,0,0,0"
+                    IsChecked="{Binding Channel.AutoDownloadNewVideos}" />
+                <Label
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Text="Automatically download new videos"
+                    VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleAutoDownloadNewVideosCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
 </toolkit:Popup>

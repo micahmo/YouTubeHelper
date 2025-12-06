@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Shell;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Polly;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Shell;
 using YouTubeHelper.Properties;
+using YouTubeHelper.Shared.Mappers;
 using YouTubeHelper.Shared.Utilities;
 using YouTubeHelper.Utilities;
 
@@ -53,14 +55,34 @@ namespace YouTubeHelper.ViewModels
             {
                 if (args.PropertyName is nameof(Channel.EnableDateRangeLimit)
                     or nameof(Channel.DateRangeLimit)
-                    or nameof(Channel.EnableVideoLengthMinimum) 
+                    or nameof(Channel.EnableVideoLengthMinimum)
                     or nameof(Channel.VideoLengthMinimum)
                     or nameof(Channel.ExcludeDaysUtc)
                     or nameof(Channel.IncludeDaysUtc))
                 {
                     OnPropertyChanged(nameof(SearchOptionsSummary));
                 }
+
+                if (args.PropertyName is nameof(channel.ExcludeDaysUtc) or nameof(channel.IncludeDaysUtc))
+                {
+                    SetupDaysOfWeek();
+                    OnPropertyChanged(nameof(ExcludeDaysOfWeek));
+                    OnPropertyChanged(nameof(IncludeDaysOfWeek));
+                    OnPropertyChanged(nameof(ExcludeDaysSummary));
+                    OnPropertyChanged(nameof(IncludeDaysSummary));
+                }
             };
+
+            SetupDaysOfWeek();
+        }
+
+        private void SetupDaysOfWeek()
+        {
+            ExcludeDaysOfWeek = CreateDayCollectionFromList(Channel.ExcludeDaysUtc);
+            IncludeDaysOfWeek = CreateDayCollectionFromList(Channel.IncludeDaysUtc);
+
+            HookDayCollection(ExcludeDaysOfWeek, OnExcludeDaysChanged);
+            HookDayCollection(IncludeDaysOfWeek, OnIncludeDaysChanged);
         }
 
         public ICommand DeleteCommand => _deleteChannelCommand ??= new RelayCommand(Delete);
@@ -289,6 +311,44 @@ namespace YouTubeHelper.ViewModels
                     parts.Add($"Min length: {length.TotalSeconds}s");
                 }
 
+                // Days of week filters
+                List<string> dayFilters = new List<string>();
+
+                List<DayOfWeekItem> excludedDays = ExcludeDaysOfWeek!.Where(d => d.IsSelected).ToList();
+                if (excludedDays.Count is > 0 and < 7)
+                {
+                    if (excludedDays.Count > 4)
+                    {
+                        IEnumerable<string> notExcluded = ExcludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        dayFilters.Add($"Exclude all except {string.Join(", ", notExcluded)}");
+                    }
+                    else
+                    {
+                        IEnumerable<string> excluded = excludedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        dayFilters.Add($"Exclude: {string.Join(", ", excluded)}");
+                    }
+                }
+
+                List<DayOfWeekItem> includedDays = IncludeDaysOfWeek!.Where(d => d.IsSelected).ToList();
+                if (includedDays.Count is > 0 and < 7)
+                {
+                    if (includedDays.Count > 4)
+                    {
+                        IEnumerable<string> notIncluded = IncludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        dayFilters.Add($"Include all except {string.Join(", ", notIncluded)}");
+                    }
+                    else
+                    {
+                        IEnumerable<string> included = includedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        dayFilters.Add($"Include: {string.Join(", ", included)}");
+                    }
+                }
+
+                if (dayFilters.Count > 0)
+                {
+                    parts.Add(string.Join(", ", dayFilters));
+                }
+
                 return string.Join(" | ", parts);
             }
         }
@@ -319,5 +379,74 @@ namespace YouTubeHelper.ViewModels
             await ServerApiClient.Instance.UpdateChannel(Channel, Guid.Empty.ToString());
             await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
         }
+
+        #region Day of week stuff
+
+        public ObservableCollection<DayOfWeekItem>? ExcludeDaysOfWeek { get; private set; }
+
+        public ObservableCollection<DayOfWeekItem>? IncludeDaysOfWeek { get; private set; }
+
+        public string ExcludeDaysSummary => BuildSummary(ExcludeDaysOfWeek!);
+
+        public string IncludeDaysSummary => BuildSummary(IncludeDaysOfWeek!);
+
+        private ObservableCollection<DayOfWeekItem> CreateDayCollectionFromList(List<DayOfWeek>? existing)
+        {
+            List<DayOfWeekItem> items = new List<DayOfWeekItem>();
+
+            Array values = Enum.GetValues(typeof(DayOfWeek));
+            foreach (object value in values)
+            {
+                DayOfWeek day = (DayOfWeek)value;
+                bool isSelected = existing != null && existing.Contains(day);
+
+                DayOfWeekItem item = new DayOfWeekItem(day, isSelected);
+                items.Add(item);
+            }
+
+            return new ObservableCollection<DayOfWeekItem>(items);
+        }
+
+        private void HookDayCollection(ObservableCollection<DayOfWeekItem> collection, EventHandler handler)
+        {
+            foreach (DayOfWeekItem item in collection)
+            {
+                item.SelectionChanged += handler;
+            }
+        }
+
+        private void OnExcludeDaysChanged(object? sender, EventArgs e)
+        {
+            Channel.ExcludeDaysUtc = BuildListFromCollection(ExcludeDaysOfWeek!);
+            OnPropertyChanged(nameof(ExcludeDaysSummary));
+        }
+
+        private void OnIncludeDaysChanged(object? sender, EventArgs e)
+        {
+            Channel.IncludeDaysUtc = BuildListFromCollection(IncludeDaysOfWeek!);
+            OnPropertyChanged(nameof(IncludeDaysSummary));
+        }
+
+        private List<DayOfWeek> BuildListFromCollection(IEnumerable<DayOfWeekItem> collection)
+        {
+            return collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
+        }
+
+        private string BuildSummary(IEnumerable<DayOfWeekItem> collection)
+        {
+            List<DayOfWeek> selected = collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
+            if (selected.Count == 0)
+            {
+                return "None";
+            }
+            if (selected.Count == 7)
+            {
+                return "All days";
+            }
+            // Use 3-letter abbreviations
+            return string.Join(", ", selected.Select(d => d.ToString().Substring(0, 3)));
+        }
     }
+
+    #endregion
 }
