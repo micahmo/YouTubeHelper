@@ -61,6 +61,12 @@
                     <Label
                         Margin="10,0,10,0"
                         FontAttributes="Bold"
+                        IsVisible="{Binding Video.New}"
+                        Text="NEW!"
+                        TextColor="Goldenrod" />
+                    <Label
+                        Margin="10,0,10,0"
+                        FontAttributes="Bold"
                         IsVisible="{Binding Video.Excluded}"
                         Text="{Binding ExcludedString}"
                         TextColor="FireBrick" />

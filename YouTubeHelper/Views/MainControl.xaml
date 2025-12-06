@@ -546,9 +546,19 @@
 
                                                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                                                                     <TextBlock
+                                                                        Padding="0,0,7,0"
+                                                                        FontWeight="Medium"
+                                                                        Foreground="Goldenrod"
+                                                                        Text="NEW!"
+                                                                        TextWrapping="Wrap"
+                                                                        Visibility="{c:Binding Video.New,
+                                                                                               FalseToVisibility=Collapsed}" />
+
+                                                                    <TextBlock
                                                                         FontWeight="Medium"
                                                                         Text="{Binding Video.Title}"
                                                                         TextWrapping="Wrap" />
+
                                                                     <TextBlock
                                                                         Padding="15,0,7,0"
                                                                         FontWeight="Light"
@@ -556,6 +566,7 @@
                                                                         TextWrapping="Wrap"
                                                                         Visibility="{c:Binding ShowChannelName,
                                                                                                FalseToVisibility=Collapsed}" />
+
                                                                     <TextBlock
                                                                         Padding="7,0,15,0"
                                                                         Cursor="Hand"
