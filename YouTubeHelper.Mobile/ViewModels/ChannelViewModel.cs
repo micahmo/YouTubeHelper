@@ -106,7 +106,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                         if (channelArgs.PropertyName is nameof(Channel.EnableDateRangeLimit)
                             or nameof(Channel.DateRangeLimit)
                             or nameof(Channel.EnableVideoLengthMinimum)
-                            or nameof(Channel.VideoLengthMinimum))
+                            or nameof(Channel.VideoLengthMinimum)
+                            or nameof(Channel.ExcludeDaysUtc)
+                            or nameof(Channel.IncludeDaysUtc))
                         {
                             OnPropertyChanged(nameof(SearchOptionsSummary));
                         }
@@ -235,7 +237,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     SearchTerms = searchTerms,
                                     Count = EnableCountLimit && CountLimit.HasValue ? CountLimit.Value : int.MaxValue,
                                     DateRangeLimit = Channel?.EnableDateRangeLimit == true ? Channel.DateRangeLimit : null,
-                                    VideoLengthMinimum = Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null
+                                    VideoLengthMinimum = Channel?.EnableVideoLengthMinimum == true ? Channel.VideoLengthMinimum : null,
+                                    ExcludeDaysUtc = Channel?.ExcludeDaysUtc,
+                                    IncludeDaysUtc = Channel?.IncludeDaysUtc
                                 });
 
                                 List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
