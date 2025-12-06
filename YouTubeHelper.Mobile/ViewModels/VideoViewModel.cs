@@ -64,7 +64,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
 
-        public string VideoTitle => $"{Video.Title}{(_channelViewModel.Channel?.ChannelPlaylist?.Contains(',') == true || AppShell.Instance?.AppShellViewModel.QueueTabSelected == true ? $" ({Video.ChannelName})" : string.Empty)}";
+        public string VideoTitle => $"{Video.Title}{(_channelViewModel.Channel?.RealPlaylistId.Count() > 1 || AppShell.Instance?.AppShellViewModel.QueueTabSelected == true ? $" ({Video.ChannelName})" : string.Empty)}";
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
         private ICommand? _videoTappedCommand;
