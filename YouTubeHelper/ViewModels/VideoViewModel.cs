@@ -292,7 +292,7 @@ namespace YouTubeHelper.ViewModels
         }
         private bool _isDescriptionExpanded;
 
-        public bool ShowChannelName => _channelViewModel.Channel.ChannelPlaylist?.Contains(',') == true;
+        public bool ShowChannelName => _channelViewModel.Channel.ChannelPlaylist?.Contains(',') == true || _channelViewModel.QueueMode;
 
         public MainControlViewModel MainControlViewModel { get; }
         
