@@ -51,6 +51,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 navigateToVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
                 navigateToVideoIntent.PutExtra("notificationId", notificationId);
                 navigateToVideoIntent.PutExtra("isDone", isDone);
+                navigateToVideoIntent.PutExtra("isNewVideo", isNewVideo);
                 navigateToVideoPendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: navigateToVideoIntentId,
@@ -100,7 +101,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
                 downloadVideoIntent.PutExtra("downloadVideo", true);
                 downloadVideoIntent.PutExtra("notificationId", notificationId);
-                downloadVideoIntent.PutExtra("isDone", isDone);
                 downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
                 downloadVideoPendingIntent = PendingIntent.GetActivity(
                     context,
