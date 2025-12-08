@@ -232,7 +232,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             options.Add(Resources.Resources.DownloadCustom);
             options.Add(string.Format(Resources.Resources.DownloadPath, Settings.Instance!.DownloadDirectory));
 
-            if (queueTabSelected)
+            if (queueTabSelected || _channelViewModel.Channel!.RealPlaylistId.Count() > 1)
             {
                 options.Add(Resources.Resources.GoToChannel);
             }
