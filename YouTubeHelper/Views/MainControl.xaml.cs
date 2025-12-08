@@ -144,11 +144,20 @@ namespace YouTubeHelper.Views
             }
         }
 
-        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        private void VideoIdTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is TextBlock textBlock)
             {
                 Clipboard.SetText(textBlock.Text);
+            }
+        }
+
+        private async void ChannelNameTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement { DataContext: VideoViewModel videoViewModel })
+            {
+                string videoUrl = $"https://youtube.com/watch?v={videoViewModel.Video.Id}";
+                await MainWindow.Instance!.HandleSharedLink(videoUrl);
             }
         }
     }

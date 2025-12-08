@@ -613,7 +613,9 @@
 
                                                                     <TextBlock
                                                                         Padding="15,0,7,0"
+                                                                        Cursor="Hand"
                                                                         FontWeight="Light"
+                                                                        MouseDown="ChannelNameTextBlock_MouseDown"
                                                                         Text="{Binding Video.ChannelName}"
                                                                         TextWrapping="Wrap"
                                                                         Visibility="{c:Binding ShowChannelName,
@@ -623,7 +625,7 @@
                                                                         Padding="7,0,15,0"
                                                                         Cursor="Hand"
                                                                         FontWeight="Light"
-                                                                        MouseDown="TextBlock_MouseDown"
+                                                                        MouseDown="VideoIdTextBlock_MouseDown"
                                                                         Text="{Binding Video.Id}"
                                                                         TextWrapping="Wrap" />
 
