@@ -3,6 +3,7 @@ using Android.App;
 using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
+using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.Mobile.Platforms.Android
 {
@@ -20,15 +21,17 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? navigateToVideoPendingIntent = null;
             PendingIntent? navigateToQueuePendingIntent = null;
             PendingIntent? openInPlexPendingIntent = null;
-            PendingIntent? launchPendingIntent = null;
+            PendingIntent? launchAppPendingIntent = null;
             PendingIntent? downloadVideoPendingIntent = null;
+            PendingIntent? markVideoAsWontWatchPendingIntent = null;
 
             int dismissIntentId = notificationId * 10 + 0;
             int navigateToVideoIntentId = notificationId * 10 + 1;
             int navigateToQueueIntentId = notificationId * 10 + 2;
             int openInPlexIntentId = notificationId * 10 + 3;
-            int launchIntentId = notificationId * 10 + 4;
+            int launchAppIntentId = notificationId * 10 + 4;
             int downloadVideoIntentId = notificationId * 10 + 5;
+            int markVideoAsWontWatchIntentId = notificationId * 10 + 6;
 
             if (context.PackageName != null)
             {
@@ -86,12 +89,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 );
 
                 // Just launch app
-                Intent launchIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                launchIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-                launchPendingIntent = PendingIntent.GetActivity(
+                Intent launchAppIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+                launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                launchAppPendingIntent = PendingIntent.GetActivity(
                     context,
-                    launchIntentId,
-                    launchIntent,
+                    launchAppIntentId,
+                    launchAppIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
 
@@ -108,6 +111,20 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     downloadVideoIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+
+                // Mark Video as Won't Watch Action
+                Intent markVideoAsWontWatchIntent = new Intent(ActionNotification);
+                markVideoAsWontWatchIntent.SetPackage(context.PackageName);
+                markVideoAsWontWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
+                markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
+                markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
+                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                markVideoAsWontWatchPendingIntent = PendingIntent.GetBroadcast(
+                    context,
+                    markVideoAsWontWatchIntentId,
+                    markVideoAsWontWatchIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
             }
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
@@ -118,12 +135,29 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDismissable)
-                .SetAutoCancel(isDismissable)
-                .SetContentIntent(string.IsNullOrEmpty(plexRatingKey) ? launchPendingIntent! : openInPlexPendingIntent)
-                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent);
+                .SetAutoCancel(isDismissable);
 
             if (isNewVideo)
             {
+                builder.SetContentIntent(navigateToVideoPendingIntent!);
+            }
+            else if (string.IsNullOrEmpty(plexRatingKey))
+            {
+                builder.SetContentIntent(launchAppPendingIntent!);
+            }
+            else
+            {
+                builder.SetContentIntent(openInPlexPendingIntent);
+            }
+
+            if (!isNewVideo)
+            {
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent);
+            }
+
+            if (isNewVideo)
+            {
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", markVideoAsWontWatchPendingIntent);
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", downloadVideoPendingIntent);
             }
 

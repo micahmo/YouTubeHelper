@@ -345,6 +345,28 @@ namespace YouTubeHelper.Mobile
             return connected;
         }
 
+        /// <summary>
+        /// Attempts to connect to the server without prompting the user
+        /// </summary>
+        public static async Task<bool> ConnectToServerSilent()
+        {
+            bool connected = false;
+
+            try
+            {
+                string? serverAddress = await SecureStorage.Default.GetAsync("server_address");
+                ServerApiClient.SetBaseUrl(serverAddress!);
+                Settings.Instance = await ServerApiClient.Instance.GetSettings();
+                connected = true;
+            }
+            catch
+            {
+                // We'll fall into the next block which prompts the user to re-enter
+            }
+
+            return connected;
+        }
+
         private async void HandleQueueUpdates(RequestData requestData)
         {
             // If we're in queue mode, we go one step further and move the video to the top of the queue or add it if it's not already there
