@@ -11,24 +11,26 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     [IntentFilter(new[] { "com.micahmo.youtubehelper.NOTIFICATION_ACTION" })]
     public class NotificationActionReceiver : BroadcastReceiver
     {
-        public override async void OnReceive(Context? context, Intent? intent)
+        public override void OnReceive(Context? context, Intent? intent)
         {
             if (context is null || intent is null)
             {
                 return;
             }
-            
-            string? actionType = intent.GetStringExtra("actionType");
+
             string? rawUrl = intent.GetStringExtra(Intent.ExtraText);
+            string? actionType = intent.GetStringExtra("actionType");
+            string? markVideoStr = intent.GetStringExtra("markVideo");
+            ExclusionReason? markVideoEnum = markVideoStr is { } s && Enum.TryParse(s, ignoreCase: true, out ExclusionReason reason) ? reason : null;
 
             switch (actionType)
             {
                 case "dismiss":
-                    await HandleDismiss(context, intent);
+                    HandleDismiss(context, intent);
                     break;
             }
 
-            if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId)
+            if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId && markVideoEnum is not null)
             {
                 PendingResult? pendingResult = GoAsync();
 
@@ -36,34 +38,24 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 {
                     try
                     {
-                        string? markVideoStr = intent.GetStringExtra("markVideo");
-                        ExclusionReason? markVideoEnum = markVideoStr is { } s && Enum.TryParse(s, ignoreCase: true, out ExclusionReason reason) ? reason : null;
-
-                        switch (markVideoEnum)
+                        if (await AppShell.ConnectToServerSilent())
                         {
-                            case ExclusionReason.WontWatch:
-                                if (await AppShell.ConnectToServerSilent())
+                            if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                                 {
-                                    if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                        {
-                                            ExclusionsMode = ExclusionsMode.ShowAll,
-                                            VideoIds = new List<string> { videoId },
-                                            SortMode = SortMode.AgeDesc,
-                                            Count = int.MaxValue
-                                        })).FirstOrDefault() is { } video)
-                                    {
-                                        video.Excluded = true;
-                                        video.ExclusionReason = ExclusionReason.WontWatch;
-                                        await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
-                                    }
-                                }
-
-                                await HandleDismiss(context, intent);
-
-                                break;
-                            default:
-                                break;
+                                    ExclusionsMode = ExclusionsMode.ShowAll,
+                                    VideoIds = new List<string> { videoId },
+                                    SortMode = SortMode.AgeDesc,
+                                    Count = int.MaxValue
+                                })).FirstOrDefault() is { } video)
+                            {
+                                video.Excluded = true;
+                                video.ExclusionReason = markVideoEnum.Value;
+                                await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
+                            }
                         }
+
+                        HandleDismiss(context, intent);
+
                     }
                     finally
                     {
@@ -73,14 +65,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             }
         }
 
-        private Task HandleDismiss(Context context, Intent intent)
+        private void HandleDismiss(Context context, Intent intent)
         {
             int notificationId = intent.GetIntExtra("notificationId", -1);
-
             AndroidX.Core.App.NotificationManagerCompat.From(context).Cancel(notificationId);
-
-            return Task.CompletedTask;
         }
     }
-
 }

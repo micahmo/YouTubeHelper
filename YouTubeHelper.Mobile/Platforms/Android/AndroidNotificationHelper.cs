@@ -25,6 +25,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? downloadVideoPendingIntent = null;
             PendingIntent? markVideoAsWontWatchPendingIntent = null;
             PendingIntent? watchVideoPendingIntent = null;
+            PendingIntent? markVideoAsMightWatchPendingIntent = null;
 
             int dismissIntentId = notificationId * 10 + 0;
             int navigateToVideoIntentId = notificationId * 10 + 1;
@@ -34,6 +35,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             int downloadVideoIntentId = notificationId * 10 + 5;
             int markVideoAsWontWatchIntentId = notificationId * 10 + 6;
             int watchVideoIntentId = notificationId * 10 + 7;
+            int markVideoAsMightWatchIntentId = notificationId * 10 + 6;
 
             if (context.PackageName != null)
             {
@@ -141,6 +143,20 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     watchVideoIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+
+                // Mark Video as Might Watch Action
+                Intent markVideoAsMightWatchIntent = new Intent(ActionNotification);
+                markVideoAsMightWatchIntent.SetPackage(context.PackageName);
+                markVideoAsMightWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
+                markVideoAsMightWatchIntent.PutExtra("markVideo", ExclusionReason.MightWatch.ToString());
+                markVideoAsMightWatchIntent.PutExtra("notificationId", notificationId);
+                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                markVideoAsMightWatchPendingIntent = PendingIntent.GetBroadcast(
+                    context,
+                    markVideoAsMightWatchIntentId,
+                    markVideoAsMightWatchIntent,
+                    PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+                );
             }
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
@@ -156,7 +172,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             // Set notification tap action
             if (isNewVideo)
             {
-                builder.SetContentIntent(navigateToVideoPendingIntent!);
+                builder.SetContentIntent(watchVideoPendingIntent!);
             }
             else if (string.IsNullOrEmpty(plexRatingKey))
             {
@@ -171,7 +187,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             if (isNewVideo)
             {
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", markVideoAsWontWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Watch", watchVideoPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Might Watch", markVideoAsMightWatchPendingIntent);
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", downloadVideoPendingIntent);
             }
             else
