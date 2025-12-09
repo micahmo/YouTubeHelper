@@ -106,11 +106,10 @@ namespace YouTubeHelper.Mobile
             try
             {
 #if ANDROID
-                Intent intent = new Intent(Intent.ActionView);
-                intent.SetPackage("dev.imranr.obtainium.fdroid");
+                string packageName = "dev.imranr.obtainium.fdroid";
+                Intent? intent = Android.App.Application.Context.PackageManager?.GetLaunchIntentForPackage(packageName);
 
-                // Try to open Obtainium directly
-                if (Android.App.Application.Context.PackageManager != null && intent.ResolveActivity(Android.App.Application.Context.PackageManager) != null)
+                if (intent != null)
                 {
                     intent.SetFlags(ActivityFlags.NewTask);
                     Android.App.Application.Context.StartActivity(intent);
