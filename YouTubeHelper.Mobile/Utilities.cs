@@ -96,7 +96,7 @@ namespace YouTubeHelper.Mobile
                     {
                         BackgroundColor = Colors.Black,
                         TextColor = Colors.White,
-                        ActionButtonTextColor = Colors.LightCoral
+                        ActionButtonTextColor = Colors.Firebrick
                     }).Show();
             });
         }
