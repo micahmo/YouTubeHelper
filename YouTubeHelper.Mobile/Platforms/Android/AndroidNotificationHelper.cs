@@ -171,8 +171,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             if (isNewVideo)
             {
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", markVideoAsWontWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Watch", downloadVideoPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", watchVideoPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Watch", watchVideoPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", downloadVideoPendingIntent);
             }
             else
             {
