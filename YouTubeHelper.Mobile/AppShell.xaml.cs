@@ -579,29 +579,29 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        public async Task HandleSharedLink(string rawUrl, bool downloadVideo = false)
+        public async Task HandleSharedLink(string rawUrl, bool downloadVideo = false, bool watchVideo = false)
         {
             string? videoId = YouTubeUtils.GetVideoIdFromUrl(rawUrl);
             if (!string.IsNullOrEmpty(YouTubeUtils.GetVideoIdFromUrl(rawUrl)))
             {
-                await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo);
+                await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo);
             }
 
             Url url = new Url(rawUrl);
             if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
             {
-                await HandleSharedLink(null, channelHandle, null, null, downloadVideo: downloadVideo);
+                await HandleSharedLink(null, channelHandle, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo);
             }
 
             if (url.PathSegments.Count >= 2
                 && url.PathSegments[0].Equals("channel", StringComparison.OrdinalIgnoreCase)
                 && url.PathSegments[1].StartsWith("UC", StringComparison.OrdinalIgnoreCase))
             {
-                await HandleSharedLink(null, null, url.PathSegments[1], YouTubeUtils.ToChannelPlaylist(url.PathSegments[1]), downloadVideo: downloadVideo);
+                await HandleSharedLink(null, null, url.PathSegments[1], YouTubeUtils.ToChannelPlaylist(url.PathSegments[1]), downloadVideo: downloadVideo, watchVideo: watchVideo);
             }
         }
 
-        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist, bool downloadVideo = false)
+        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist, bool downloadVideo = false, bool watchVideo = false)
         {
             while (!_loaded)
             {
@@ -704,6 +704,11 @@ namespace YouTubeHelper.Mobile
                     if (downloadVideo)
                     {
                         Task __ = videoViewModel.DownloadVideo("plex");
+                    }
+
+                    if (watchVideo)
+                    {
+                        Task ___ = videoViewModel.WatchVideoExternally();
                     }
                 }
             }

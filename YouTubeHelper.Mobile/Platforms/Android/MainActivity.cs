@@ -36,6 +36,7 @@ namespace YouTubeHelper.Mobile
             bool isDone = intent.GetBooleanExtra("isDone", false);
             bool isNewVideo = intent.GetBooleanExtra("isNewVideo", false);
             bool downloadVideo = intent.GetBooleanExtra("downloadVideo", false);
+            bool watchVideo = intent.GetBooleanExtra("watchVideo", false);
             int notificationId = intent.GetIntExtra("notificationId", -1);
 
             bool isDismissable = isDone || isNewVideo;
@@ -47,7 +48,7 @@ namespace YouTubeHelper.Mobile
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
-                _ = AppShell.Instance?.HandleSharedLink(rawUrl, downloadVideo);
+                _ = AppShell.Instance?.HandleSharedLink(rawUrl, downloadVideo, watchVideo);
             }
 
             // See if we got an intent to navigate to the queue tab

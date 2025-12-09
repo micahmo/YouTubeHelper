@@ -112,23 +112,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.WatchExternal)
                 {
-                    try
-                    {
-                        _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
-                        {
-                            v.IsPlaying = false;
-                        });
-
-                        IsPlaying = true;
-
-                        // Open the URI in the system default app
-                        Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
-                        await Launcher.OpenAsync(videoUri);
-                    }
-                    catch
-                    {
-                        // Ignore
-                    }
+                    await WatchVideoExternally();
                 }
                 else if (action == Resources.Resources.ExcludeWatched)
                 {
@@ -320,6 +304,27 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private string? _previousRequestId;
         private bool _statusWasEverNotDone;
+
+        internal async Task WatchVideoExternally()
+        {
+            try
+            {
+                _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
+                {
+                    v.IsPlaying = false;
+                });
+
+                IsPlaying = true;
+
+                // Open the URI in the system default app
+                Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
+                await Launcher.OpenAsync(videoUri);
+            }
+            catch
+            {
+                // Ignore
+            }
+        }
 
         public void UpdateCheck(string requestId, RequestData result, bool showInAppNotifications = true)
         {
