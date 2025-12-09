@@ -199,6 +199,14 @@ namespace YouTubeHelper.Mobile
             SyncSelectedChannel();
 
             _loaded = true;
+
+            // Check for updates
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2)); // Small delay to not interfere with startup
+                UpdateChecker updateChecker = new UpdateChecker();
+                await updateChecker.CheckForUpdatesAsync();
+            });
         }
 
         private void SyncSelectedChannel()
