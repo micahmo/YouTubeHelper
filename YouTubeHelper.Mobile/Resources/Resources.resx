@@ -299,7 +299,4 @@
   <data name="NoSearchHistoryFound" xml:space="preserve">
     <value>No search history found</value>
   </data>
-  <data name="PlayingExternally" xml:space="preserve">
-    <value>Playing externally...</value>
-  </data>
 </root>

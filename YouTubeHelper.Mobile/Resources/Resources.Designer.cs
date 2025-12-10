@@ -452,15 +452,6 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Playing externally....
-        /// </summary>
-        internal static string PlayingExternally {
-            get {
-                return ResourceManager.GetString("PlayingExternally", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Press back again to close.
         /// </summary>
         internal static string PressBackAgainToClose {

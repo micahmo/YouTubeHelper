@@ -309,19 +309,16 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             try
             {
-                using (new BusyIndicator(_page, Resources.Resources.PlayingExternally))
+                _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
                 {
-                    _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
-                    {
-                        v.IsPlaying = false;
-                    });
+                    v.IsPlaying = false;
+                });
 
-                    IsPlaying = true;
+                IsPlaying = true;
 
-                    // Open the URI in the system default app
-                    Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
-                    await Launcher.OpenAsync(videoUri);
-                }
+                // Open the URI in the system default app
+                Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
+                await Launcher.OpenAsync(videoUri);
             }
             catch
             {
