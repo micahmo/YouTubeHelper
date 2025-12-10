@@ -35,7 +35,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             int downloadVideoIntentId = notificationId * 10 + 5;
             int markVideoAsWontWatchIntentId = notificationId * 10 + 6;
             int watchVideoIntentId = notificationId * 10 + 7;
-            int markVideoAsMightWatchIntentId = notificationId * 10 + 6;
+            int markVideoAsMightWatchIntentId = notificationId * 10 + 8;
 
             if (context.PackageName != null)
             {
