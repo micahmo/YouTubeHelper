@@ -104,8 +104,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                             }
                         }
 
-                        HandleDismiss(context, intent);
-
                     }
                     finally
                     {
