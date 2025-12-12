@@ -122,7 +122,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsWontWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
                 markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
                 markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
-                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                markVideoAsWontWatchIntent.PutExtra("isNewVideo", isNewVideo);
                 markVideoAsWontWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsWontWatchIntentId,
