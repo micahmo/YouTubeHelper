@@ -214,6 +214,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
             }
 
+            if (isDone)
+            {
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
+            }
+
             if (hasProgress)
             {
                 builder.SetProgress(max: 100, progress: (int)progress, false);
