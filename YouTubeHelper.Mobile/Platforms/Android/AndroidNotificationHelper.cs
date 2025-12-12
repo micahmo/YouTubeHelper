@@ -11,7 +11,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? disabledAction = null)
         {
             bool isDismissable = isDone || isNewVideo;
 
@@ -109,6 +109,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 downloadVideoIntent.PutExtra("downloadVideo", true);
                 downloadVideoIntent.PutExtra("notificationId", notificationId);
                 downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                // Add extra data needed to rebuild notification
+                downloadVideoIntent.PutExtra("title", title);
+                downloadVideoIntent.PutExtra("body", body);
+                downloadVideoIntent.PutExtra("thumbnailPath", thumbnailPath);
+                downloadVideoIntent.PutExtra("channelId", notificationChannelId);
+                downloadVideoIntent.PutExtra("hasProgress", hasProgress);
+                downloadVideoIntent.PutExtra("progress", progress);
+                downloadVideoIntent.PutExtra("plexRatingKey", plexRatingKey);
                 downloadVideoPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     downloadVideoIntentId,
@@ -123,6 +131,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
                 markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
                 markVideoAsWontWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                // Add extra data needed to rebuild notification
+                markVideoAsWontWatchIntent.PutExtra("title", title);
+                markVideoAsWontWatchIntent.PutExtra("body", body);
+                markVideoAsWontWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                markVideoAsWontWatchIntent.PutExtra("channelId", notificationChannelId);
+                markVideoAsWontWatchIntent.PutExtra("hasProgress", hasProgress);
+                markVideoAsWontWatchIntent.PutExtra("progress", progress);
+                markVideoAsWontWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
                 markVideoAsWontWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsWontWatchIntentId,
@@ -150,7 +166,15 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsMightWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
                 markVideoAsMightWatchIntent.PutExtra("markVideo", ExclusionReason.MightWatch.ToString());
                 markVideoAsMightWatchIntent.PutExtra("notificationId", notificationId);
-                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                markVideoAsMightWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                // Add extra data needed to rebuild notification
+                markVideoAsMightWatchIntent.PutExtra("title", title);
+                markVideoAsMightWatchIntent.PutExtra("body", body);
+                markVideoAsMightWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                markVideoAsMightWatchIntent.PutExtra("channelId", notificationChannelId);
+                markVideoAsMightWatchIntent.PutExtra("hasProgress", hasProgress);
+                markVideoAsMightWatchIntent.PutExtra("progress", progress);
+                markVideoAsMightWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
                 markVideoAsMightWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsMightWatchIntentId,
@@ -186,9 +210,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             // Set additional actions
             if (isNewVideo)
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", markVideoAsWontWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Might Watch", markVideoAsMightWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", downloadVideoPendingIntent);
+                // If an action is disabled, set its PendingIntent to null
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", disabledAction == "WontWatch" ? null : markVideoAsWontWatchPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Might Watch", disabledAction == "MightWatch" ? null : markVideoAsMightWatchPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
             }
             else
             {

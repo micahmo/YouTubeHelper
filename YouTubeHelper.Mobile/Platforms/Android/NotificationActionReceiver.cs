@@ -33,6 +33,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId && markVideoEnum is not null)
             {
+                // Immediately update notification to show the action as disabled
+                string disabledAction = markVideoEnum.Value.ToString();
+                UpdateNotificationWithDisabledAction(context, intent, disabledAction);
+
                 PendingResult? pendingResult = GoAsync();
 
                 _ = Task.Run(async () =>
@@ -42,12 +46,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                         if (await AppShell.ConnectToServerSilent())
                         {
                             if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                {
-                                    ExclusionsMode = ExclusionsMode.ShowAll,
-                                    VideoIds = new List<string> { videoId },
-                                    SortMode = SortMode.AgeDesc,
-                                    Count = int.MaxValue
-                                })).FirstOrDefault() is { } video)
+                            {
+                                ExclusionsMode = ExclusionsMode.ShowAll,
+                                VideoIds = new List<string> { videoId },
+                                SortMode = SortMode.AgeDesc,
+                                Count = int.MaxValue
+                            })).FirstOrDefault() is { } video)
                             {
                                 video.Excluded = true;
                                 video.ExclusionReason = markVideoEnum.Value;
@@ -67,6 +71,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId2 && downloadVideo)
             {
+                // Immediately update notification to show the Download action as disabled
+                UpdateNotificationWithDisabledAction(context, intent, "Download");
+
                 PendingResult? pendingResult = GoAsync();
 
                 _ = Task.Run(async () =>
@@ -76,12 +83,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                         if (await AppShell.ConnectToServerSilent())
                         {
                             if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                {
-                                    ExclusionsMode = ExclusionsMode.ShowAll,
-                                    VideoIds = new List<string> { videoId2 },
-                                    SortMode = SortMode.AgeDesc,
-                                    Count = int.MaxValue
-                                })).FirstOrDefault() is { } video)
+                            {
+                                ExclusionsMode = ExclusionsMode.ShowAll,
+                                VideoIds = new List<string> { videoId2 },
+                                SortMode = SortMode.AgeDesc,
+                                Count = int.MaxValue
+                            })).FirstOrDefault() is { } video)
                             {
                                 await ServerApiClient.Instance.DownloadVideo(
                                     url: rawUrl,
@@ -106,6 +113,37 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     }
                 });
             }
+        }
+
+        private void UpdateNotificationWithDisabledAction(Context context, Intent intent, string disabledAction)
+        {
+            // Extract all the data needed to rebuild the notification
+            int notificationId = intent.GetIntExtra("notificationId", -1);
+            string title = intent.GetStringExtra("title") ?? string.Empty;
+            string body = intent.GetStringExtra("body") ?? string.Empty;
+            string videoUrl = intent.GetStringExtra(Intent.ExtraText) ?? string.Empty;
+            string thumbnailPath = intent.GetStringExtra("thumbnailPath") ?? string.Empty;
+            string channelId = intent.GetStringExtra("channelId") ?? string.Empty;
+            bool isNewVideo = intent.GetBooleanExtra("isNewVideo", false);
+            bool hasProgress = intent.GetBooleanExtra("hasProgress", false);
+            double progress = intent.GetDoubleExtra("progress", 0);
+            string? plexRatingKey = intent.GetStringExtra("plexRatingKey");
+
+            // Call the Show method with the disabled action parameter
+            AndroidNotificationHelper.Show(
+                title: title,
+                body: body,
+                videoUrl: videoUrl,
+                thumbnailPath: thumbnailPath,
+                notificationChannelId: channelId,
+                notificationId: notificationId,
+                isDone: false,
+                isNewVideo: isNewVideo,
+                hasProgress: hasProgress,
+                progress: progress,
+                plexRatingKey: plexRatingKey,
+                disabledAction: disabledAction
+            );
         }
 
         private void HandleDismiss(Context context, Intent intent)
