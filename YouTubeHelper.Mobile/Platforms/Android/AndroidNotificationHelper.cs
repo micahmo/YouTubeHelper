@@ -172,7 +172,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             // Set notification tap action
             if (isNewVideo)
             {
-                builder.SetContentIntent(watchVideoPendingIntent!);
+                builder.SetContentIntent(navigateToVideoPendingIntent!);
             }
             else if (string.IsNullOrEmpty(plexRatingKey))
             {
