@@ -22,6 +22,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             string? actionType = intent.GetStringExtra("actionType");
             string? markVideoStr = intent.GetStringExtra("markVideo");
             ExclusionReason? markVideoEnum = markVideoStr is { } s && Enum.TryParse(s, ignoreCase: true, out ExclusionReason reason) ? reason : null;
+            bool downloadVideo = intent.GetBooleanExtra("downloadVideo", false);
 
             switch (actionType)
             {
@@ -51,6 +52,48 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                                 video.Excluded = true;
                                 video.ExclusionReason = markVideoEnum.Value;
                                 await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
+                            }
+                        }
+
+                        HandleDismiss(context, intent);
+
+                    }
+                    finally
+                    {
+                        pendingResult?.Finish();
+                    }
+                });
+            }
+
+            if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId2 && downloadVideo)
+            {
+                PendingResult? pendingResult = GoAsync();
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (await AppShell.ConnectToServerSilent())
+                        {
+                            if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                {
+                                    ExclusionsMode = ExclusionsMode.ShowAll,
+                                    VideoIds = new List<string> { videoId2 },
+                                    SortMode = SortMode.AgeDesc,
+                                    Count = int.MaxValue
+                                })).FirstOrDefault() is { } video)
+                            {
+                                await ServerApiClient.Instance.DownloadVideo(
+                                    url: rawUrl,
+                                    silent: true,
+                                    requestId: Guid.NewGuid().ToString(),
+                                    dataDirectorySubpath: "plex",
+                                    videoId: video.Id,
+                                    videoName: video.Title ?? string.Empty,
+                                    thumbnailUrl: video.ThumbnailUrl ?? string.Empty,
+                                    channelPlaylist: video.ChannelPlaylist,
+                                    channelName: video.ChannelName,
+                                    idInChannelFolder: true);
                             }
                         }
 

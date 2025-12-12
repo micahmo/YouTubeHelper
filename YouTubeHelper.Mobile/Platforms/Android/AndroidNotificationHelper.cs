@@ -103,13 +103,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 );
 
                 // Download Video Action
-                Intent downloadVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                downloadVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                Intent downloadVideoIntent = new Intent(ActionNotification);
+                downloadVideoIntent.SetPackage(context.PackageName);
                 downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
                 downloadVideoIntent.PutExtra("downloadVideo", true);
                 downloadVideoIntent.PutExtra("notificationId", notificationId);
                 downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
-                downloadVideoPendingIntent = PendingIntent.GetActivity(
+                downloadVideoPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     downloadVideoIntentId,
                     downloadVideoIntent,
