@@ -194,18 +194,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetAutoCancel(isDismissable);
 
             // Set notification tap action
-            if (isNewVideo)
-            {
-                builder.SetContentIntent(navigateToVideoPendingIntent!);
-            }
-            else if (string.IsNullOrEmpty(plexRatingKey))
-            {
-                builder.SetContentIntent(launchAppPendingIntent!);
-            }
-            else
-            {
-                builder.SetContentIntent(openInPlexPendingIntent);
-            }
+            builder.SetContentIntent(navigateToVideoPendingIntent!);
 
             // Set additional actions
             if (isNewVideo)
@@ -217,13 +206,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             }
             else
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Video", navigateToVideoPendingIntent);
                 builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
             }
 
-            if (isDone)
+            if (!string.IsNullOrEmpty(plexRatingKey))
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
+                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
             }
 
             if (hasProgress)
