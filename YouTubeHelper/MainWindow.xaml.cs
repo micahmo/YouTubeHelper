@@ -54,6 +54,13 @@ namespace YouTubeHelper
             _updateChecker = new MyUpdateChecker("https://gist.githubusercontent.com/micahmo/2f8966f2a9acbc8d11d70d69dc75c34c/raw/YouTubeHelperVersionInfo.xml", this);
         }
 
+        private void Window_Activated(object? sender, EventArgs e)
+        {
+#if !DEBUG
+            _updateChecker.CheckForUpdates(UpdateNotifyMode.Auto);
+#endif
+        }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -193,14 +200,6 @@ namespace YouTubeHelper
             ApplicationSettings.Instance.SelectedSortMode = MainControlViewModel.SelectedSortMode.Value;
             ApplicationSettings.Instance.SelectedExclusionsMode = MainControlViewModel.SelectedExclusionsMode.Value;
             ApplicationSettings.Instance.SelectedExclusionReason = MainControlViewModel.SelectedExclusionFilter.Value;
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-#if !DEBUG
-            // Auto allows the user to Skip (updates are still available via F1)
-            _updateChecker.CheckForUpdates(UpdateNotifyMode.Auto);
-#endif
         }
 
         private static MainControlViewModel? MainControlViewModel;

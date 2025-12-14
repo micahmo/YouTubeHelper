@@ -11,6 +11,7 @@
     Title="{x:Static properties:Resources.ApplicationName}"
     Width="1450"
     Height="700"
+    Activated="Window_Activated"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
     MouseDown="Window_MouseDown"
