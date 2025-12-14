@@ -11,7 +11,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? disabledAction = null)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
         {
             bool isDismissable = isDone || isNewVideo;
 
@@ -117,6 +117,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 downloadVideoIntent.PutExtra("hasProgress", hasProgress);
                 downloadVideoIntent.PutExtra("progress", progress);
                 downloadVideoIntent.PutExtra("plexRatingKey", plexRatingKey);
+                downloadVideoIntent.PutExtra("channelName", channelName);
                 downloadVideoPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     downloadVideoIntentId,
@@ -139,6 +140,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsWontWatchIntent.PutExtra("hasProgress", hasProgress);
                 markVideoAsWontWatchIntent.PutExtra("progress", progress);
                 markVideoAsWontWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
+                markVideoAsWontWatchIntent.PutExtra("channelName", channelName);
                 markVideoAsWontWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsWontWatchIntentId,
@@ -175,6 +177,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsMightWatchIntent.PutExtra("hasProgress", hasProgress);
                 markVideoAsMightWatchIntent.PutExtra("progress", progress);
                 markVideoAsMightWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
+                markVideoAsMightWatchIntent.PutExtra("channelName", channelName);
                 markVideoAsMightWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsMightWatchIntentId,
@@ -194,6 +197,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: notificationChannelId)
                 .SetContentTitle(title)
                 .SetContentText(body)
+                .SetSubText(channelName)
                 .SetStyle(bigPictureStyle)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
                 .SetLargeIcon(bitmap)

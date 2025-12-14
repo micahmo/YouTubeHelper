@@ -29,6 +29,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
             data.TryGetValue("plexRatingKey", out string? plexRatingKey);
+            data.TryGetValue("channelName", out string? channelName);
 
             if (title is not null && body is not null && tag is not null)
             {
@@ -43,6 +44,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 #if ANDROID
                 AndroidNotificationHelper.Show(
                     title: title,
+                    channelName: channelName,
                     body: body,
                     videoUrl: videoUrl,
                     thumbnailPath: await Utilities.GetCachedImagePath(thumbnailUrl),

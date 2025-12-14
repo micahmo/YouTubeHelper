@@ -126,10 +126,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool hasProgress = intent.GetBooleanExtra("hasProgress", false);
             double progress = intent.GetDoubleExtra("progress", 0);
             string? plexRatingKey = intent.GetStringExtra("plexRatingKey");
+            string? channelName = intent.GetStringExtra("channelName");
 
             // Call the Show method with the disabled action parameter
             AndroidNotificationHelper.Show(
                 title: title,
+                channelName: channelName,
                 body: body,
                 videoUrl: videoUrl,
                 thumbnailPath: thumbnailPath,
