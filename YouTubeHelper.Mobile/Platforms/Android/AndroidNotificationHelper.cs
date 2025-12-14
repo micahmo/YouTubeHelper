@@ -185,9 +185,16 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
 
+            NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle()
+                .BigPicture(bitmap)
+                .BigLargeIcon((Bitmap?)null)
+                .SetBigContentTitle(title)
+                .SetSummaryText(body);
+
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: notificationChannelId)
                 .SetContentTitle(title)
                 .SetContentText(body)
+                .SetStyle(bigPictureStyle)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
                 .SetLargeIcon(bitmap)
                 .SetOngoing(!isDismissable)
