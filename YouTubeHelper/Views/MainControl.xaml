@@ -39,7 +39,9 @@
                         <Label
                             Grid.Column="0"
                             Margin="10,0,0,0"
-                            Content="{Binding SelectedChannel.SearchOptionsSummary}" />
+                            Content="{Binding SelectedChannel.SearchOptionsSummary}"
+                            Visibility="{c:Binding '!QueueMode',
+                                                   FalseToVisibility=Collapsed}" />
 
                         <StackPanel
                             Grid.Column="1"
