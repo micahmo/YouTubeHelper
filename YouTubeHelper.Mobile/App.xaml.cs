@@ -10,5 +10,18 @@ namespace YouTubeHelper.Mobile
 
             MainPage = new AppShell();
         }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+#if !DEBUG
+            _ = Task.Run(async () =>
+            {
+                UpdateChecker updateChecker = new UpdateChecker();
+                await updateChecker.CheckForUpdatesAsync();
+            });
+#endif
+        }
     }
 }
