@@ -57,7 +57,7 @@ namespace YouTubeHelper
         private void Window_Activated(object? sender, EventArgs e)
         {
 #if !DEBUG
-            _updateChecker.CheckForUpdates(UpdateNotifyMode.Auto);
+            _updateChecker.CheckForUpdates(UpdateNotifyMode.NewUncheckedUpdate);
 #endif
         }
 
