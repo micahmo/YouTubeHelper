@@ -13,7 +13,6 @@
     Height="700"
     Activated="Window_Activated"
     Closing="Window_Closing"
-    Loaded="Window_Loaded"
     MouseDown="Window_MouseDown"
     mc:Ignorable="d">
     <Window.CommandBindings>
