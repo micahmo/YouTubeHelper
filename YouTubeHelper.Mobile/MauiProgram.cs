@@ -31,7 +31,7 @@ namespace YouTubeHelper.Mobile
                             {
                                 Id = "progress",
                                 Name = "Download Progress Updates",
-                                Importance = AndroidImportance.Low
+                                Importance = AndroidImportance.Default // Low should work without noise, but it's not appearing in the status bar
                             });
 
                             android.AddChannel(new NotificationChannelRequest
