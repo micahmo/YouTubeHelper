@@ -59,8 +59,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                             }
                         }
 
+                        // Wait a bit for the notification update to be visible, then dismiss
+                        await Task.Delay(800);
                         HandleDismiss(context, intent);
-
                     }
                     finally
                     {
