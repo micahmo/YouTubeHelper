@@ -28,6 +28,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool isNewVideo = bool.TryParse(newVideoStr, out bool newVideo) && newVideo;
             data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
+            data.TryGetValue("channelThumbnailUrl", out string? channelThumbnailUrl);
             data.TryGetValue("plexRatingKey", out string? plexRatingKey);
             data.TryGetValue("channelName", out string? channelName);
 
@@ -48,6 +49,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     body: body,
                     videoUrl: videoUrl,
                     thumbnailPath: await Utilities.GetCachedImagePath(thumbnailUrl),
+                    channelThumbnailPath: await Utilities.GetCachedImagePath(channelThumbnailUrl),
                     notificationChannelId: isDone || isNewVideo ? "completion" : "progress",
                     notificationId: int.Parse(tag),
                     isDone: isDone,

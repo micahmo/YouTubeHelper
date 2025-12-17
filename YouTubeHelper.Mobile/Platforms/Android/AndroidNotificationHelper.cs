@@ -11,7 +11,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
         {
             bool isDismissable = isDone || isNewVideo;
 
@@ -113,6 +113,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 downloadVideoIntent.PutExtra("title", title);
                 downloadVideoIntent.PutExtra("body", body);
                 downloadVideoIntent.PutExtra("thumbnailPath", thumbnailPath);
+                downloadVideoIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
                 downloadVideoIntent.PutExtra("channelId", notificationChannelId);
                 downloadVideoIntent.PutExtra("hasProgress", hasProgress);
                 downloadVideoIntent.PutExtra("progress", progress);
@@ -136,6 +137,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsWontWatchIntent.PutExtra("title", title);
                 markVideoAsWontWatchIntent.PutExtra("body", body);
                 markVideoAsWontWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                markVideoAsWontWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
                 markVideoAsWontWatchIntent.PutExtra("channelId", notificationChannelId);
                 markVideoAsWontWatchIntent.PutExtra("hasProgress", hasProgress);
                 markVideoAsWontWatchIntent.PutExtra("progress", progress);
@@ -173,6 +175,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 markVideoAsMightWatchIntent.PutExtra("title", title);
                 markVideoAsMightWatchIntent.PutExtra("body", body);
                 markVideoAsMightWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                markVideoAsMightWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
                 markVideoAsMightWatchIntent.PutExtra("channelId", notificationChannelId);
                 markVideoAsMightWatchIntent.PutExtra("hasProgress", hasProgress);
                 markVideoAsMightWatchIntent.PutExtra("progress", progress);
@@ -186,10 +189,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 );
             }
 
-            Bitmap? bitmap = BitmapFactory.DecodeFile(thumbnailPath);
+            Bitmap? videoBitmap = BitmapFactory.DecodeFile(thumbnailPath);
+            Bitmap? channelBitmap = BitmapFactory.DecodeFile(channelThumbnailPath);
 
             NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle()
-                .BigPicture(bitmap)
+                .BigPicture(videoBitmap)
                 .BigLargeIcon((Bitmap?)null)
                 .SetBigContentTitle(title)
                 .SetSummaryText(body);
@@ -200,7 +204,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetSubText(channelName)
                 .SetStyle(bigPictureStyle)
                 .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
-                .SetLargeIcon(bitmap)
+                .SetLargeIcon(channelBitmap)
                 .SetOngoing(!isDismissable)
                 .SetAutoCancel(isDismissable);
 
