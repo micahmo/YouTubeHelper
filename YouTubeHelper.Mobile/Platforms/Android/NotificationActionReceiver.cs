@@ -99,12 +99,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                                     videoId: video.Id,
                                     videoName: video.Title ?? string.Empty,
                                     thumbnailUrl: video.ThumbnailUrl ?? string.Empty,
+                                    channelThumbnailUrl: video.ChannelThumbnailUrl,
                                     channelPlaylist: video.ChannelPlaylist,
                                     channelName: video.ChannelName,
                                     idInChannelFolder: true);
                             }
                         }
-
                     }
                     finally
                     {
