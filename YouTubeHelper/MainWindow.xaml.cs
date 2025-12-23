@@ -507,11 +507,16 @@ namespace YouTubeHelper
                 {
                     string channelName = await ServerApiClient.Instance.FindChannelName(channelId, Properties.Resources.Unknown);
 
-                    foundChannelViewModel = new(new Channel(persistent: false)
+                    Channel channel = new(persistent: false)
                     {
                         VanityName = channelName,
                         ChannelPlaylist = channelPlaylist
-                    }, MainControlViewModel);
+                    };
+
+                    // See if we can populate the whole thing
+                    _ = ServerApiClient.Instance.PopulateChannel(channel, ClientId, persist: false);
+
+                    foundChannelViewModel = new(channel, MainControlViewModel);
                     MainControlViewModel.Channels.Insert(0, foundChannelViewModel);
                     MainControlViewModel.RealChannels.Insert(0, foundChannelViewModel);
                     MainControlViewModel.SelectedChannel = foundChannelViewModel;
@@ -524,7 +529,7 @@ namespace YouTubeHelper
                     VideoViewModel videoViewModel = new(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
                     foundChannelViewModel.Videos.Add(videoViewModel);
 
-                    Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
+                    _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
                 }
             }
 
