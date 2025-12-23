@@ -104,7 +104,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void LookupChannel()
         {
-            if (await ServerApiClient.Instance.PopulateChannel(Channel, MainWindow.ClientId))
+            if (await ServerApiClient.Instance.PopulateChannel(Channel, MainWindow.ClientId, persist: true))
             {
                 SearchGlyph = Icons.Check;
                 await Task.Delay(TimeSpan.FromSeconds(5));

@@ -651,7 +651,7 @@ namespace YouTubeHelper.Mobile
                 }
 
                 ChannelViewModel? foundChannelViewModel = default;
-                foreach (var content in ChannelTab.Items)
+                foreach (ShellContent? content in ChannelTab.Items)
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
                         && channelViewModel.Channel?.ChannelPlaylist == channelPlaylist)
@@ -675,13 +675,18 @@ namespace YouTubeHelper.Mobile
                 {
                     string channelName = await ServerApiClient.Instance.FindChannelName(channelId, Mobile.Resources.Resources.Unknown);
 
+                    Channel channel = new(persistent: false)
+                    {
+                        VanityName = channelName,
+                        ChannelPlaylist = channelPlaylist
+                    };
+
+                    // See if we can populate the whole thing
+                    _ = ServerApiClient.Instance.PopulateChannel(channel, ClientId, persist: false);
+
                     foundChannelViewModel = new(this)
                     {
-                        Channel = new Channel(persistent: false)
-                        {
-                            VanityName = channelName,
-                            ChannelPlaylist = channelPlaylist
-                        },
+                        Channel = channel,
                         SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4),
                         SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1),
                         SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)

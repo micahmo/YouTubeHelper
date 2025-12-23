@@ -69,7 +69,7 @@ public partial class ChannelView : ContentPage
         // See if we can populate it
         try
         {
-            _ = await ServerApiClient.Instance.PopulateChannel(channel, AppShell.ClientId);
+            _ = await ServerApiClient.Instance.PopulateChannel(channel, AppShell.ClientId, persist: true);
         }
         catch (Exception ex)
         {
