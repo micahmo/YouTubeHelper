@@ -7,7 +7,6 @@ using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
@@ -77,7 +76,7 @@ namespace YouTubeHelper
             {
                 await ServerApiClient.Instance.SubscribeToHubEvents(
                     reconnecting: _ => Task.CompletedTask,
-                    reconnected: async _ => { await ServerApiClient.Instance.ReconnectAllGroups(); },
+                    reconnected: async _ => await ServerApiClient.Instance.ReconnectAllGroups(),
                     closed: _ => Task.CompletedTask);
 
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
@@ -120,14 +119,14 @@ namespace YouTubeHelper
 
             while (!connected)
             {
-                var result = await MessageBoxHelper.ShowInputBox(Properties.Resources.EnterServerAddress, Properties.Resources.Server);
+                (string Text, ContentDialogResult Result) = await MessageBoxHelper.ShowInputBox(Properties.Resources.EnterServerAddress, Properties.Resources.Server);
 
-                if (result.Result == ContentDialogResult.None)
+                if (Result == ContentDialogResult.None)
                 {
                     Environment.Exit(1);
                 }
 
-                ServerApiClient.SetBaseUrl(result.Text);
+                ServerApiClient.SetBaseUrl(Text);
 
                 string error = string.Empty;
                 try
@@ -141,7 +140,7 @@ namespace YouTubeHelper
 
                 if (!string.IsNullOrEmpty(error))
                 {
-                    await MessageBoxHelper.Show(string.Format(Properties.Resources.ErrorConnectingToServer, error), Properties.Resources.Error, MessageBoxButton.OK);
+                    _ = await MessageBoxHelper.Show(string.Format(Properties.Resources.ErrorConnectingToServer, error), Properties.Resources.Error, MessageBoxButton.OK);
                 }
                 else
                 {
@@ -155,10 +154,7 @@ namespace YouTubeHelper
             ApplicationSettings.Instance.ServerAddress = serverAddressEncryptedBytes;
         }
 
-        private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-        {
-            HandleNavigationItemChanged(args.InvokedItem?.ToString(), args.IsSettingsInvoked);
-        }
+        private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) => HandleNavigationItemChanged(args.InvokedItem?.ToString(), args.IsSettingsInvoked);
 
         private void HandleNavigationItemChanged(string? name, bool isSettingsInvoked)
         {
@@ -175,10 +171,7 @@ namespace YouTubeHelper
             NavigationView.Content = isSettingsInvoked ? SettingsControl : MainControl;
             NavigationView.Header = isSettingsInvoked ? Properties.Resources.Settings : null;
 
-            Dispatcher.BeginInvoke(() =>
-            {
-                Keyboard.Focus((NavigationView.Content as MainControl)?.Expander);
-            });
+            _ = Dispatcher.BeginInvoke(() => Keyboard.Focus((NavigationView.Content as MainControl)?.Expander));
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -213,7 +206,7 @@ namespace YouTubeHelper
             if (!_dialogOpen)
             {
                 _dialogOpen = true;
-                
+
                 string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddWatchedIdsMessage,
                         MainControlViewModel!.SelectedChannel?.Channel.VanityName,
@@ -239,7 +232,7 @@ namespace YouTubeHelper
                         }
                     }
 
-                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWatched, updatedCount, videoIds.Length - updatedCount), 
+                    _ = await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWatched, updatedCount, videoIds.Length - updatedCount),
                         Properties.Resources.Success, MessageBoxButton.OK);
                 }
 
@@ -252,7 +245,7 @@ namespace YouTubeHelper
             if (!_dialogOpen)
             {
                 _dialogOpen = true;
-                
+
                 string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddWontWatchIdsMessage,
                         MainControlViewModel!.SelectedChannel?.Channel.VanityName,
@@ -278,7 +271,7 @@ namespace YouTubeHelper
                         }
                     }
 
-                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWontWatch, updatedCount, videoIds.Length - updatedCount),
+                    _ = await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsWontWatch, updatedCount, videoIds.Length - updatedCount),
                         Properties.Resources.Success, MessageBoxButton.OK);
                 }
 
@@ -291,7 +284,7 @@ namespace YouTubeHelper
             if (!_dialogOpen)
             {
                 _dialogOpen = true;
-                
+
                 string? input = await MessageBoxHelper.ShowPastableText(string.Format(
                         Properties.Resources.AddMightWatchIdsMessage,
                         MainControlViewModel!.SelectedChannel?.Channel.VanityName,
@@ -317,7 +310,7 @@ namespace YouTubeHelper
                         }
                     }
 
-                    await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsMightWatch, updatedCount, videoIds.Length - updatedCount),
+                    _ = await MessageBoxHelper.Show(string.Format(Properties.Resources.MarkedAsMightWatch, updatedCount, videoIds.Length - updatedCount),
                         Properties.Resources.Success, MessageBoxButton.OK);
                 }
 
@@ -421,7 +414,7 @@ namespace YouTubeHelper
         private async void HandlePaste_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             string rawUrl = Clipboard.GetText();
-            
+
             await HandleSharedLink(rawUrl);
         }
 
@@ -437,7 +430,7 @@ namespace YouTubeHelper
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
-                Url url = new Url(rawUrl);
+                Url url = new(rawUrl);
 
                 if (url.QueryParams.FirstOrDefault(q => q.Name == "v").Value is string id)
                 {
@@ -457,7 +450,7 @@ namespace YouTubeHelper
                     channelHandle = cid;
                 }
 
-                if (url.PathSegments.Count >= 2 
+                if (url.PathSegments.Count >= 2
                     && url.PathSegments[0].Equals("channel", StringComparison.OrdinalIgnoreCase)
                     && url.PathSegments[1].StartsWith("UC", StringComparison.OrdinalIgnoreCase))
                 {
@@ -471,7 +464,7 @@ namespace YouTubeHelper
                 video = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                 {
                     ExclusionsMode = ExclusionsMode.ShowAll,
-                    VideoIds = new List<string> { videoId },
+                    VideoIds = [videoId],
                     SortMode = SortMode.AgeDesc,
                     Count = int.MaxValue
                 })).FirstOrDefault();
@@ -528,7 +521,7 @@ namespace YouTubeHelper
 
                 if (video is not null)
                 {
-                    VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
+                    VideoViewModel videoViewModel = new(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
                     foundChannelViewModel.Videos.Add(videoViewModel);
 
                     Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
@@ -540,7 +533,10 @@ namespace YouTubeHelper
 
         private async void HandleQueueUpdates(RequestData requestData)
         {
-            if (MainControlViewModel == null) return;
+            if (MainControlViewModel == null)
+            {
+                return;
+            }
 
             // If we're in queue mode, we go one step further and move the video to the top of the queue or add it if it's not already there
             if (MainControlViewModel.QueueMode)
@@ -556,24 +552,21 @@ namespace YouTubeHelper
 
                         await Application.Current.Dispatcher.BeginInvoke(() =>
                         {
-                            queueChannel.Videos.Remove(targetVideoViewModel);
+                            _ = queueChannel.Videos.Remove(targetVideoViewModel);
                             queueChannel.Videos.Insert(0, targetVideoViewModel);
                         });
                     }
                     else if (indexOfCurrentVideo < 0)
                     {
                         if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                            {
-                                ExclusionsMode = ExclusionsMode.ShowAll,
-                                VideoIds = new List<string> { requestData.VideoId },
-                                SortMode = SortMode.AgeDesc,
-                                Count = int.MaxValue
-                            })).FirstOrDefault() is { } newVideo)
                         {
-                            await Application.Current.Dispatcher.BeginInvoke(() =>
-                            {
-                                queueChannel.Videos.Insert(0, new VideoViewModel(newVideo, MainControlViewModel, queueChannel));
-                            });
+                            ExclusionsMode = ExclusionsMode.ShowAll,
+                            VideoIds = [requestData.VideoId],
+                            SortMode = SortMode.AgeDesc,
+                            Count = int.MaxValue
+                        })).FirstOrDefault() is { } newVideo)
+                        {
+                            await Application.Current.Dispatcher.BeginInvoke(() => queueChannel.Videos.Insert(0, new VideoViewModel(newVideo, MainControlViewModel, queueChannel)));
                         }
                     }
                 }
@@ -597,9 +590,15 @@ namespace YouTubeHelper
 
         private void HandleVideoObjectUpdates(ObjectChangedEventArgs<Video> updatedVideoArgs)
         {
-            if (updatedVideoArgs.Originator == ClientId) return;
-            
-            if (MainControlViewModel == null) return;
+            if (updatedVideoArgs.Originator == ClientId)
+            {
+                return;
+            }
+
+            if (MainControlViewModel == null)
+            {
+                return;
+            }
 
             Video updatedVideo = updatedVideoArgs.Obj;
 
@@ -621,9 +620,15 @@ namespace YouTubeHelper
         {
             lock (ChannelUpdatesLock)
             {
-                if (updatedChannelArgs.Originator == ClientId) return;
+                if (updatedChannelArgs.Originator == ClientId)
+                {
+                    return;
+                }
 
-                if (MainControlViewModel == null) return;
+                if (MainControlViewModel == null)
+                {
+                    return;
+                }
 
                 Channel updatedChannel = updatedChannelArgs.Obj;
 
@@ -640,9 +645,10 @@ namespace YouTubeHelper
                         {
                             if (MainControlViewModel.SelectedChannel == channelViewModel)
                             {
-                                Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
+                                _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
                             }
-                            Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
+
+                            _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
                             channelViewModel.Channel.Persistent = false;
                         }
                         else
@@ -665,7 +671,7 @@ namespace YouTubeHelper
                             channelViewModel.Channel.Persistent = true; // resume updates
 
                             // If server index changed, reorder locally to that position
-                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            _ = Application.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 lock (ChannelUpdatesLock)
                                 {
@@ -695,13 +701,10 @@ namespace YouTubeHelper
                 if (!found && !updatedChannel.MarkForDeletion)
                 {
                     ChannelViewModel channelViewModel = new(updatedChannel, MainControlViewModel);
-                    Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
+                    _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
 
                     // Listen for changes
-                    updatedChannel.Changed += async (_, _) =>
-                    {
-                        await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
-                    };
+                    updatedChannel.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
                 }
             }
         }
@@ -709,20 +712,20 @@ namespace YouTubeHelper
         private void AboutBoxCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // Get the icon
-            Uri iconUri = new Uri("pack://application:,,,/Images/logo.ico", UriKind.Absolute);
+            Uri iconUri = new("pack://application:,,,/Images/logo.ico", UriKind.Absolute);
             StreamResourceInfo? info = Application.GetResourceStream(iconUri);
 
             BitmapSource? bitmapIcon = null;
             if (info != null)
             {
-                using Icon icon = new Icon(info.Stream);
+                using Icon icon = new(info.Stream);
                 bitmapIcon = Imaging.CreateBitmapSourceFromHIcon(
                     icon.Handle,
                     Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
             }
 
-            new AboutBox(bitmapIcon, showLanguageSelection: false)
+            _ = new AboutBox(bitmapIcon, showLanguageSelection: false)
             {
                 Owner = this,
                 UpdateChecker = _updateChecker,
