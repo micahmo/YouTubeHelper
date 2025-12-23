@@ -304,7 +304,7 @@ namespace YouTubeHelper.Mobile
             {
                 while (!connected)
                 {
-                    var res = await DisplayPromptAsync(Mobile.Resources.Resources.Server, Mobile.Resources.Resources.EnterServerAddress);
+                    string res = await DisplayPromptAsync(Mobile.Resources.Resources.Server, Mobile.Resources.Resources.EnterServerAddress);
 
                     if (string.IsNullOrEmpty(res))
                     {
