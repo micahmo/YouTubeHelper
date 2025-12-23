@@ -3,6 +3,7 @@ using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
 using Flurl;
+using Plugin.LocalNotification;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
@@ -189,7 +190,13 @@ namespace YouTubeHelper.Mobile
             busyIndicator.Dispose();
 
             // Check for battery restrictions
-            _ = CheckBatteryOptimizations();
+            //_ = CheckBatteryOptimizations();
+
+            // Request notifications permissions
+            if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+            {
+                await LocalNotificationCenter.Current.RequestNotificationPermission();
+            }
 
             SyncSelectedChannel();
 
