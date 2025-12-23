@@ -68,6 +68,11 @@ namespace YouTubeHelper.ViewModels
                     OnPropertyChanged(nameof(ExcludeDaysSummary));
                     OnPropertyChanged(nameof(IncludeDaysSummary));
                 }
+
+                if (args.PropertyName == nameof(channel.ThumbnailUrl))
+                {
+                    OnPropertyChanged(nameof(HasThumbnail));
+                }
             };
 
             SetupDaysOfWeek();
@@ -434,7 +439,9 @@ namespace YouTubeHelper.ViewModels
             // Use 3-letter abbreviations
             return string.Join(", ", selected.Select(d => d.ToString()[..3]));
         }
-    }
 
-    #endregion
+        #endregion
+
+        public bool HasThumbnail => !string.IsNullOrWhiteSpace(Channel.ThumbnailUrl);
+    }
 }
