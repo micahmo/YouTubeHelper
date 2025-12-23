@@ -1,13 +1,12 @@
-using ServerStatusBot.Definitions.Api;
-using System.Collections;
-using System.Text;
 using Android.Webkit;
 using CommunityToolkit.Maui.Alerts;
-using ServerStatusBot.Definitions.Database.Models;
-using YouTubeHelper.Mobile.ViewModels;
-using CommunityToolkit.Maui.Views;
-using WebView = Microsoft.Maui.Controls.WebView;
 using CommunityToolkit.Maui.Core;
+using ServerStatusBot.Definitions.Api;
+using ServerStatusBot.Definitions.Database.Models;
+using System.Collections;
+using System.Text;
+using YouTubeHelper.Mobile.ViewModels;
+using WebView = Microsoft.Maui.Controls.WebView;
 
 namespace YouTubeHelper.Mobile.Views;
 
@@ -43,21 +42,15 @@ public partial class ChannelView : ContentPage
         }
     }
 
-    private async void OnMoveLeftTapped(object? sender, TappedEventArgs e)
-    {
-        await MoveChannelRelativeAsync(-1);
-    }
+    private async void OnMoveLeftTapped(object? sender, TappedEventArgs e) => await MoveChannelRelativeAsync(-1);
 
-    private async void OnMoveRightTapped(object? sender, TappedEventArgs e)
-    {
-        await MoveChannelRelativeAsync(1);
-    }
+    private async void OnMoveRightTapped(object? sender, TappedEventArgs e) => await MoveChannelRelativeAsync(1);
 
     private async void OnAddChannelTapped(object? sender, TappedEventArgs e)
     {
         (BindingContext as ChannelViewModel)!.IsFabOpen = false;
 
-        var res = await DisplayPromptAsync(Mobile.Resources.Resources.AddChannel, Mobile.Resources.Resources.AddChannelMessage);
+        string res = await DisplayPromptAsync(Mobile.Resources.Resources.AddChannel, Mobile.Resources.Resources.AddChannelMessage);
 
         if (string.IsNullOrEmpty(res))
         {
@@ -66,7 +59,7 @@ public partial class ChannelView : ContentPage
 
         List<ChannelViewModel> existingChannels = AppShell.Instance!.AppShellViewModel.ChannelViewModels;
 
-        Channel channel = new Channel
+        Channel channel = new()
         {
             VanityName = Mobile.Resources.Resources.NewChannel,
             Index = existingChannels.MaxBy(c => c.Channel!.Index)?.Channel!.Index + 1 ?? 0,
@@ -76,7 +69,7 @@ public partial class ChannelView : ContentPage
         // See if we can populate it
         try
         {
-            await ServerApiClient.Instance.PopulateChannel(channel, AppShell.ClientId);
+            _ = await ServerApiClient.Instance.PopulateChannel(channel, AppShell.ClientId);
         }
         catch (Exception ex)
         {
@@ -98,15 +91,12 @@ public partial class ChannelView : ContentPage
         // Now create a view for it and add it to each section
         foreach (Tab tab in new List<Tab> { AppShell.Instance.ChannelTab })
         {
-            ChannelView channelView = new ChannelView { BindingContext = channelViewModel };
+            ChannelView channelView = new() { BindingContext = channelViewModel };
             tab.Items.Add(new ShellContent { Title = channel.VanityName, Content = channelView });
         }
 
         // And finally, listen for any changes and persist them
-        channel.Changed += async (_, _) =>
-        {
-            await ServerApiClient.Instance.UpdateChannel(channel, AppShell.ClientId);
-        };
+        channel.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(channel, AppShell.ClientId);
     }
 
     private async void OnDeleteChannelTapped(object? sender, TappedEventArgs e)
@@ -124,7 +114,7 @@ public partial class ChannelView : ContentPage
                     {
                         try
                         {
-                            tab.Items.Remove(content);
+                            _ = tab.Items.Remove(content);
                         }
                         catch
                         {
@@ -136,11 +126,11 @@ public partial class ChannelView : ContentPage
                 }
             }
 
-            AppShell.Instance.AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
+            _ = AppShell.Instance.AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
 
             channelViewModel.Channel!.MarkForDeletion = true;
             channelViewModel.Channel!.Persistent = false; // Stop doing updates!
-            await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, AppShell.ClientId);
+            _ = await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, AppShell.ClientId);
         }
     }
 
@@ -151,20 +141,20 @@ public partial class ChannelView : ContentPage
             channelViewModel.IsFabOpen = false;
 
             // Show a WebView (not system browser; we want control) to let the user log into YouTube
-            WebView webView = new WebView { Source = "https://accounts.google.com/ServiceLogin?service=youtube" };
+            WebView webView = new() { Source = "https://accounts.google.com/ServiceLogin?service=youtube" };
 
             // Handle the navigated event so we can get the cookies once we're redirected to YouTube (meaning a successful login)
             webView.Navigated += HandleWebViewNavigation;
 
             // Create a page to hold the web view
-            ContentPage loginPage = new ContentPage
+            ContentPage loginPage = new()
             {
                 Title = "YouTube Login",
                 Content = new Grid { webView }
             };
 
             // Add a back button
-            ToolbarItem backButton = new ToolbarItem
+            ToolbarItem backButton = new()
             {
                 IconImageSource = new FontImageSource
                 {
@@ -178,7 +168,7 @@ public partial class ChannelView : ContentPage
             loginPage.ToolbarItems.Add(backButton);
 
             // Navigate to it
-            NavigationPage navigationPage = new NavigationPage(loginPage)
+            NavigationPage navigationPage = new(loginPage)
             {
                 BarTextColor = Colors.White
             };
@@ -190,8 +180,8 @@ public partial class ChannelView : ContentPage
     {
         (BindingContext as ChannelViewModel)!.IsFabOpen = false;
 
-        SecureStorage.Default.Remove("server_address");
-        await AppShell.Instance!.ConnectToServer();
+        _ = SecureStorage.Default.Remove("server_address");
+        _ = await AppShell.Instance!.ConnectToServer();
 
         // After reconnecting, re-hook up SignalR
         Exception? finalEx = null;
@@ -220,10 +210,7 @@ public partial class ChannelView : ContentPage
 
         if (finalEx != null)
         {
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.UnexpectedError, finalEx), Mobile.Resources.Resources.OK);
-            });
+            await MainThread.InvokeOnMainThreadAsync(async () => await DisplayAlert(Mobile.Resources.Resources.Error, string.Format(Mobile.Resources.Resources.UnexpectedError, finalEx), Mobile.Resources.Resources.OK));
         }
     }
 
@@ -260,11 +247,11 @@ public partial class ChannelView : ContentPage
                         BoxViewDim.IsVisible = true;
                     });
 
-                    await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
+                    _ = await BoxViewDim.FadeTo(0.3, 250, Easing.SinOut);
                 }
                 else
                 {
-                    await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
+                    _ = await BoxViewDim.FadeTo(0, 200, Easing.SinIn);
 
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
@@ -283,7 +270,7 @@ public partial class ChannelView : ContentPage
                     layout.TranslationY = 50;
                     layout.Opacity = 0;
 
-                    await Task.WhenAll(
+                    _ = await Task.WhenAll(
                         layout.TranslateTo(0, 0, 250, Easing.SinOut),
                         layout.FadeTo(1)
                     );
@@ -291,7 +278,7 @@ public partial class ChannelView : ContentPage
                 else
                 {
                     // Closing animation
-                    await Task.WhenAll(
+                    _ = await Task.WhenAll(
                         layout.TranslateTo(0, 50, 200, Easing.SinIn),
                         layout.FadeTo(0, 200)
                     );
@@ -304,7 +291,7 @@ public partial class ChannelView : ContentPage
         }
         finally
         {
-            FabLock.Release();
+            _ = FabLock.Release();
         }
     }
 
@@ -313,10 +300,10 @@ public partial class ChannelView : ContentPage
     /// </summary>
     private Stream ConvertAndroidCookiesToNetscape(string rawCookies, string domain = ".youtube.com", string path = "/")
     {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("# Netscape HTTP Cookie File");
-        sb.AppendLine("# This file was generated by CookieConverter");
-        sb.AppendLine();
+        StringBuilder sb = new();
+        _ = sb.AppendLine("# Netscape HTTP Cookie File");
+        _ = sb.AppendLine("# This file was generated by CookieConverter");
+        _ = sb.AppendLine();
 
         long expires = DateTimeOffset.UtcNow.AddYears(5).ToUnixTimeSeconds();
 
@@ -333,7 +320,7 @@ public partial class ChannelView : ContentPage
             string name = parts[0];
             string value = parts[1];
 
-            sb.AppendLine($"{domain}\tTRUE\t{path}\tFALSE\t{expires}\t{name}\t{value}");
+            _ = sb.AppendLine($"{domain}\tTRUE\t{path}\tFALSE\t{expires}\t{name}\t{value}");
         }
 
         return new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
@@ -382,15 +369,12 @@ public partial class ChannelView : ContentPage
             await Toast.Make(result, ToastDuration.Long).Show();
 
             // Close the browser
-            await Shell.Current.Navigation.PopAsync();
+            _ = await Shell.Current.Navigation.PopAsync();
         }
     }
 
-    private void UpdateFooter()
-    {
-        // If the footer appears where there is no FAB, some funky stuff happens
-        VideosCollectionView.Footer = AppShell.Instance!.AppShellViewModel.QueueTabSelected ? null : new Grid { HeightRequest = 90 };
-    }
+    // If the footer appears where there is no FAB, some funky stuff happens
+    private void UpdateFooter() => VideosCollectionView.Footer = AppShell.Instance!.AppShellViewModel.QueueTabSelected ? null : new Grid { HeightRequest = 90 };
 
     private async Task MoveChannelRelativeAsync(int delta)
     {
@@ -426,8 +410,8 @@ public partial class ChannelView : ContentPage
                 targetChannelViewModel.Channel!.Index = currentIndex;
 
                 // Use an empty GUID so that this message comes back to us and is processed
-                await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, Guid.Empty.ToString());
-                await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
+                _ = await ServerApiClient.Instance.UpdateChannel(channelViewModel.Channel, Guid.Empty.ToString());
+                _ = await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
             }
         }
     }
