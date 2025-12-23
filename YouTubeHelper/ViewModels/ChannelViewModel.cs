@@ -46,10 +46,7 @@ namespace YouTubeHelper.ViewModels
                 }
             };
 
-            Videos.CollectionChanged += (_, _) =>
-            {
-                OnPropertyChanged(nameof(CountLabel));
-            };
+            Videos.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CountLabel));
 
             Channel.PropertyChanged += (_, args) =>
             {
@@ -91,10 +88,10 @@ namespace YouTubeHelper.ViewModels
         private async void Delete()
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
-            MainControlViewModel.Channels.Remove(this);
+            _ = MainControlViewModel.Channels.Remove(this);
             Channel.MarkForDeletion = true;
             Channel.Persistent = false; // Stop doing updates!
-            await ServerApiClient.Instance.UpdateChannel(Channel, MainWindow.ClientId);
+            _ = await ServerApiClient.Instance.UpdateChannel(Channel, MainWindow.ClientId);
         }
 
         public ICommand LookupChannelCommand => _searchCommand ??= new RelayCommand(LookupChannel);
@@ -140,16 +137,9 @@ namespace YouTubeHelper.ViewModels
 
                         if (!string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm))
                         {
-                            if (MainControlViewModel.SearchByTitleTerm.StartsWith('"')
-                                && MainControlViewModel.SearchByTitleTerm.EndsWith('"')
-                                && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')))
-                            {
-                                searchTerms = new List<string> { MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"') };
-                            }
-                            else
-                            {
-                                searchTerms = MainControlViewModel.SearchByTitleTerm.Split().ToList();
-                            }
+                            searchTerms = MainControlViewModel.SearchByTitleTerm.StartsWith('"') && MainControlViewModel.SearchByTitleTerm.EndsWith('"') && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"'))
+                                ? [MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')]
+                                : MainControlViewModel.SearchByTitleTerm.Split().ToList();
                         }
 
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
@@ -167,7 +157,7 @@ namespace YouTubeHelper.ViewModels
                         });
 
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
-                        Application.Current.Dispatcher.Invoke(() => { Videos.AddRange(videoViewModels); });
+                        Application.Current.Dispatcher.Invoke(() => Videos.AddRange(videoViewModels));
 
                         Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
 
@@ -196,17 +186,17 @@ namespace YouTubeHelper.ViewModels
                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
                 List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                    {
-                        ExclusionsMode = ExclusionsMode.ShowAll,
-                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
-                        Count = int.MaxValue
-                    }))
+                {
+                    ExclusionsMode = ExclusionsMode.ShowAll,
+                    VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
+                    Count = int.MaxValue
+                }))
                     .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTimeOffset.MinValue)
                     .ToList();
 
                 foreach (Video video in queuedVideos)
                 {
-                    VideoViewModel videoViewModel = new VideoViewModel(video, MainControlViewModel, this);
+                    VideoViewModel videoViewModel = new(video, MainControlViewModel, this);
                     Videos.Add(videoViewModel);
                     string requestId = distinctQueue.First(v => v.VideoId == video.Id).RequestGuid.ToString();
 
@@ -244,7 +234,7 @@ namespace YouTubeHelper.ViewModels
         }
         private string _deleteGlyph = Icons.Delete;
 
-        public MyObservableCollection<VideoViewModel> Videos { get; } = new();
+        public MyObservableCollection<VideoViewModel> Videos { get; } = [];
 
         public bool ChannelMode => MainControlViewModel.Mode == MainControlMode.Channel;
 
@@ -260,11 +250,11 @@ namespace YouTubeHelper.ViewModels
         {
             get
             {
-                List<string> parts = new List<string>
-                {
+                List<string> parts =
+                [
                     // Sort order
                     $"Sort: {MainControlViewModel.SelectedSortMode.Description}"
-                };
+                ];
 
                 // Exclusions mode
                 ExclusionsMode mode = MainControlViewModel.SelectedExclusionsMode.Value;
@@ -312,19 +302,19 @@ namespace YouTubeHelper.ViewModels
                 }
 
                 // Days of week filters
-                List<string> dayFilters = new List<string>();
+                List<string> dayFilters = [];
 
                 List<DayOfWeekItem> excludedDays = ExcludeDaysOfWeek!.Where(d => d.IsSelected).ToList();
                 if (excludedDays.Count is > 0 and < 7)
                 {
                     if (excludedDays.Count > 4)
                     {
-                        IEnumerable<string> notExcluded = ExcludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> notExcluded = ExcludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Exclude all except {string.Join(", ", notExcluded)}");
                     }
                     else
                     {
-                        IEnumerable<string> excluded = excludedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> excluded = excludedDays.Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Exclude: {string.Join(", ", excluded)}");
                     }
                 }
@@ -334,12 +324,12 @@ namespace YouTubeHelper.ViewModels
                 {
                     if (includedDays.Count > 4)
                     {
-                        IEnumerable<string> notIncluded = IncludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> notIncluded = IncludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Include all except {string.Join(", ", notIncluded)}");
                     }
                     else
                     {
-                        IEnumerable<string> included = includedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> included = includedDays.Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Include: {string.Join(", ", included)}");
                     }
                 }
@@ -376,8 +366,8 @@ namespace YouTubeHelper.ViewModels
             Channel.Index = targetIndex;
             targetChannelViewModel.Channel.Index = currentIndex;
 
-            await ServerApiClient.Instance.UpdateChannel(Channel, Guid.Empty.ToString());
-            await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
+            _ = await ServerApiClient.Instance.UpdateChannel(Channel, Guid.Empty.ToString());
+            _ = await ServerApiClient.Instance.UpdateChannel(targetChannelViewModel.Channel, Guid.Empty.ToString());
         }
 
         #region Day of week stuff
@@ -392,7 +382,7 @@ namespace YouTubeHelper.ViewModels
 
         private ObservableCollection<DayOfWeekItem> CreateDayCollectionFromList(List<DayOfWeek>? existing)
         {
-            List<DayOfWeekItem> items = new List<DayOfWeekItem>();
+            List<DayOfWeekItem> items = [];
 
             Array values = Enum.GetValues(typeof(DayOfWeek));
             foreach (object value in values)
@@ -400,7 +390,7 @@ namespace YouTubeHelper.ViewModels
                 DayOfWeek day = (DayOfWeek)value;
                 bool isSelected = existing != null && existing.Contains(day);
 
-                DayOfWeekItem item = new DayOfWeekItem(day, isSelected);
+                DayOfWeekItem item = new(day, isSelected);
                 items.Add(item);
             }
 
@@ -427,10 +417,7 @@ namespace YouTubeHelper.ViewModels
             OnPropertyChanged(nameof(IncludeDaysSummary));
         }
 
-        private List<DayOfWeek> BuildListFromCollection(IEnumerable<DayOfWeekItem> collection)
-        {
-            return collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
-        }
+        private List<DayOfWeek> BuildListFromCollection(IEnumerable<DayOfWeekItem> collection) => collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
 
         private string BuildSummary(IEnumerable<DayOfWeekItem> collection)
         {
@@ -439,12 +426,13 @@ namespace YouTubeHelper.ViewModels
             {
                 return "None";
             }
+
             if (selected.Count == 7)
             {
                 return "All days";
             }
             // Use 3-letter abbreviations
-            return string.Join(", ", selected.Select(d => d.ToString().Substring(0, 3)));
+            return string.Join(", ", selected.Select(d => d.ToString()[..3]));
         }
     }
 
