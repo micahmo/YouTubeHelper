@@ -40,7 +40,7 @@ namespace YouTubeHelper.Mobile
             {
                 Environment.Exit(1);
             }
-            
+
             bool anyPlayerOpen = false;
 
             // First, close any open players
@@ -60,7 +60,7 @@ namespace YouTubeHelper.Mobile
             // Close the cookie browser
             if (Current.Navigation.NavigationStack.Count > 1)
             {
-                Current.Navigation.PopAsync();
+                _ = Current.Navigation.PopAsync();
                 return true;
             }
 
@@ -80,7 +80,7 @@ namespace YouTubeHelper.Mobile
             }
 
             // Finally, prompt the user to close
-            Snackbar.Make(
+            _ = Snackbar.Make(
                 Mobile.Resources.Resources.PressBackAgainToClose,
                 duration: TimeSpan.FromSeconds(3),
                 action: null,
@@ -93,7 +93,7 @@ namespace YouTubeHelper.Mobile
 
             _canClose = true;
 
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(3));
                 _canClose = false;
@@ -112,7 +112,7 @@ namespace YouTubeHelper.Mobile
                 return;
             }
 
-            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.ConnectingToServer);
+            BusyIndicator busyIndicator = new(this, Mobile.Resources.Resources.ConnectingToServer);
 
             bool connectedToServer = await ConnectToServer(withPrompt: false);
 
@@ -129,7 +129,7 @@ namespace YouTubeHelper.Mobile
             {
                 await ServerApiClient.Instance.SubscribeToHubEvents(
                     reconnecting: _ => Task.CompletedTask,
-                    reconnected: async _ => { await ServerApiClient.Instance.ReconnectAllGroups(); },
+                    reconnected: async _ => await ServerApiClient.Instance.ReconnectAllGroups(),
                     closed: _ => Task.CompletedTask);
 
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
@@ -149,10 +149,7 @@ namespace YouTubeHelper.Mobile
             List<Channel> channels = await ServerApiClient.Instance.GetChannels();
             foreach (Channel channel in channels.Reverse<Channel>())
             {
-                channel.Changed += (_, _) =>
-                {
-                    ServerApiClient.Instance.UpdateChannel(channel, ClientId);
-                };
+                channel.Changed += (_, _) => ServerApiClient.Instance.UpdateChannel(channel, ClientId);
 
                 ChannelViewModel channelViewModel = new(this)
                 {
@@ -163,7 +160,7 @@ namespace YouTubeHelper.Mobile
                 };
                 AppShellViewModel.ChannelViewModels.Add(channelViewModel);
 
-                var channelView = new ChannelView { BindingContext = channelViewModel };
+                ChannelView channelView = new() { BindingContext = channelViewModel };
 
                 ChannelTab.Items.Insert(0, new ShellContent { Title = channel.VanityName, Content = channelView });
             }
@@ -171,7 +168,8 @@ namespace YouTubeHelper.Mobile
             // Add one placeholder to the queue tab
             QueueTab.Items.Insert(0, new ShellContent
             {
-                Title = Mobile.Resources.Resources.Queue, Content = new ChannelView
+                Title = Mobile.Resources.Resources.Queue,
+                Content = new ChannelView
                 {
                     BindingContext = AppShellViewModel.QueueChannelViewModel = new ChannelViewModel(this)
                     {
@@ -186,10 +184,7 @@ namespace YouTubeHelper.Mobile
             // Make sure we know the first channel is actually selected
             TabBar.CurrentItem.CurrentItem = TabBar.CurrentItem.Items.FirstOrDefault();
 
-            AppShellViewModel.ChannelViewModels.ForEach(c =>
-            {
-                c.Loading = false;
-            });
+            AppShellViewModel.ChannelViewModels.ForEach(c => c.Loading = false);
 
             busyIndicator.Dispose();
 
@@ -231,7 +226,6 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-
         private async Task CheckBatteryOptimizations()
         {
             PermissionStatus status = await Permissions.CheckStatusAsync<Permissions.Battery>();
@@ -268,7 +262,7 @@ namespace YouTubeHelper.Mobile
                 string? packageName = context.PackageName;
                 return powerManager?.IsIgnoringBatteryOptimizations(packageName) == true;
             }
-            
+
             return true;
         }
 
@@ -276,15 +270,15 @@ namespace YouTubeHelper.Mobile
         {
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
-                bool res = await DisplayAlert(Mobile.Resources.Resources.BatteryOptimizations, 
+                bool res = await DisplayAlert(Mobile.Resources.Resources.BatteryOptimizations,
                     Mobile.Resources.Resources.BatteryOptimizationsPrompt,
-                    Mobile.Resources.Resources.Yes, 
+                    Mobile.Resources.Resources.Yes,
                     Mobile.Resources.Resources.No);
 
                 if (res)
                 {
-                    Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
-                    intent.SetFlags(ActivityFlags.NewTask);
+                    Intent intent = new(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    _ = intent.SetFlags(ActivityFlags.NewTask);
                     Android.App.Application.Context.StartActivity(intent);
                 }
             }
@@ -390,7 +384,7 @@ namespace YouTubeHelper.Mobile
 
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        queueChannel.Videos.Remove(targetVideoViewModel);
+                        _ = queueChannel.Videos.Remove(targetVideoViewModel);
                         queueChannel.Videos.Insert(0, targetVideoViewModel);
 
                         // Scroll the view to the top so we can see the newly inserted item
@@ -400,12 +394,12 @@ namespace YouTubeHelper.Mobile
                 else if (indexOfCurrentVideo < 0)
                 {
                     if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                        {
-                            ExclusionsMode = ExclusionsMode.ShowAll,
-                            VideoIds = new List<string> { requestData.VideoId },
-                            SortMode = SortMode.AgeDesc,
-                            Count = int.MaxValue
-                        })).FirstOrDefault() is { } newVideo)
+                    {
+                        ExclusionsMode = ExclusionsMode.ShowAll,
+                        VideoIds = [requestData.VideoId],
+                        SortMode = SortMode.AgeDesc,
+                        Count = int.MaxValue
+                    })).FirstOrDefault() is { } newVideo)
                     {
                         await MainThread.InvokeOnMainThreadAsync(() =>
                         {
@@ -436,7 +430,10 @@ namespace YouTubeHelper.Mobile
 
         private void HandleVideoObjectUpdates(ObjectChangedEventArgs<Video> updatedVideoArgs)
         {
-            if (updatedVideoArgs.Originator == ClientId) return;
+            if (updatedVideoArgs.Originator == ClientId)
+            {
+                return;
+            }
 
             Video updatedVideo = updatedVideoArgs.Obj;
 
@@ -456,7 +453,10 @@ namespace YouTubeHelper.Mobile
         {
             lock (_notificationLock)
             {
-                if (updatedChannelArgs.Originator == ClientId) return;
+                if (updatedChannelArgs.Originator == ClientId)
+                {
+                    return;
+                }
 
                 Channel updatedChannel = updatedChannelArgs.Obj;
 
@@ -480,7 +480,6 @@ namespace YouTubeHelper.Mobile
                                 newIndex = updatedChannel.Index;
                             }).GetAwaiter().GetResult();
 
-
                             // We have it, but it's marked for deletion. Remove it!
                             if (updatedChannel.MarkForDeletion)
                             {
@@ -488,7 +487,7 @@ namespace YouTubeHelper.Mobile
                                 {
                                     try
                                     {
-                                        tab.Items.Remove(content);
+                                        _ = tab.Items.Remove(content);
                                     }
                                     catch
                                     {
@@ -496,7 +495,7 @@ namespace YouTubeHelper.Mobile
                                     }
                                 }).GetAwaiter().GetResult();
 
-                                AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
+                                _ = AppShellViewModel.ChannelViewModels.Remove(channelViewModel);
                                 channelViewModel.Channel!.MarkForDeletion = true;
                                 channelViewModel.Channel!.Persistent = false;
                             }
@@ -547,15 +546,12 @@ namespace YouTubeHelper.Mobile
 
                             AppShellViewModel.ChannelViewModels.Add(newlyAddedChannelViewModel);
 
-                            updatedChannel.Changed += async (_, _) =>
-                            {
-                                await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
-                            };
+                            updatedChannel.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);
                         }
 
                         MainThread.InvokeOnMainThreadAsync(() =>
                         {
-                            ChannelView channelView = new ChannelView { BindingContext = newlyAddedChannelViewModel };
+                            ChannelView channelView = new() { BindingContext = newlyAddedChannelViewModel };
                             tab.Items.Add(new ShellContent { Title = updatedChannel.VanityName, Content = channelView });
                         }).GetAwaiter().GetResult();
                     }
@@ -596,7 +592,7 @@ namespace YouTubeHelper.Mobile
                 await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo);
             }
 
-            Url url = new Url(rawUrl);
+            Url url = new(rawUrl);
             if (url.PathSegments.FirstOrDefault(p => p.StartsWith('@')) is { } channelHandle)
             {
                 await HandleSharedLink(null, channelHandle, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo);
@@ -617,7 +613,7 @@ namespace YouTubeHelper.Mobile
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
-            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.HandlingSharedLink);
+            BusyIndicator busyIndicator = new(this, Mobile.Resources.Resources.HandlingSharedLink);
 
             Video? video = default;
 
@@ -628,11 +624,11 @@ namespace YouTubeHelper.Mobile
                 video = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                 {
                     ExclusionsMode = ExclusionsMode.ShowAll,
-                    VideoIds = new List<string> { videoId },
+                    VideoIds = [videoId],
                     SortMode = SortMode.AgeDesc,
                     Count = int.MaxValue
                 })).FirstOrDefault();
-                
+
                 if (video is not null)
                 {
                     channelPlaylist = video.ChannelPlaylist;
@@ -692,9 +688,9 @@ namespace YouTubeHelper.Mobile
                     };
                     AppShellViewModel.ChannelViewModels.Add(foundChannelViewModel);
 
-                    var channelView = new ChannelView { BindingContext = foundChannelViewModel };
+                    ChannelView channelView = new() { BindingContext = foundChannelViewModel };
 
-                    ShellContent watchTabContent = new ShellContent { Title = channelName, Content = channelView };
+                    ShellContent watchTabContent = new() { Title = channelName, Content = channelView };
                     ChannelTab.Items.Insert(0, watchTabContent);
                     ChannelTab.CurrentItem = watchTabContent;
 
@@ -705,7 +701,7 @@ namespace YouTubeHelper.Mobile
 
                 if (video is not null)
                 {
-                    VideoViewModel videoViewModel = new VideoViewModel(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
+                    VideoViewModel videoViewModel = new(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
                     foundChannelViewModel.Videos.Add(videoViewModel);
 
                     Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
@@ -741,20 +737,17 @@ namespace YouTubeHelper.Mobile
 
         public async Task HandleOpenInPlex(string plexRatingKey)
         {
-            BusyIndicator busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.OpeningInPlex);
+            BusyIndicator busyIndicator = new(this, Mobile.Resources.Resources.OpeningInPlex);
 
             try
             {
                 string plexUri = $"plex://server://8316eb530162c189b29f3250d4734700515fc5f8/com.plexapp.plugins.library/library/metadata/{plexRatingKey}";
-                await Launcher.Default.OpenAsync(new Uri(plexUri));
+                _ = await Launcher.Default.OpenAsync(new Uri(plexUri));
             }
             catch (Exception ex)
             {
                 // Show message box for any errors instead of toast so we can see the full error
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    await DisplayAlert("Error opening Plex", ex.ToString(), "OK");
-                });
+                await MainThread.InvokeOnMainThreadAsync(async () => await DisplayAlert("Error opening Plex", ex.ToString(), "OK"));
             }
             finally
             {
@@ -774,7 +767,7 @@ namespace YouTubeHelper.Mobile
             tab.Items.RemoveAt(index);
 
             // Create replacement with same content/binding, new title
-            ShellContent replacement = new ShellContent { Title = title, Content = channelView };
+            ShellContent replacement = new() { Title = title, Content = channelView };
 
             // Insert back at same index and keep selection
             tab.Items.Insert(newIndex, replacement);
@@ -786,7 +779,7 @@ namespace YouTubeHelper.Mobile
             {
                 ShellContent? toRestore = wasCurrent ? replacement : previousCurrent;
 
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(100));
                     await MainThread.InvokeOnMainThreadAsync(() =>
