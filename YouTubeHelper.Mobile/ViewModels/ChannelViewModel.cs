@@ -194,15 +194,11 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 List<string>? searchTerms = null;
 
-                                if (!string.IsNullOrEmpty(SearchByTitleTerm))
+                                if (!string.IsNullOrWhiteSpace(SearchByTitleTerm))
                                 {
                                     string searchByTitleTermTrimmed = SearchByTitleTerm.Trim();
 
-                                    searchTerms = searchByTitleTermTrimmed.StartsWith('"')
-                                        && searchByTitleTermTrimmed.EndsWith('"')
-                                        && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"'))
-                                        ? [searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')]
-                                        : searchByTitleTermTrimmed.Split().ToList();
+                                    searchTerms = IsExactSearch ? [searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')] : searchByTitleTermTrimmed.Split().ToList();
 
                                     // Update the history
                                     string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
@@ -360,6 +356,8 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private string? _searchByTitleTerm;
 
+        public bool IsExactSearch => !string.IsNullOrWhiteSpace(SearchByTitleTerm) && SearchByTitleTerm.Trim().StartsWith('"') && SearchByTitleTerm.Trim().EndsWith('"') && !string.IsNullOrEmpty(SearchByTitleTerm.Trim().TrimStart('"').TrimEnd('"'));
+
         public bool EnableCountLimit
         {
             get => _enableCountLimit;
@@ -516,7 +514,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 // Search term
                 if (!string.IsNullOrWhiteSpace(SearchByTitleTerm))
                 {
-                    parts.Add($"Search term: \"{SearchByTitleTerm}\"");
+                    parts.Add($"Search term: {(IsExactSearch ? $"\"{SearchByTitleTerm?.Trim().TrimStart('"').TrimEnd('"')}\" (exact)" : string.Join(", ", SearchByTitleTerm?.Trim().Split().Select(s => $"\"{s}\"") ?? Enumerable.Empty<string>()))}");
                 }
 
                 // Max results

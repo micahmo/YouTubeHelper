@@ -140,11 +140,11 @@ namespace YouTubeHelper.ViewModels
 
                         List<string>? searchTerms = null;
 
-                        if (!string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm))
+                        if (!string.IsNullOrWhiteSpace(MainControlViewModel.SearchByTitleTerm))
                         {
-                            searchTerms = MainControlViewModel.SearchByTitleTerm.StartsWith('"') && MainControlViewModel.SearchByTitleTerm.EndsWith('"') && !string.IsNullOrEmpty(MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"'))
-                                ? [MainControlViewModel.SearchByTitleTerm.TrimStart('"').TrimEnd('"')]
-                                : MainControlViewModel.SearchByTitleTerm.Split().ToList();
+                            string searchByTitleTermTrimmed = MainControlViewModel.SearchByTitleTerm.Trim();
+
+                            searchTerms = MainControlViewModel.IsExactSearch ? [searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')] : searchByTitleTermTrimmed.Split().ToList();
                         }
 
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
@@ -280,7 +280,7 @@ namespace YouTubeHelper.ViewModels
                 // Search term
                 if (!string.IsNullOrWhiteSpace(MainControlViewModel.SearchByTitleTerm))
                 {
-                    parts.Add($"Search term: \"{MainControlViewModel.SearchByTitleTerm}\"");
+                    parts.Add($"Search term: {(MainControlViewModel.IsExactSearch ? $"\"{MainControlViewModel.SearchByTitleTerm?.Trim().TrimStart('"').TrimEnd('"')}\" (exact)" : string.Join(", ", MainControlViewModel.SearchByTitleTerm?.Trim().Split().Select(s => $"\"{s}\"") ?? Enumerable.Empty<string>()))}");
                 }
 
                 // Max results
