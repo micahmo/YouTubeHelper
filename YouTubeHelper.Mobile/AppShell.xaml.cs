@@ -691,12 +691,19 @@ namespace YouTubeHelper.Mobile
                     // See if we can populate the whole thing
                     _ = ServerApiClient.Instance.PopulateChannel(channel, ClientId, persist: false);
 
+                    int selectedSortModeIndex = AppShellViewModel.ChannelViewModels.FirstOrDefault()?.SelectedSortModeIndex
+                        ?? Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4);
+                    int selectedExclusionsModeIndex = AppShellViewModel.ChannelViewModels.FirstOrDefault()?.SelectedExclusionsModeIndex
+                        ?? Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1);
+                    int selectedExclusionFilterIndex = AppShellViewModel.ChannelViewModels.FirstOrDefault()?.SelectedExclusionFilterIndex
+                        ?? Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0);
+
                     foundChannelViewModel = new(this)
                     {
                         Channel = channel,
-                        SelectedSortModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedSortModeIndex), 4),
-                        SelectedExclusionsModeIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionsModeIndex), 1),
-                        SelectedExclusionFilterIndex = Preferences.Default.Get(nameof(ChannelViewModel.SelectedExclusionFilterIndex), 0)
+                        SelectedSortModeIndex = selectedSortModeIndex,
+                        SelectedExclusionsModeIndex = selectedExclusionsModeIndex,
+                        SelectedExclusionFilterIndex = selectedExclusionFilterIndex
                     };
                     AppShellViewModel.ChannelViewModels.Add(foundChannelViewModel);
 
