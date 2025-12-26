@@ -140,36 +140,21 @@ namespace YouTubeHelper.Mobile.ViewModels
             HookDayCollection(IncludeDaysOfWeek, OnIncludeDaysChanged);
         }
 
-        public MyObservableCollection<VideoViewModel> Videos { get; } = new();
+        public MyObservableCollection<VideoViewModel> Videos { get; } = [];
 
-        public ICommand ToggleEnableCountLimitCommand => _toggleEnableCountLimitCommand ??= new RelayCommand(() =>
-        {
-            EnableCountLimit = !EnableCountLimit;
-        });
+        public ICommand ToggleEnableCountLimitCommand => _toggleEnableCountLimitCommand ??= new RelayCommand(() => EnableCountLimit = !EnableCountLimit);
         private RelayCommand? _toggleEnableCountLimitCommand;
 
-        public ICommand ToggleEnableVideoLengthMinimumCommand => _toggleEnableVideoLengthMinimumCommand ??= new RelayCommand(() =>
-        {
-            Channel!.EnableVideoLengthMinimum = !Channel.EnableVideoLengthMinimum;
-        });
+        public ICommand ToggleEnableVideoLengthMinimumCommand => _toggleEnableVideoLengthMinimumCommand ??= new RelayCommand(() => Channel!.EnableVideoLengthMinimum = !Channel.EnableVideoLengthMinimum);
         private RelayCommand? _toggleEnableVideoLengthMinimumCommand;
 
-        public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() =>
-        {
-            Channel!.EnableDateRangeLimit = !Channel.EnableDateRangeLimit;
-        });
+        public ICommand ToggleEnableDateRangeLimitCommand => _toggleEnableDateRangeLimitCommand ??= new RelayCommand(() => Channel!.EnableDateRangeLimit = !Channel.EnableDateRangeLimit);
         private ICommand? _toggleEnableDateRangeLimitCommand;
 
-        public ICommand ToggleSendNotificationsForNewVideosCommand => _toggleSendNotificationsForNewVideosCommand ??= new RelayCommand(() =>
-        {
-            Channel!.SendNotificationsForNewVideos = !Channel.SendNotificationsForNewVideos;
-        });
+        public ICommand ToggleSendNotificationsForNewVideosCommand => _toggleSendNotificationsForNewVideosCommand ??= new RelayCommand(() => Channel!.SendNotificationsForNewVideos = !Channel.SendNotificationsForNewVideos);
         private ICommand? _toggleSendNotificationsForNewVideosCommand;
 
-        public ICommand ToggleAutoDownloadNewVideosCommand => _toggleAutoDownloadNewVideosCommand ??= new RelayCommand(() =>
-        {
-            Channel!.AutoDownloadNewVideos = !Channel.AutoDownloadNewVideos;
-        });
+        public ICommand ToggleAutoDownloadNewVideosCommand => _toggleAutoDownloadNewVideosCommand ??= new RelayCommand(() => Channel!.AutoDownloadNewVideos = !Channel.AutoDownloadNewVideos);
         private ICommand? _toggleAutoDownloadNewVideosCommand;
 
         public ICommand FindVideosCommand => _findVideosCommand ??= new RelayCommand(FindVideos);
@@ -187,21 +172,14 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             await Policy
                 .Handle<Exception>().FallbackAsync(_ => Task.CompletedTask, async ex =>
-                {
                     // This happens once we've retried and failed.
                     // Show that there was an unhandled error.
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        await Page.DisplayAlert(Resources.Resources.Error, string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), Resources.Resources.OK);
-                    });
-                })
+                    await MainThread.InvokeOnMainThreadAsync(async () => await Page.DisplayAlert(Resources.Resources.Error, string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), Resources.Resources.OK)))
                 .WrapAsync(Policy.Handle<Exception>().RetryAsync(5, (_, _) =>
                 {
                     // Nothing to do
                 }))
-                .ExecuteAsync(async () =>
-                {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                .ExecuteAsync(async () => await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         using (new BusyIndicator(Page))
                         {
@@ -216,35 +194,29 @@ namespace YouTubeHelper.Mobile.ViewModels
                             {
                                 List<string>? searchTerms = null;
 
-
                                 if (!string.IsNullOrEmpty(SearchByTitleTerm))
                                 {
                                     string searchByTitleTermTrimmed = SearchByTitleTerm.Trim();
 
-                                    if (searchByTitleTermTrimmed.StartsWith('"')
+                                    searchTerms = searchByTitleTermTrimmed.StartsWith('"')
                                         && searchByTitleTermTrimmed.EndsWith('"')
-                                        && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')))
-                                    {
-                                        searchTerms = new List<string> { searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"') };
-                                    }
-                                    else
-                                    {
-                                        searchTerms = searchByTitleTermTrimmed.Split().ToList();
-                                    }
+                                        && !string.IsNullOrEmpty(searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"'))
+                                        ? [searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')]
+                                        : searchByTitleTermTrimmed.Split().ToList();
 
                                     // Update the history
                                     string? searchTermHistory = Preferences.Default.Get<string?>(nameof(SearchByTitleTerm), null);
                                     List<string> searchTermHistoryList;
                                     try
                                     {
-                                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+                                        searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? [];
                                     }
                                     catch
                                     {
-                                        searchTermHistoryList = new();
+                                        searchTermHistoryList = [];
                                     }
 
-                                    searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
+                                    _ = searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
                                     searchTermHistoryList.Insert(0, searchByTitleTermTrimmed);
                                     searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
                                     Preferences.Default.Set(nameof(SearchByTitleTerm), JsonConvert.SerializeObject(searchTermHistoryList));
@@ -268,7 +240,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 Videos.AddRange(videoViewModels);
 
                                 // Do not await this, as it slows the loading of the page
-                                Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
+                                _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
@@ -276,27 +248,26 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
 
                                 List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
-                                    {
-                                        ExclusionsMode = ExclusionsMode.ShowAll,
-                                        VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
-                                        Count = int.MaxValue
-                                    }))
+                                {
+                                    ExclusionsMode = ExclusionsMode.ShowAll,
+                                    VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
+                                    Count = int.MaxValue
+                                }))
                                     .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue)
                                     .ToList();
 
                                 foreach (Video? video in queuedVideos)
                                 {
-                                    VideoViewModel videoViewModel = new VideoViewModel(video, Page, this);
+                                    VideoViewModel videoViewModel = new(video, Page, this);
                                     Videos.Add(videoViewModel);
                                     string requestId = distinctQueue.First(v => v.VideoId == video.Id).RequestGuid.ToString();
 
                                     // Do not await this, as it slows the loading of the queue page
-                                    Task _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
+                                    _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
                                 }
                             }
                         }
-                    });
-                });
+                    }));
 
             _findInProgress = false;
         }
@@ -322,7 +293,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             try
             {
-                await Page.ShowPopupAsync(new FilterOptionsPopup(this));
+                _ = await Page.ShowPopupAsync(new FilterOptionsPopup(this));
             }
             finally
             {
@@ -345,7 +316,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             set
             {
                 _selectedSortModeIndex = value;
-                
+
                 // Have to do an explicit raise here since setting to 0 doesn't.
                 OnPropertyChanged();
             }
@@ -443,7 +414,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             get => _isFabOpen;
             set
             {
-                SetProperty(ref _isFabOpen, value);
+                _ = SetProperty(ref _isFabOpen, value);
                 _ = ChannelView!.ToggleFabExpander(_isFabOpen);
             }
         }
@@ -471,11 +442,11 @@ namespace YouTubeHelper.Mobile.ViewModels
             List<string> searchTermHistoryList;
             try
             {
-                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? new();
+                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(searchTermHistory!) ?? [];
             }
             catch
             {
-                searchTermHistoryList = new();
+                searchTermHistoryList = [];
             }
 
             if (!searchTermHistoryList.Any())
@@ -520,11 +491,11 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             get
             {
-                List<string> parts = new List<string>
-                {
+                List<string> parts =
+                [
                     // Sort order
                     $"Sort: {SelectedSortMode.Description}"
-                };
+                ];
 
                 // Exclusions mode
                 ExclusionsMode mode = SelectedExclusionsMode.Value;
@@ -572,19 +543,19 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
 
                 // Days of week filters
-                List<string> dayFilters = new List<string>();
+                List<string> dayFilters = [];
 
                 List<DayOfWeekItem> excludedDays = ExcludeDaysOfWeek!.Where(d => d.IsSelected).ToList();
                 if (excludedDays.Count is > 0 and < 7)
                 {
                     if (excludedDays.Count > 4)
                     {
-                        IEnumerable<string> notExcluded = ExcludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> notExcluded = ExcludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Exclude all except {string.Join(", ", notExcluded)}");
                     }
                     else
                     {
-                        IEnumerable<string> excluded = excludedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> excluded = excludedDays.Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Exclude: {string.Join(", ", excluded)}");
                     }
                 }
@@ -594,12 +565,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     if (includedDays.Count > 4)
                     {
-                        IEnumerable<string> notIncluded = IncludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> notIncluded = IncludeDaysOfWeek!.Where(d => !d.IsSelected).Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Include all except {string.Join(", ", notIncluded)}");
                     }
                     else
                     {
-                        IEnumerable<string> included = includedDays.Select(d => d.Day.ToString().Substring(0, 3));
+                        IEnumerable<string> included = includedDays.Select(d => d.Day.ToString()[..3]);
                         dayFilters.Add($"Include: {string.Join(", ", included)}");
                     }
                 }
@@ -625,7 +596,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private ObservableCollection<DayOfWeekItem> CreateDayCollectionFromList(List<DayOfWeek>? existing)
         {
-            List<DayOfWeekItem> items = new List<DayOfWeekItem>();
+            List<DayOfWeekItem> items = [];
 
             Array values = Enum.GetValues(typeof(DayOfWeek));
             foreach (object value in values)
@@ -633,7 +604,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 DayOfWeek day = (DayOfWeek)value;
                 bool isSelected = existing != null && existing.Contains(day);
 
-                DayOfWeekItem item = new DayOfWeekItem(day, isSelected);
+                DayOfWeekItem item = new(day, isSelected);
                 items.Add(item);
             }
 
@@ -660,10 +631,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             OnPropertyChanged(nameof(IncludeDaysSummary));
         }
 
-        private List<DayOfWeek> BuildListFromCollection(IEnumerable<DayOfWeekItem> collection)
-        {
-            return collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
-        }
+        private List<DayOfWeek> BuildListFromCollection(IEnumerable<DayOfWeekItem> collection) => collection.Where(i => i.IsSelected).Select(i => i.Day).ToList();
 
         private string BuildSummary(IEnumerable<DayOfWeekItem> collection)
         {
@@ -672,12 +640,13 @@ namespace YouTubeHelper.Mobile.ViewModels
             {
                 return "None";
             }
+
             if (selected.Count == 7)
             {
                 return "All days";
             }
             // Use 3-letter abbreviations
-            return string.Join(", ", selected.Select(d => d.ToString().Substring(0, 3)));
+            return string.Join(", ", selected.Select(d => d.ToString()[..3]));
         }
     }
 

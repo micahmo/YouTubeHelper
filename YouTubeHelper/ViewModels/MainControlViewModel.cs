@@ -28,21 +28,18 @@ namespace YouTubeHelper.ViewModels
                 {
                     if (AllowCreateNewChannel)
                     {
-                        Dispatcher.CurrentDispatcher.BeginInvoke(async () =>
+                        _ = Dispatcher.CurrentDispatcher.BeginInvoke(async () =>
                         {
-                            Channel channel = new Channel { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 };
+                            Channel channel = new() { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 };
                             ChannelViewModel channelViewModel = new(channel, this);
                             Channels.Insert(Channels.Count - 1, channelViewModel);
                             SelectedChannel = channelViewModel;
 
                             // Persist it!
-                            await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
+                            _ = await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
 
                             // Listen for changes
-                            channel.Changed += async (_, _) =>
-                            {
-                                await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
-                            };
+                            channel.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(channel, MainWindow.ClientId);
                         });
                     }
                 }
@@ -57,10 +54,7 @@ namespace YouTubeHelper.ViewModels
                     switch (Mode)
                     {
                         case MainControlMode.Channel:
-                            Channels.ToList().ForEach(c =>
-                            {
-                                c.Videos.Clear();
-                            });
+                            Channels.ToList().ForEach(c => c.Videos.Clear());
                             break;
                         case MainControlMode.Queue:
                             Channels.Clear();
@@ -88,17 +82,14 @@ namespace YouTubeHelper.ViewModels
             _queueChannelTab = new(new Channel(persistent: false) { VanityName = Resources.Queue }, this);
         }
 
-        public void RaisePropertyChanged(string propertyName)
-        {
-            OnPropertyChanged(propertyName);
-        }
+        public void RaisePropertyChanged(string propertyName) => OnPropertyChanged(propertyName);
 
         public MainControlMode Mode
         {
             get => _mode;
             set
             {
-                SetProperty(ref _mode, value);
+                _ = SetProperty(ref _mode, value);
                 OnPropertyChanged(nameof(ChannelMode));
                 OnPropertyChanged(nameof(QueueMode));
             }
@@ -112,12 +103,12 @@ namespace YouTubeHelper.ViewModels
         [Obsolete("This should ONLY be used for XAML binding")]
         public bool ShowExclusions => SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded);
 
-        public ObservableCollection<ChannelViewModel> Channels { get; } = new();
+        public ObservableCollection<ChannelViewModel> Channels { get; } = [];
 
         /// <summary>
         /// Represents the "real" list of channels from the database. Can be used to repopulate <see cref="Channels"/> when needed.
         /// </summary>
-        public List<ChannelViewModel> RealChannels { get; } = new();
+        public List<ChannelViewModel> RealChannels { get; } = [];
 
         public bool IsBusy
         {
@@ -169,7 +160,6 @@ namespace YouTubeHelper.ViewModels
 
         public GridLength ZeroGridLength { get; } = new(0, GridUnitType.Pixel);
 
-
         public string? ActiveVideo
         {
             get => _activeVideo;
@@ -195,7 +185,7 @@ namespace YouTubeHelper.ViewModels
             get => _activeVideoElapsedTimeSpan;
             set
             {
-                SetProperty(ref _activeVideoElapsedTimeSpan, value);
+                _ = SetProperty(ref _activeVideoElapsedTimeSpan, value);
                 OnPropertyChanged(nameof(ActiveVideoRemainingTimeSpan));
                 OnPropertyChanged(nameof(ActiveVideoTimeString));
             }
@@ -207,7 +197,7 @@ namespace YouTubeHelper.ViewModels
             get => _activeVideoDuration;
             set
             {
-                SetProperty(ref _activeVideoDuration, value);
+                _ = SetProperty(ref _activeVideoDuration, value);
                 OnPropertyChanged(nameof(ActiveVideoRemainingTimeSpan));
                 OnPropertyChanged(nameof(ActiveVideoTimeString));
             }
@@ -268,7 +258,7 @@ namespace YouTubeHelper.ViewModels
             get => _selectedExclusionsMode ?? ExclusionsModeValues.First();
             set
             {
-                SetProperty(ref _selectedExclusionsMode, value);
+                _ = SetProperty(ref _selectedExclusionsMode, value);
 #pragma warning disable CS0618
                 OnPropertyChanged(nameof(ShowExclusions));
 #pragma warning restore CS0618
@@ -384,13 +374,7 @@ namespace YouTubeHelper.ViewModels
             {
                 channels = ServerApiClient.Instance.GetChannels().GetAwaiter().GetResult();
 
-                channels.ToList().ForEach(c =>
-                {
-                    c.Changed += async (_, _) =>
-                    {
-                        await ServerApiClient.Instance.UpdateChannel(c, MainWindow.ClientId);
-                    };
-                });
+                channels.ToList().ForEach(c => c.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(c, MainWindow.ClientId));
             });
 
             // Populate the UI with the channels we retrieved
@@ -424,7 +408,7 @@ namespace YouTubeHelper.ViewModels
 
             _loaded = true;
         }
-        
+
         // Helps to prevent double-loading when using the app through RDP sessions.
         private bool _loaded;
     }
