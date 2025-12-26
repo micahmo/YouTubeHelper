@@ -289,6 +289,8 @@ namespace YouTubeHelper.ViewModels
         }
         private string? _searchByTitleTerm;
 
+        public bool IsExactSearch => !string.IsNullOrWhiteSpace(SearchByTitleTerm) && SearchByTitleTerm.Trim().StartsWith('"') && SearchByTitleTerm.Trim().EndsWith('"') && !string.IsNullOrEmpty(SearchByTitleTerm.Trim().TrimStart('"').TrimEnd('"'));
+
         public bool EnableCountLimit
         {
             get => _enableCountLimit;
