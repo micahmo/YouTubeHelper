@@ -241,22 +241,13 @@ namespace YouTubeHelper.Mobile.ViewModels
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
                                 // Get the queue from the server
-                                List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
+                                List<QueueVideoItem> queueItems = await ServerApiClient.Instance.GetQueuePopulated();
 
-                                List<Video> queuedVideos = (await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                foreach (QueueVideoItem item in queueItems)
                                 {
-                                    ExclusionsMode = ExclusionsMode.ShowAll,
-                                    VideoIds = distinctQueue.Select(queueItem => queueItem.VideoId).ToList(),
-                                    Count = int.MaxValue
-                                }))
-                                    .OrderByDescending(video => distinctQueue.FirstOrDefault(v => v.VideoId == video.Id)?.DateAdded ?? DateTime.MinValue)
-                                    .ToList();
-
-                                foreach (Video? video in queuedVideos)
-                                {
-                                    VideoViewModel videoViewModel = new(video, Page, this);
+                                    VideoViewModel videoViewModel = new(item.Video, Page, this);
                                     Videos.Add(videoViewModel);
-                                    string requestId = distinctQueue.First(v => v.VideoId == video.Id).RequestGuid.ToString();
+                                    string requestId = item.RequestData.RequestGuid.ToString();
 
                                     // Do not await this, as it slows the loading of the queue page
                                     _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
