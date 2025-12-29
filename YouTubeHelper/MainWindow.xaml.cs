@@ -492,6 +492,7 @@ namespace YouTubeHelper
                 }
 
                 ChannelViewModel? foundChannelViewModel = default;
+                bool foundVideo = false;
                 foreach (ChannelViewModel channelViewModel in MainControlViewModel.Channels)
                 {
                     if (channelViewModel.Channel.ChannelPlaylist == channelPlaylist)
@@ -499,6 +500,12 @@ namespace YouTubeHelper
                         foundChannelViewModel = channelViewModel;
 
                         MainControlViewModel.SelectedChannel = foundChannelViewModel;
+
+                        if (foundChannelViewModel.Videos.Count == 1 & foundChannelViewModel.Videos.First().Video.Id == videoId)
+                        {
+                            foundVideo = true;
+                        }
+
                         break;
                     }
                 }
@@ -522,14 +529,17 @@ namespace YouTubeHelper
                     MainControlViewModel.SelectedChannel = foundChannelViewModel;
                 }
 
-                foundChannelViewModel.Videos.Clear();
-
-                if (video is not null)
+                if (!foundVideo)
                 {
-                    VideoViewModel videoViewModel = new(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
-                    foundChannelViewModel.Videos.Add(videoViewModel);
+                    foundChannelViewModel.Videos.Clear();
 
-                    _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
+                    if (video is not null)
+                    {
+                        VideoViewModel videoViewModel = new(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
+                        foundChannelViewModel.Videos.Add(videoViewModel);
+
+                        _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
+                    }
                 }
             }
 

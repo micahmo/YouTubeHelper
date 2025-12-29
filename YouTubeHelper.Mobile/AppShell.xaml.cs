@@ -658,6 +658,7 @@ namespace YouTubeHelper.Mobile
                 }
 
                 ChannelViewModel? foundChannelViewModel = default;
+                bool foundVideo = false;
                 foreach (ShellContent? content in ChannelTab.Items)
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
@@ -672,6 +673,11 @@ namespace YouTubeHelper.Mobile
                         catch
                         {
                             // This throws an exception, but it gets far enough.
+                        }
+
+                        if (foundChannelViewModel.Videos.Count == 1 && foundChannelViewModel.Videos.First().Video.Id == videoId)
+                        {
+                            foundVideo = true;
                         }
 
                         break;
@@ -716,23 +722,26 @@ namespace YouTubeHelper.Mobile
                     foundChannelViewModel.Loading = false;
                 }
 
-                foundChannelViewModel.Videos.Clear();
-
-                if (video is not null)
+                if (!foundVideo)
                 {
-                    VideoViewModel videoViewModel = new(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
-                    foundChannelViewModel.Videos.Add(videoViewModel);
+                    foundChannelViewModel.Videos.Clear();
 
-                    Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
-
-                    if (downloadVideo)
+                    if (video is not null)
                     {
-                        Task __ = videoViewModel.DownloadVideo("plex");
-                    }
+                        VideoViewModel videoViewModel = new(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
+                        foundChannelViewModel.Videos.Add(videoViewModel);
 
-                    if (watchVideo)
-                    {
-                        Task ___ = videoViewModel.WatchVideoExternally();
+                        Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
+
+                        if (downloadVideo)
+                        {
+                            Task __ = videoViewModel.DownloadVideo("plex");
+                        }
+
+                        if (watchVideo)
+                        {
+                            Task ___ = videoViewModel.WatchVideoExternally();
+                        }
                     }
                 }
             }
