@@ -228,15 +228,8 @@ public partial class ChannelView : ContentPage
                 return;
             }
 
-            if (FabIconImage != null)
-            {
-                FabIconImage.IsVisible = !isExpanded;
-            }
-
-            if (FabIconLabel != null)
-            {
-                FabIconLabel.IsVisible = isExpanded;
-            }
+            FabIconImage.IsVisible = !isExpanded;
+            FabIconLabel.IsVisible = isExpanded;
 
             FabIconLabel.Text = isExpanded ? "\uF406" : "•••"; // \uF406 is the Ionicons "close" or "X" glyph
             FabIconLabel.FontSize = isExpanded ? 35 : 23;
