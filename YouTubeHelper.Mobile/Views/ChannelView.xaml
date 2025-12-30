@@ -143,28 +143,38 @@
                 VerticalOptions="End">
 
                 <toolkit:Expander.Header>
-                    <Frame
-                        Padding="0"
-                        BackgroundColor="Firebrick"
-                        BorderColor="Firebrick"
-                        CornerRadius="16"
-                        HasShadow="True"
+                    <Border
+                        Background="Firebrick"
                         HeightRequest="56"
                         HorizontalOptions="End"
+                        Stroke="Firebrick"
+                        StrokeThickness="0"
                         VerticalOptions="End"
                         WidthRequest="56">
 
-                        <Label
-                            x:Name="FabIconLabel"
-                            FontFamily="ionicons"
-                            FontSize="23"
-                            HorizontalOptions="Center"
-                            HorizontalTextAlignment="Center"
-                            Text="•••"
-                            TextColor="White"
-                            VerticalOptions="Center"
-                            VerticalTextAlignment="Center" />
-                    </Frame>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+
+                        <Grid>
+                            <Image
+                                x:Name="FabIconImage"
+                                Aspect="AspectFill"
+                                HorizontalOptions="Fill"
+                                Source="{Binding Channel.ThumbnailUrl}"
+                                VerticalOptions="Fill" />
+
+                            <Label
+                                x:Name="FabIconLabel"
+                                FontFamily="ionicons"
+                                FontSize="23"
+                                HorizontalOptions="Center"
+                                HorizontalTextAlignment="Center"
+                                TextColor="White"
+                                VerticalOptions="Center"
+                                VerticalTextAlignment="Center" />
+                        </Grid>
+                    </Border>
                 </toolkit:Expander.Header>
 
                 <toolkit:Expander.Content>
