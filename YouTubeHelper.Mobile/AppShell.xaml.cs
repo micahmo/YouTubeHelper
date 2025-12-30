@@ -8,7 +8,6 @@ using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
-using YouTubeHelper.Mobile.Notifications;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared.Utilities;
@@ -345,11 +344,6 @@ namespace YouTubeHelper.Mobile
 
                 // We made it here, so we must have connected successfully. Save the server address.
                 await SecureStorage.Default.SetAsync("server_address", ServerApiClient.BaseUrl!);
-            }
-
-            if (connected)
-            {
-                await FirebaseService.InitializeAsync();
             }
 
             return connected;
