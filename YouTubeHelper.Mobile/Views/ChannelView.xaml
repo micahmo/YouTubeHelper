@@ -156,6 +156,14 @@
                             <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
 
+                        <Border.Shadow>
+                            <Shadow
+                                Brush="#80000000"
+                                Opacity="0.6"
+                                Radius="12"
+                                Offset="0,6" />
+                        </Border.Shadow>
+
                         <Grid>
                             <Image
                                 x:Name="FabIconImage"
