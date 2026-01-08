@@ -48,14 +48,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                             if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                             {
                                 ExclusionsMode = ExclusionsMode.ShowAll,
-                                VideoIds = new List<string> { videoId },
+                                VideoIds = [videoId],
                                 SortMode = SortMode.AgeDesc,
                                 Count = int.MaxValue
                             })).FirstOrDefault() is { } video)
                             {
                                 video.Excluded = true;
                                 video.ExclusionReason = markVideoEnum.Value;
-                                await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
+                                _ = await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
                             }
                         }
 
@@ -86,7 +86,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                             if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
                             {
                                 ExclusionsMode = ExclusionsMode.ShowAll,
-                                VideoIds = new List<string> { videoId2 },
+                                VideoIds = [videoId2],
                                 SortMode = SortMode.AgeDesc,
                                 Count = int.MaxValue
                             })).FirstOrDefault() is { } video)
