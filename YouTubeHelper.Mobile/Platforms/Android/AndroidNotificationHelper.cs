@@ -11,7 +11,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool isFailed, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
         {
             bool isDismissable = isDone || isNewVideo;
 
@@ -47,6 +47,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = dismissIntent.PutExtra("actionType", "dismiss");
                 _ = dismissIntent.PutExtra("notificationId", notificationId);
                 _ = dismissIntent.PutExtra("isDone", isDone);
+                _ = dismissIntent.PutExtra("isFailed", isFailed);
                 dismissPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     dismissIntentId,
@@ -61,6 +62,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = navigateToVideoIntent.PutExtra("notificationId", notificationId);
                 _ = navigateToVideoIntent.PutExtra("isDone", isDone);
                 _ = navigateToVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = navigateToVideoIntent.PutExtra("isFailed", isFailed);
                 navigateToVideoPendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: navigateToVideoIntentId,
@@ -74,6 +76,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = navigateToQueueIntent.PutExtra("navigateTo", "queue");
                 _ = navigateToQueueIntent.PutExtra("notificationId", notificationId);
                 _ = navigateToQueueIntent.PutExtra("isDone", isDone);
+                _ = navigateToQueueIntent.PutExtra("isFailed", isFailed);
                 navigateToQueuePendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: navigateToQueueIntentId,
@@ -87,6 +90,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = openInPlexIntent.PutExtra("plexRatingKey", plexRatingKey);
                 _ = openInPlexIntent.PutExtra("notificationId", notificationId);
                 _ = openInPlexIntent.PutExtra("isDone", isDone);
+                _ = openInPlexIntent.PutExtra("isFailed", isFailed);
                 openInPlexPendingIntent = PendingIntent.GetActivity(
                     context,
                     openInPlexIntentId,
@@ -243,6 +247,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             if (hasProgress)
             {
                 _ = builder.SetProgress(max: 100, progress: (int)progress, false);
+            }
+
+            if (isFailed)
+            {
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Re-download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
             }
 
             NotificationManagerCompat.From(context).Notify(notificationId, builder.Build());

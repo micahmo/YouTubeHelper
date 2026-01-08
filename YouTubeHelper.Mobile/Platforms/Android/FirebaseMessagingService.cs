@@ -26,6 +26,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             bool isDone = bool.TryParse(doneStr, out bool done) && done;
             data.TryGetValue("newVideo", out string? newVideoStr);
             bool isNewVideo = bool.TryParse(newVideoStr, out bool newVideo) && newVideo;
+            data.TryGetValue("failed", out string? failedStr);
+            bool isFailed = bool.TryParse(failedStr, out bool failed) && failed;
             data.TryGetValue("videoUrl", out string? videoUrl);
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
             data.TryGetValue("channelThumbnailUrl", out string? channelThumbnailUrl);
@@ -54,6 +56,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     notificationId: int.Parse(tag),
                     isDone: isDone,
                     isNewVideo: isNewVideo,
+                    isFailed: isFailed,
                     hasProgress: hasProgress,
                     progress: progress,
                     plexRatingKey: plexRatingKey
