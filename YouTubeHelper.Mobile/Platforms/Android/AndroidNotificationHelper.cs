@@ -17,6 +17,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             Context context = global::Android.App.Application.Context;
 
+#pragma warning disable IDE0059
             PendingIntent? dismissPendingIntent = null;
             PendingIntent? navigateToVideoPendingIntent = null;
             PendingIntent? navigateToQueuePendingIntent = null;
@@ -26,6 +27,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             PendingIntent? markVideoAsWontWatchPendingIntent = null;
             PendingIntent? watchVideoPendingIntent = null;
             PendingIntent? markVideoAsMightWatchPendingIntent = null;
+#pragma warning restore IDE0059
 
             int dismissIntentId = notificationId * 10 + 0;
             int navigateToVideoIntentId = notificationId * 10 + 1;
@@ -40,11 +42,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             if (context.PackageName != null)
             {
                 // Dismiss Action
-                Intent dismissIntent = new Intent(ActionNotification);
-                dismissIntent.SetPackage(context.PackageName);
-                dismissIntent.PutExtra("actionType", "dismiss");
-                dismissIntent.PutExtra("notificationId", notificationId);
-                dismissIntent.PutExtra("isDone", isDone);
+                Intent dismissIntent = new(ActionNotification);
+                _ = dismissIntent.SetPackage(context.PackageName);
+                _ = dismissIntent.PutExtra("actionType", "dismiss");
+                _ = dismissIntent.PutExtra("notificationId", notificationId);
+                _ = dismissIntent.PutExtra("isDone", isDone);
                 dismissPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     dismissIntentId,
@@ -54,11 +56,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 // Navigate to Video Action
                 Intent navigateToVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                navigateToVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-                navigateToVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
-                navigateToVideoIntent.PutExtra("notificationId", notificationId);
-                navigateToVideoIntent.PutExtra("isDone", isDone);
-                navigateToVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = navigateToVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                _ = navigateToVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                _ = navigateToVideoIntent.PutExtra("notificationId", notificationId);
+                _ = navigateToVideoIntent.PutExtra("isDone", isDone);
+                _ = navigateToVideoIntent.PutExtra("isNewVideo", isNewVideo);
                 navigateToVideoPendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: navigateToVideoIntentId,
@@ -68,10 +70,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 // Navigate to Queue Action
                 Intent navigateToQueueIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                navigateToQueueIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-                navigateToQueueIntent.PutExtra("navigateTo", "queue");
-                navigateToQueueIntent.PutExtra("notificationId", notificationId);
-                navigateToQueueIntent.PutExtra("isDone", isDone);
+                _ = navigateToQueueIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                _ = navigateToQueueIntent.PutExtra("navigateTo", "queue");
+                _ = navigateToQueueIntent.PutExtra("notificationId", notificationId);
+                _ = navigateToQueueIntent.PutExtra("isDone", isDone);
                 navigateToQueuePendingIntent = PendingIntent.GetActivity(
                     context,
                     requestCode: navigateToQueueIntentId,
@@ -81,10 +83,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 // Open In Plex Action
                 Intent openInPlexIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                openInPlexIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-                openInPlexIntent.PutExtra("plexRatingKey", plexRatingKey);
-                openInPlexIntent.PutExtra("notificationId", notificationId);
-                openInPlexIntent.PutExtra("isDone", isDone);
+                _ = openInPlexIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                _ = openInPlexIntent.PutExtra("plexRatingKey", plexRatingKey);
+                _ = openInPlexIntent.PutExtra("notificationId", notificationId);
+                _ = openInPlexIntent.PutExtra("isDone", isDone);
                 openInPlexPendingIntent = PendingIntent.GetActivity(
                     context,
                     openInPlexIntentId,
@@ -94,31 +96,33 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 // Just launch app
                 Intent launchAppIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                _ = launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+#pragma warning disable IDE0059
                 launchAppPendingIntent = PendingIntent.GetActivity(
                     context,
                     launchAppIntentId,
                     launchAppIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+#pragma warning restore IDE0059
 
                 // Download Video Action
-                Intent downloadVideoIntent = new Intent(ActionNotification);
-                downloadVideoIntent.SetPackage(context.PackageName);
-                downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
-                downloadVideoIntent.PutExtra("downloadVideo", true);
-                downloadVideoIntent.PutExtra("notificationId", notificationId);
-                downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                Intent downloadVideoIntent = new(ActionNotification);
+                _ = downloadVideoIntent.SetPackage(context.PackageName);
+                _ = downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                _ = downloadVideoIntent.PutExtra("downloadVideo", true);
+                _ = downloadVideoIntent.PutExtra("notificationId", notificationId);
+                _ = downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
                 // Add extra data needed to rebuild notification
-                downloadVideoIntent.PutExtra("title", title);
-                downloadVideoIntent.PutExtra("body", body);
-                downloadVideoIntent.PutExtra("thumbnailPath", thumbnailPath);
-                downloadVideoIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
-                downloadVideoIntent.PutExtra("channelId", notificationChannelId);
-                downloadVideoIntent.PutExtra("hasProgress", hasProgress);
-                downloadVideoIntent.PutExtra("progress", progress);
-                downloadVideoIntent.PutExtra("plexRatingKey", plexRatingKey);
-                downloadVideoIntent.PutExtra("channelName", channelName);
+                _ = downloadVideoIntent.PutExtra("title", title);
+                _ = downloadVideoIntent.PutExtra("body", body);
+                _ = downloadVideoIntent.PutExtra("thumbnailPath", thumbnailPath);
+                _ = downloadVideoIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
+                _ = downloadVideoIntent.PutExtra("channelId", notificationChannelId);
+                _ = downloadVideoIntent.PutExtra("hasProgress", hasProgress);
+                _ = downloadVideoIntent.PutExtra("progress", progress);
+                _ = downloadVideoIntent.PutExtra("plexRatingKey", plexRatingKey);
+                _ = downloadVideoIntent.PutExtra("channelName", channelName);
                 downloadVideoPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     downloadVideoIntentId,
@@ -127,22 +131,22 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 );
 
                 // Mark Video as Won't Watch Action
-                Intent markVideoAsWontWatchIntent = new Intent(ActionNotification);
-                markVideoAsWontWatchIntent.SetPackage(context.PackageName);
-                markVideoAsWontWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
-                markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
-                markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
-                markVideoAsWontWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                Intent markVideoAsWontWatchIntent = new(ActionNotification);
+                _ = markVideoAsWontWatchIntent.SetPackage(context.PackageName);
+                _ = markVideoAsWontWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
+                _ = markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
+                _ = markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
+                _ = markVideoAsWontWatchIntent.PutExtra("isNewVideo", isNewVideo);
                 // Add extra data needed to rebuild notification
-                markVideoAsWontWatchIntent.PutExtra("title", title);
-                markVideoAsWontWatchIntent.PutExtra("body", body);
-                markVideoAsWontWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
-                markVideoAsWontWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
-                markVideoAsWontWatchIntent.PutExtra("channelId", notificationChannelId);
-                markVideoAsWontWatchIntent.PutExtra("hasProgress", hasProgress);
-                markVideoAsWontWatchIntent.PutExtra("progress", progress);
-                markVideoAsWontWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
-                markVideoAsWontWatchIntent.PutExtra("channelName", channelName);
+                _ = markVideoAsWontWatchIntent.PutExtra("title", title);
+                _ = markVideoAsWontWatchIntent.PutExtra("body", body);
+                _ = markVideoAsWontWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                _ = markVideoAsWontWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
+                _ = markVideoAsWontWatchIntent.PutExtra("channelId", notificationChannelId);
+                _ = markVideoAsWontWatchIntent.PutExtra("hasProgress", hasProgress);
+                _ = markVideoAsWontWatchIntent.PutExtra("progress", progress);
+                _ = markVideoAsWontWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
+                _ = markVideoAsWontWatchIntent.PutExtra("channelName", channelName);
                 markVideoAsWontWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsWontWatchIntentId,
@@ -152,35 +156,37 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                 // Watch Video Action
                 Intent watchVideoIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
-                watchVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
-                watchVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
-                watchVideoIntent.PutExtra("watchVideo", true);
-                watchVideoIntent.PutExtra("notificationId", notificationId);
-                watchVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = watchVideoIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+                _ = watchVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
+                _ = watchVideoIntent.PutExtra("watchVideo", true);
+                _ = watchVideoIntent.PutExtra("notificationId", notificationId);
+                _ = watchVideoIntent.PutExtra("isNewVideo", isNewVideo);
+#pragma warning disable IDE0059
                 watchVideoPendingIntent = PendingIntent.GetActivity(
                     context,
                     watchVideoIntentId,
                     watchVideoIntent,
                     PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
                 );
+#pragma warning restore IDE0059
 
                 // Mark Video as Might Watch Action
-                Intent markVideoAsMightWatchIntent = new Intent(ActionNotification);
-                markVideoAsMightWatchIntent.SetPackage(context.PackageName);
-                markVideoAsMightWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
-                markVideoAsMightWatchIntent.PutExtra("markVideo", ExclusionReason.MightWatch.ToString());
-                markVideoAsMightWatchIntent.PutExtra("notificationId", notificationId);
-                markVideoAsMightWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                Intent markVideoAsMightWatchIntent = new(ActionNotification);
+                _ = markVideoAsMightWatchIntent.SetPackage(context.PackageName);
+                _ = markVideoAsMightWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
+                _ = markVideoAsMightWatchIntent.PutExtra("markVideo", ExclusionReason.MightWatch.ToString());
+                _ = markVideoAsMightWatchIntent.PutExtra("notificationId", notificationId);
+                _ = markVideoAsMightWatchIntent.PutExtra("isNewVideo", isNewVideo);
                 // Add extra data needed to rebuild notification
-                markVideoAsMightWatchIntent.PutExtra("title", title);
-                markVideoAsMightWatchIntent.PutExtra("body", body);
-                markVideoAsMightWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
-                markVideoAsMightWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
-                markVideoAsMightWatchIntent.PutExtra("channelId", notificationChannelId);
-                markVideoAsMightWatchIntent.PutExtra("hasProgress", hasProgress);
-                markVideoAsMightWatchIntent.PutExtra("progress", progress);
-                markVideoAsMightWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
-                markVideoAsMightWatchIntent.PutExtra("channelName", channelName);
+                _ = markVideoAsMightWatchIntent.PutExtra("title", title);
+                _ = markVideoAsMightWatchIntent.PutExtra("body", body);
+                _ = markVideoAsMightWatchIntent.PutExtra("thumbnailPath", thumbnailPath);
+                _ = markVideoAsMightWatchIntent.PutExtra("channelThumbnailPath", channelThumbnailPath);
+                _ = markVideoAsMightWatchIntent.PutExtra("channelId", notificationChannelId);
+                _ = markVideoAsMightWatchIntent.PutExtra("hasProgress", hasProgress);
+                _ = markVideoAsMightWatchIntent.PutExtra("progress", progress);
+                _ = markVideoAsMightWatchIntent.PutExtra("plexRatingKey", plexRatingKey);
+                _ = markVideoAsMightWatchIntent.PutExtra("channelName", channelName);
                 markVideoAsMightWatchPendingIntent = PendingIntent.GetBroadcast(
                     context,
                     markVideoAsMightWatchIntentId,
@@ -209,34 +215,34 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 .SetAutoCancel(isDismissable);
 
             // Set notification tap action
-            builder.SetContentIntent(navigateToVideoPendingIntent!);
+            _ = builder.SetContentIntent(navigateToVideoPendingIntent!);
 
             // Set additional actions
             if (isNewVideo)
             {
                 // If an action is disabled, set its PendingIntent to null
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", disabledAction == "WontWatch" ? null : markVideoAsWontWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Might Watch", disabledAction == "MightWatch" ? null : markVideoAsMightWatchPendingIntent);
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", disabledAction == "WontWatch" ? null : markVideoAsWontWatchPendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Might Watch", disabledAction == "MightWatch" ? null : markVideoAsMightWatchPendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
             }
             else
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
             }
 
             if (!string.IsNullOrEmpty(plexRatingKey))
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
             }
 
             if (isDone)
             {
-                builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
             }
 
             if (hasProgress)
             {
-                builder.SetProgress(max: 100, progress: (int)progress, false);
+                _ = builder.SetProgress(max: 100, progress: (int)progress, false);
             }
 
             NotificationManagerCompat.From(context).Notify(notificationId, builder.Build());
