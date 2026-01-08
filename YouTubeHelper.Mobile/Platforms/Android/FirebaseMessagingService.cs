@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Firebase.Messaging;
 using Plugin.LocalNotification;
+using ServerStatusBot.Definitions.Api;
 
 namespace YouTubeHelper.Mobile.Platforms.Android
 {
@@ -13,6 +14,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             base.OnMessageReceived(message);
 
             await HandleNotificationData(message.Data);
+        }
+
+        public override async void OnNewToken(string token)
+        {
+            base.OnNewToken(token);
+
+            _ = await ServerApiClient.Instance.RegisterDeviceId(token);
         }
 
         public static async Task HandleNotificationData(IDictionary<string, string> data)

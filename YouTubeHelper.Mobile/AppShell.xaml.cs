@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Gms.Extensions;
 using Android.OS;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
@@ -124,8 +125,27 @@ namespace YouTubeHelper.Mobile
                 busyIndicator = new BusyIndicator(this, Mobile.Resources.Resources.LoadingChannels);
             }
 
+            // Register FCM token with server
+#if ANDROID
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    Java.Lang.Object token = await Firebase.Messaging.FirebaseMessaging.Instance.GetToken();
+                    if (!string.IsNullOrEmpty((string?)token))
+                    {
+                        await ServerApiClient.Instance.RegisterDeviceId((string)token!);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Swallow but should probably show the user a message
+                }
+            });
+#endif
+
             // Connect to queue updates over SignalR
-            Task _ = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await ServerApiClient.Instance.SubscribeToHubEvents(
                     reconnecting: _ => Task.CompletedTask,
