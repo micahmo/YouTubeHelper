@@ -124,6 +124,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             string thumbnailPath = intent.GetStringExtra("thumbnailPath") ?? string.Empty;
             string channelThumbnailPath = intent.GetStringExtra("channelThumbnailPath") ?? string.Empty;
             string channelId = intent.GetStringExtra("channelId") ?? string.Empty;
+            bool isDone = intent.GetBooleanExtra("isDone", false);
             bool isNewVideo = intent.GetBooleanExtra("isNewVideo", false);
             bool isFailed = intent.GetBooleanExtra("isFailed", false);
             bool hasProgress = intent.GetBooleanExtra("hasProgress", false);
@@ -141,7 +142,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 channelThumbnailPath: channelThumbnailPath,
                 notificationChannelId: channelId,
                 notificationId: notificationId,
-                isDone: false,
+                isDone: isDone,
                 isNewVideo: isNewVideo,
                 isFailed: isFailed,
                 hasProgress: hasProgress,
