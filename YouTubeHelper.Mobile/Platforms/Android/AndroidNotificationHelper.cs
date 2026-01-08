@@ -116,7 +116,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = downloadVideoIntent.PutExtra(Intent.ExtraText, videoUrl);
                 _ = downloadVideoIntent.PutExtra("downloadVideo", true);
                 _ = downloadVideoIntent.PutExtra("notificationId", notificationId);
+                _ = downloadVideoIntent.PutExtra("isDone", isDone);
                 _ = downloadVideoIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = downloadVideoIntent.PutExtra("isFailed", isFailed);
                 // Add extra data needed to rebuild notification
                 _ = downloadVideoIntent.PutExtra("title", title);
                 _ = downloadVideoIntent.PutExtra("body", body);
@@ -140,7 +142,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = markVideoAsWontWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
                 _ = markVideoAsWontWatchIntent.PutExtra("markVideo", ExclusionReason.WontWatch.ToString());
                 _ = markVideoAsWontWatchIntent.PutExtra("notificationId", notificationId);
+                _ = markVideoAsWontWatchIntent.PutExtra("isDone", isDone);
                 _ = markVideoAsWontWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = markVideoAsWontWatchIntent.PutExtra("isFailed", isFailed);
                 // Add extra data needed to rebuild notification
                 _ = markVideoAsWontWatchIntent.PutExtra("title", title);
                 _ = markVideoAsWontWatchIntent.PutExtra("body", body);
@@ -180,7 +184,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = markVideoAsMightWatchIntent.PutExtra(Intent.ExtraText, videoUrl);
                 _ = markVideoAsMightWatchIntent.PutExtra("markVideo", ExclusionReason.MightWatch.ToString());
                 _ = markVideoAsMightWatchIntent.PutExtra("notificationId", notificationId);
+                _ = markVideoAsMightWatchIntent.PutExtra("isDone", isDone);
                 _ = markVideoAsMightWatchIntent.PutExtra("isNewVideo", isNewVideo);
+                _ = markVideoAsMightWatchIntent.PutExtra("isFailed", isFailed);
                 // Add extra data needed to rebuild notification
                 _ = markVideoAsMightWatchIntent.PutExtra("title", title);
                 _ = markVideoAsMightWatchIntent.PutExtra("body", body);
@@ -239,6 +245,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
             }
 
+            if (isFailed)
+            {
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Re-download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
+            }
+
             if (isDone)
             {
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
@@ -247,11 +258,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             if (hasProgress)
             {
                 _ = builder.SetProgress(max: 100, progress: (int)progress, false);
-            }
-
-            if (isFailed)
-            {
-                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Re-download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
             }
 
             NotificationManagerCompat.From(context).Notify(notificationId, builder.Build());
