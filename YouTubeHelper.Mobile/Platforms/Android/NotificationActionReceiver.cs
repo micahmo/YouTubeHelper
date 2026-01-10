@@ -43,25 +43,47 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 {
                     try
                     {
-                        if (await AppShell.ConnectToServerSilent())
+                        bool success = false;
+                        try
                         {
-                            if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                            if (await AppShell.ConnectToServerSilent())
                             {
-                                ExclusionsMode = ExclusionsMode.ShowAll,
-                                VideoIds = [videoId],
-                                SortMode = SortMode.AgeDesc,
-                                Count = int.MaxValue
-                            })).FirstOrDefault() is { } video)
-                            {
-                                video.Excluded = true;
-                                video.ExclusionReason = markVideoEnum.Value;
-                                _ = await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
+                                if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                {
+                                    ExclusionsMode = ExclusionsMode.ShowAll,
+                                    VideoIds = [videoId],
+                                    SortMode = SortMode.AgeDesc,
+                                    Count = int.MaxValue
+                                })).FirstOrDefault() is { } video)
+                                {
+                                    video.Excluded = true;
+                                    video.ExclusionReason = markVideoEnum.Value;
+                                    video = await ServerApiClient.Instance.UpdateVideo(video, AppShell.ClientId);
+
+                                    if (video.Excluded && video.ExclusionReason == markVideoEnum.Value)
+                                    {
+                                        success = true;
+                                    }
+                                }
                             }
+                        }
+                        catch
+                        {
+                            // Don't die due to any server problems; we still want to update the notification
                         }
 
                         // Wait a bit for the notification update to be visible, then dismiss
                         await Task.Delay(800);
-                        HandleDismiss(context, intent);
+
+                        if (success)
+                        {
+                            HandleDismiss(context, intent);
+                        }
+                        else
+                        {
+                            // Re-show the original notification
+                            UpdateNotificationWithDisabledAction(context, intent, null);
+                        }
                     }
                     finally
                     {
@@ -114,7 +136,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             }
         }
 
-        private void UpdateNotificationWithDisabledAction(Context context, Intent intent, string disabledAction)
+        private void UpdateNotificationWithDisabledAction(Context context, Intent intent, string? disabledAction)
         {
             // Extract all the data needed to rebuild the notification
             int notificationId = intent.GetIntExtra("notificationId", -1);
