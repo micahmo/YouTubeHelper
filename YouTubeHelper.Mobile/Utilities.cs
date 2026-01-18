@@ -103,14 +103,13 @@ namespace YouTubeHelper.Mobile
             try
             {
 #if ANDROID
-                string packageName = "dev.imranr.obtainium.fdroid";
-                Intent? intent = Android.App.Application.Context.PackageManager?.GetLaunchIntentForPackage(packageName);
+                string obtainiumUri = "obtainium://add/https://github.com/micahmo/youtubehelper";
 
-                if (intent != null)
-                {
-                    intent.SetFlags(ActivityFlags.NewTask);
-                    Android.App.Application.Context.StartActivity(intent);
-                }
+                Intent intent = new(Intent.ActionView);
+                intent.SetData(Android.Net.Uri.Parse(obtainiumUri));
+                intent.SetFlags(ActivityFlags.NewTask);
+
+                Android.App.Application.Context.StartActivity(intent);
 #endif
             }
             catch
