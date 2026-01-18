@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Maui.Core;
+﻿using Android.Content;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
 using Flurl.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Android.Content;
-using CommunityToolkit.Maui.Alerts;
 
 namespace YouTubeHelper.Mobile
 {
@@ -12,8 +12,11 @@ namespace YouTubeHelper.Mobile
     {
         public static async Task<string?> GetCachedImagePath(string? url)
         {
-            if (string.IsNullOrEmpty(url)) return null;
-            
+            if (string.IsNullOrEmpty(url))
+            {
+                return null;
+            }
+
             string fileName = GetHashedFileName(url) + Path.GetExtension(url);
             string localPath = Path.Combine(FileSystem.CacheDirectory, fileName);
 
@@ -66,10 +69,7 @@ namespace YouTubeHelper.Mobile
             return JsonDocument.Parse(json);
         }
 
-        private Version GetCurrentVersion()
-        {
-            return new Version(AppInfo.VersionString);
-        }
+        private Version GetCurrentVersion() => new(AppInfo.VersionString);
 
         private Version ParseVersionFromRelease(JsonDocument release)
         {
@@ -85,9 +85,7 @@ namespace YouTubeHelper.Mobile
         {
             Version newVersion = ParseVersionFromRelease(release);
 
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                await Snackbar.Make(
+            await MainThread.InvokeOnMainThreadAsync(async () => await Snackbar.Make(
                     $"Update available: {newVersion}",
                     OpenObtainiumAsync,
                     "Obtainium",
@@ -97,8 +95,7 @@ namespace YouTubeHelper.Mobile
                         BackgroundColor = Colors.Black,
                         TextColor = Colors.White,
                         ActionButtonTextColor = Color.FromArgb("#EF4444")
-                    }).Show();
-            });
+                    }).Show());
         }
 
         private void OpenObtainiumAsync()
