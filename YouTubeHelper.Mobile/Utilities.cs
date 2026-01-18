@@ -103,7 +103,7 @@ namespace YouTubeHelper.Mobile
             try
             {
 #if ANDROID
-                string obtainiumUri = "obtainium://add/https://github.com/micahmo/youtubehelper";
+                string obtainiumUri = "obtainium://add/https://github.com/micahmo/YouTubeHelper";
 
                 Intent intent = new(Intent.ActionView);
                 intent.SetData(Android.Net.Uri.Parse(obtainiumUri));
