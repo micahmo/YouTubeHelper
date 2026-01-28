@@ -663,7 +663,11 @@ namespace YouTubeHelper
                                 _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(channelViewModel) - 1)]);
                             }
 
-                            _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Remove(channelViewModel));
+                            _ = Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                _ = MainControlViewModel.Channels.Remove(channelViewModel);
+                                _ = MainControlViewModel.RealChannels.Remove(channelViewModel);
+                            });
                             channelViewModel.Channel.Persistent = false;
                         }
                         else
@@ -699,8 +703,20 @@ namespace YouTubeHelper
 
                                     if (currentIndex != desiredIndex)
                                     {
+                                        int currentRealIndex = MainControlViewModel.ChannelsIndexToRealChannelsIndex(currentIndex);
+                                        int desiredRealIndex = MainControlViewModel.ChannelsIndexToRealChannelsIndex(desiredIndex);
+
                                         MainControlViewModel.Channels.RemoveAt(currentIndex);
+                                        if (currentRealIndex != -1)
+                                        {
+                                            MainControlViewModel.RealChannels.RemoveAt(currentRealIndex);
+                                        }
+
                                         MainControlViewModel.Channels.Insert(desiredIndex, channelViewModel);
+                                        if (desiredRealIndex != -1)
+                                        {
+                                            MainControlViewModel.RealChannels.Insert(desiredRealIndex, channelViewModel);
+                                        }
 
                                         MainControlViewModel.SelectedChannel = previouslySelectedChannel;
                                     }
@@ -716,7 +732,11 @@ namespace YouTubeHelper
                 if (!found && !updatedChannel.MarkForDeletion)
                 {
                     ChannelViewModel channelViewModel = new(updatedChannel, MainControlViewModel);
-                    _ = Application.Current.Dispatcher.BeginInvoke(() => MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel));
+                    _ = Application.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        MainControlViewModel.Channels.Insert(MainControlViewModel.Channels.Count - 1, channelViewModel);
+                        MainControlViewModel.RealChannels.Insert(MainControlViewModel.RealChannels.Count - 1, channelViewModel);
+                    });
 
                     // Listen for changes
                     updatedChannel.Changed += async (_, _) => await ServerApiClient.Instance.UpdateChannel(updatedChannel, ClientId);

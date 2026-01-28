@@ -33,6 +33,7 @@ namespace YouTubeHelper.ViewModels
                             Channel channel = new() { VanityName = Resources.NewChannel, Index = Channels.Where(c => c != _newChannelTab).MaxBy(c => c.Channel.Index)?.Channel.Index + 1 ?? 0 };
                             ChannelViewModel channelViewModel = new(channel, this);
                             Channels.Insert(Channels.Count - 1, channelViewModel);
+                            RealChannels.Insert(RealChannels.Count - 1, channelViewModel);
                             SelectedChannel = channelViewModel;
 
                             // Persist it!
@@ -109,6 +110,25 @@ namespace YouTubeHelper.ViewModels
         /// Represents the "real" list of channels from the database. Can be used to repopulate <see cref="Channels"/> when needed.
         /// </summary>
         public List<ChannelViewModel> RealChannels { get; } = [];
+
+        /// <summary>
+        /// Takes an index from <see cref="Channels"/> and returns the corresponding index in <see cref="RealChannels"/>.
+        /// </summary>
+        /// <remarks>
+        /// Requires that the channel exist in both lists
+        /// </remarks>
+        public int ChannelsIndexToRealChannelsIndex(int channelsIndex)
+        {
+            try
+            {
+                ChannelViewModel channelViewModel = Channels[channelsIndex];
+                return RealChannels.IndexOf(channelViewModel);
+            }
+            catch
+            {
+                return -1;
+            }
+        }
 
         public bool IsBusy
         {
