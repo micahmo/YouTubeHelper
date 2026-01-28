@@ -94,6 +94,7 @@ namespace YouTubeHelper.ViewModels
         {
             MainControlViewModel.SelectedChannel = MainControlViewModel.Channels[Math.Max(0, MainControlViewModel.Channels.IndexOf(this) - 1)];
             _ = MainControlViewModel.Channels.Remove(this);
+            _ = MainControlViewModel.RealChannels.Remove(this);
             Channel.MarkForDeletion = true;
             Channel.Persistent = false; // Stop doing updates!
             _ = await ServerApiClient.Instance.UpdateChannel(Channel, MainWindow.ClientId);
