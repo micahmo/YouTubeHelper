@@ -1,11 +1,11 @@
 ﻿using Jot;
 using Jot.Storage;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using ServerStatusBot.Definitions;
+using ServerStatusBot.Definitions.Database.Models;
 using System;
 using System.IO;
 using System.Windows;
-using ServerStatusBot.Definitions;
-using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.Models
 {
@@ -21,17 +21,14 @@ namespace YouTubeHelper.Models
 
         private ApplicationSettings()
         {
-            Tracker.Configure<Window>()
+            _ = Tracker.Configure<Window>()
                 .Id(w => w.Name, new Size(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight))
                 .Properties(w => new { w.Top, w.Width, w.Height, w.Left, w.WindowState })
                 .PersistOn(nameof(Window.Closing))
                 .StopTrackingOn(nameof(Window.Closing))
                 .WhenPersistingProperty((w, p) => p.Cancel = p.Property == nameof(w.WindowState) && w.WindowState == WindowState.Minimized);
 
-            PropertyChanged += (_, _) =>
-            {
-                Save();
-            };
+            PropertyChanged += (_, _) => Save();
         }
 
         public void Load()
@@ -45,10 +42,7 @@ namespace YouTubeHelper.Models
                 .Track(this);
         }
 
-        private void Save()
-        {
-            Tracker.Persist(this);
-        }
+        private void Save() => Tracker.Persist(this);
 
         public int SelectedTabIndex
         {
