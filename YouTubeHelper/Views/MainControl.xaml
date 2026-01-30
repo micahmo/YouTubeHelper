@@ -446,6 +446,57 @@
                                                             KeyDown="Search_KeyDown"
                                                             Text="{Binding MainControlViewModel.SearchByTitleTerm, UpdateSourceTrigger=PropertyChanged}" />
 
+                                                        <Button Command="{Binding MainControlViewModel.ShowSearchHistoryCommand}" ToolTip="Search History">
+                                                            <ui:FontIcon Glyph="&#xE81C;" />
+                                                            <ui:FlyoutService.Flyout>
+                                                                <ui:Flyout Placement="Bottom">
+                                                                    <Grid MinWidth="250">
+                                                                        <Grid.RowDefinitions>
+                                                                            <RowDefinition Height="*" />
+                                                                            <RowDefinition Height="Auto" />
+                                                                        </Grid.RowDefinitions>
+
+                                                                        <!--  History items  -->
+                                                                        <ItemsControl Grid.Row="0" ItemsSource="{Binding MainControlViewModel.SearchHistoryList}">
+                                                                            <ItemsControl.ItemTemplate>
+                                                                                <DataTemplate>
+                                                                                    <Button
+                                                                                        Padding="10,5"
+                                                                                        HorizontalAlignment="Stretch"
+                                                                                        HorizontalContentAlignment="Left"
+                                                                                        Background="Transparent"
+                                                                                        Command="{Binding DataContext.SelectSearchHistoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                        CommandParameter="{Binding}"
+                                                                                        Content="{Binding}" />
+                                                                                </DataTemplate>
+                                                                            </ItemsControl.ItemTemplate>
+                                                                        </ItemsControl>
+
+                                                                        <!--  Clear history button  -->
+                                                                        <Button
+                                                                            Grid.Row="1"
+                                                                            Margin="0,5,0,0"
+                                                                            Padding="10,5"
+                                                                            HorizontalAlignment="Stretch"
+                                                                            Command="{Binding MainControlViewModel.ClearSearchHistoryCommand}"
+                                                                            Content="Clear History"
+                                                                            Visibility="{c:Binding 'MainControlViewModel.SearchHistoryList.Count > 0',
+                                                                                                   FalseToVisibility=Collapsed}" />
+
+                                                                        <!--  No history message  -->
+                                                                        <TextBlock
+                                                                            Grid.Row="0"
+                                                                            Padding="10"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            Text="No search history"
+                                                                            Visibility="{c:Binding 'MainControlViewModel.SearchHistoryList.Count == 0',
+                                                                                                   FalseToVisibility=Collapsed}" />
+                                                                    </Grid>
+                                                                </ui:Flyout>
+                                                            </ui:FlyoutService.Flyout>
+                                                        </Button>
+
                                                         <Border Width="15" />
 
                                                         <CheckBox Content="{x:Static properties:Resources.MaxResults}" IsChecked="{Binding MainControlViewModel.EnableCountLimit}" />

@@ -39,6 +39,7 @@ namespace YouTubeHelper.Models
                 .Property(a => a.SelectedExclusionsMode)
                 .Property(a => a.SelectedExclusionReason)
                 .Property(a => a.ServerAddress)
+                .Property(a => a.SearchHistory)
                 .Track(this);
         }
 
@@ -78,6 +79,13 @@ namespace YouTubeHelper.Models
             set => SetProperty(ref _serverAddress, value);
         }
         private byte[]? _serverAddress;
+
+        public string? SearchHistory
+        {
+            get => _searchHistory;
+            set => SetProperty(ref _searchHistory, value);
+        }
+        private string? _searchHistory;
 
         #region Tracker instance
 

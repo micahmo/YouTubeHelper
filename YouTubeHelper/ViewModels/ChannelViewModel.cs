@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Newtonsoft.Json;
 using Polly;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shell;
+using YouTubeHelper.Models;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared.Mappers;
 using YouTubeHelper.Shared.Utilities;
@@ -146,6 +148,22 @@ namespace YouTubeHelper.ViewModels
                             string searchByTitleTermTrimmed = MainControlViewModel.SearchByTitleTerm.Trim();
 
                             searchTerms = MainControlViewModel.IsExactSearch ? [searchByTitleTermTrimmed.TrimStart('"').TrimEnd('"')] : searchByTitleTermTrimmed.Split().ToList();
+
+                            // Update the history
+                            List<string> searchTermHistoryList;
+                            try
+                            {
+                                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(ApplicationSettings.Instance.SearchHistory!) ?? [];
+                            }
+                            catch
+                            {
+                                searchTermHistoryList = [];
+                            }
+
+                            _ = searchTermHistoryList.RemoveAll(s => s.Equals(searchByTitleTermTrimmed, StringComparison.OrdinalIgnoreCase));
+                            searchTermHistoryList.Insert(0, searchByTitleTermTrimmed);
+                            searchTermHistoryList = searchTermHistoryList.Take(5).ToList();
+                            ApplicationSettings.Instance.SearchHistory = JsonConvert.SerializeObject(searchTermHistoryList);
                         }
 
                         List<Video> videos = await ServerApiClient.Instance.FindVideos(new FindVideosRequest
@@ -165,7 +183,7 @@ namespace YouTubeHelper.ViewModels
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
                         Application.Current.Dispatcher.Invoke(() => Videos.AddRange(videoViewModels));
 
-                        Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
+                        _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
 
                         MainControlViewModel.Progress = 0;
                         MainControlViewModel.ProgressState = TaskbarItemProgressState.Normal;

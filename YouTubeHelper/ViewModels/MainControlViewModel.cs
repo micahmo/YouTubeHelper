@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Newtonsoft.Json;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
@@ -379,6 +380,55 @@ namespace YouTubeHelper.ViewModels
         #endregion
 
         public bool AllowCreateNewChannel { get; set; } = true;
+
+        // Observable collection for binding to the flyout
+        public ObservableCollection<string> SearchHistoryList { get; } = [];
+
+        #region Search History
+
+        public ICommand SelectSearchHistoryCommand => _selectSearchHistoryCommand ??= new RelayCommand<string>(term =>
+        {
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                SearchByTitleTerm = term;
+            }
+        });
+        private ICommand? _selectSearchHistoryCommand;
+
+        public ICommand ShowSearchHistoryCommand => _showSearchHistoryCommand ??= new RelayCommand(ShowSearchHistory);
+        private ICommand? _showSearchHistoryCommand;
+
+        public ICommand ClearSearchHistoryCommand => _clearSearchHistoryCommand ??= new RelayCommand(ClearSearchHistory);
+        private ICommand? _clearSearchHistoryCommand;
+
+        private void ShowSearchHistory()
+        {
+            List<string> searchTermHistoryList;
+
+            try
+            {
+                searchTermHistoryList = JsonConvert.DeserializeObject<List<string>>(ApplicationSettings.Instance.SearchHistory!) ?? [];
+            }
+            catch
+            {
+                searchTermHistoryList = [];
+            }
+
+            // Update the observable collection
+            SearchHistoryList.Clear();
+            foreach (string term in searchTermHistoryList)
+            {
+                SearchHistoryList.Add(term);
+            }
+        }
+
+        private void ClearSearchHistory()
+        {
+            ApplicationSettings.Instance.SearchHistory = null;
+            SearchHistoryList.Clear();
+        }
+
+        #endregion
 
         public async Task Load()
         {
