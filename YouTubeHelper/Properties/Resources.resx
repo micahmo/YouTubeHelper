@@ -309,8 +309,8 @@ Updated the status of {1} video(s).</value>
   <data name="OpenExternally" xml:space="preserve">
     <value>Open Externally</value>
   </data>
-  <data name="AdvancedFilters" xml:space="preserve">
-    <value>Advanced Filters</value>
+  <data name="GlobalFilters" xml:space="preserve">
+    <value>Global Filters</value>
   </data>
   <data name="MaxResults" xml:space="preserve">
     <value>Maximum number of results</value>

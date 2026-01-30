@@ -326,12 +326,12 @@ namespace YouTubeHelper.ViewModels
         }
         private int? _countLimit;
 
-        public ICommand ToggleShowAdvancedFiltersCommand => _toggleShowAdvancedFiltersCommand ??= new RelayCommand(() =>
+        public ICommand ToggleShowGlobalFiltersCommand => _toggleShowGlobalFiltersCommand ??= new RelayCommand(() =>
         {
-            AdvancedFiltersHeight = AdvancedFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
-            AdvancedFiltersGlyph = AdvancedFiltersGlyph == Icons.Filter ? Icons.X : Icons.Filter;
+            GlobalFiltersHeight = GlobalFiltersHeight.GridUnitType == GridUnitType.Auto ? new GridLength(0, GridUnitType.Pixel) : new GridLength(1, GridUnitType.Auto);
+            GlobalFiltersGlyph = GlobalFiltersGlyph == Icons.Filter ? Icons.X : Icons.Filter;
         });
-        private ICommand? _toggleShowAdvancedFiltersCommand;
+        private ICommand? _toggleShowGlobalFiltersCommand;
 
         public ICommand ToggleShowChannelFiltersCommand => _toggleShowChannelFiltersCommand ??= new RelayCommand(() =>
         {
@@ -340,12 +340,12 @@ namespace YouTubeHelper.ViewModels
         });
         private ICommand? _toggleShowChannelFiltersCommand;
 
-        public GridLength AdvancedFiltersHeight
+        public GridLength GlobalFiltersHeight
         {
-            get => _advancedFiltersHeight;
-            set => SetProperty(ref _advancedFiltersHeight, value);
+            get => _globalFiltersHeight;
+            set => SetProperty(ref _globalFiltersHeight, value);
         }
-        private GridLength _advancedFiltersHeight = new(0, GridUnitType.Pixel);
+        private GridLength _globalFiltersHeight = new(0, GridUnitType.Pixel);
 
         public GridLength ChannelFiltersHeight
         {
@@ -361,12 +361,12 @@ namespace YouTubeHelper.ViewModels
         }
         private string _channelFiltersGlyph = Icons.List;
 
-        public string AdvancedFiltersGlyph
+        public string GlobalFiltersGlyph
         {
-            get => _advancedFiltersGlyph;
-            set => SetProperty(ref _advancedFiltersGlyph, value);
+            get => _globalFiltersGlyph;
+            set => SetProperty(ref _globalFiltersGlyph, value);
         }
-        private string _advancedFiltersGlyph = Icons.Filter;
+        private string _globalFiltersGlyph = Icons.Filter;
 
         public ICommand ResetFiltersCommand => _resetFiltersCommand ??= new RelayCommand(() =>
         {

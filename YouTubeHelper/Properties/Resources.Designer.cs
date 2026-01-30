@@ -19,7 +19,7 @@ namespace YouTubeHelper.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -93,15 +93,6 @@ namespace YouTubeHelper.Properties {
         public static string AddWontWatchIdsMessage {
             get {
                 return ResourceManager.GetString("AddWontWatchIdsMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Advanced Filters.
-        /// </summary>
-        public static string AdvancedFilters {
-            get {
-                return ResourceManager.GetString("AdvancedFilters", resourceCulture);
             }
         }
         
@@ -329,6 +320,15 @@ namespace YouTubeHelper.Properties {
         public static string FailedToDownload {
             get {
                 return ResourceManager.GetString("FailedToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Filters.
+        /// </summary>
+        public static string GlobalFilters {
+            get {
+                return ResourceManager.GetString("GlobalFilters", resourceCulture);
             }
         }
         

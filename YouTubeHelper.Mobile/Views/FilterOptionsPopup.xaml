@@ -46,7 +46,7 @@
                 Margin="-5,0,0,0"
                 FontAttributes="Bold"
                 FontSize="14"
-                Text="Advanced filters" />
+                Text="Global filters" />
 
             <BoxView HeightRequest="10" Color="Transparent" />
 
