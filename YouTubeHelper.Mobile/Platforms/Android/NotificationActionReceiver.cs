@@ -18,6 +18,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 return;
             }
 
+            int notificationId = intent.GetIntExtra("notificationId", -1);
             string? rawUrl = intent.GetStringExtra(Intent.ExtraText);
             string? actionType = intent.GetStringExtra("actionType");
             string? markVideoStr = intent.GetStringExtra("markVideo");
@@ -27,7 +28,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             switch (actionType)
             {
                 case "dismiss":
-                    HandleDismiss(context, intent);
+                    AndroidUtils.DismissNotification(context, notificationId);
                     break;
             }
 
@@ -80,7 +81,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                         if (success)
                         {
-                            HandleDismiss(context, intent);
+                            AndroidUtils.DismissNotification(context, notificationId);
                         }
                         else
                         {
@@ -175,12 +176,6 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 plexRatingKey: plexRatingKey,
                 disabledAction: disabledAction
             );
-        }
-
-        private void HandleDismiss(Context context, Intent intent)
-        {
-            int notificationId = intent.GetIntExtra("notificationId", -1);
-            AndroidX.Core.App.NotificationManagerCompat.From(context).Cancel(notificationId);
         }
     }
 }

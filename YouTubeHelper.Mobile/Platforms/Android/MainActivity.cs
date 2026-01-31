@@ -2,11 +2,9 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Flurl;
-using Polly;
 using Color = Android.Graphics.Color;
 
-namespace YouTubeHelper.Mobile
+namespace YouTubeHelper.Mobile.Platforms.Android
 {
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
@@ -27,8 +25,11 @@ namespace YouTubeHelper.Mobile
 
         protected override void OnNewIntent(Intent? intent)
         {
-            if (intent is null) return;
-            
+            if (intent is null)
+            {
+                return;
+            }
+
             base.OnNewIntent(intent);
 
             // See if we got an intent to load a video
@@ -43,7 +44,7 @@ namespace YouTubeHelper.Mobile
 
             if (isDismissable)
             {
-                AndroidX.Core.App.NotificationManagerCompat.From(this).Cancel(notificationId);
+                AndroidUtils.DismissNotification(this, notificationId);
             }
 
             if (!string.IsNullOrEmpty(rawUrl))
