@@ -1,0 +1,66 @@
+name: PR Build
+on:
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install MAUI workload for Android
+        run: dotnet workload install maui-android
+
+      - name: Add GitHub NuGet source
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/micahmo/index.json `
+            --name GitHub_micahmo `
+            --username micahmo `
+            --password "${{ secrets.GITHUB_TOKEN }}" `
+            --store-password-in-clear-text
+
+      - name: Restore dependencies (Mobile)
+        run: dotnet restore YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj
+
+      - name: Build Android APK
+        run: dotnet build YouTubeHelper.Mobile/YouTubeHelper.Mobile.csproj -f net8.0-android -c Release
+
+  build-desktop:
+    name: Build Windows App
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Add GitHub NuGet source
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/micahmo/index.json `
+            --name GitHub_micahmo `
+            --username micahmo `
+            --password "${{ secrets.GITHUB_TOKEN }}" `
+            --store-password-in-clear-text
+
+      - name: Restore dependencies (Desktop)
+        run: dotnet restore YouTubeHelper/YouTubeHelper.csproj
+
+      - name: Build WPF Desktop App
+        run: dotnet build YouTubeHelper/YouTubeHelper.csproj -c Release -f net8.0-windows
