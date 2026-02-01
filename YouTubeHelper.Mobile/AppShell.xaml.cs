@@ -9,7 +9,6 @@ using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
-using YouTubeHelper.Mobile.Platforms.Android;
 using YouTubeHelper.Mobile.ViewModels;
 using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared.Utilities;
@@ -156,7 +155,6 @@ namespace YouTubeHelper.Mobile
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
                 await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);
                 await ServerApiClient.Instance.JoinChannelObjectUpdatesGroup(HandleChannelObjectUpdates);
-                await ServerApiClient.Instance.JoinDismissNotificationGroup(HandleDismissNotification);
             });
 
             busyIndicator.Text = Mobile.Resources.Resources.LoadingChannels;
@@ -580,20 +578,6 @@ namespace YouTubeHelper.Mobile
                     }
                 }
             }
-        }
-
-        private void HandleDismissNotification(ObjectChangedEventArgs<string> dismissNotificationArgs)
-        {
-            if (dismissNotificationArgs.Originator == ClientId)
-            {
-                return;
-            }
-
-            int notificationId = int.TryParse(dismissNotificationArgs.Obj, out int parsedId) ? parsedId : -1;
-
-#if ANDROID
-            AndroidUtils.DismissNotification(Android.App.Application.Context, notificationId, broadcast: false);
-#endif
         }
 
         public AppShellViewModel AppShellViewModel => (AppShellViewModel)BindingContext;
