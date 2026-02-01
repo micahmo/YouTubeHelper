@@ -6,6 +6,7 @@ concurrency:
   cancel-in-progress: true
 permissions:
   contents: read
+  packages: read
 
 jobs:
   build-android:
@@ -29,7 +30,7 @@ jobs:
           dotnet nuget add source https://nuget.pkg.github.com/micahmo/index.json `
             --name GitHub_micahmo `
             --username micahmo `
-            --password "${{ secrets.GITHUB_TOKEN }}" `
+            --password "${{ secrets.GH_NUGET_PAT }}" `
             --store-password-in-clear-text
 
       - name: Restore dependencies (Mobile)
@@ -56,7 +57,7 @@ jobs:
           dotnet nuget add source https://nuget.pkg.github.com/micahmo/index.json `
             --name GitHub_micahmo `
             --username micahmo `
-            --password "${{ secrets.GITHUB_TOKEN }}" `
+            --password "${{ secrets.GH_NUGET_PAT }}" `
             --store-password-in-clear-text
 
       - name: Restore dependencies (Desktop)
