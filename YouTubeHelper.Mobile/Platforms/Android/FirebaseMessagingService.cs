@@ -25,6 +25,26 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
         public static async Task HandleNotificationData(IDictionary<string, string> data)
         {
+            // Check if this is a notification dismissal message
+            if (data.TryGetValue("notificationId", out string? notificationIdStr) &&
+                data.TryGetValue("clientId", out string? clientId))
+            {
+                // This is a dismissal message
+                if (int.TryParse(notificationIdStr, out int notificationId))
+                {
+                    // Only dismiss if this dismissal didn't originate from this client
+                    if (clientId != AppShell.ClientId)
+                    {
+#if ANDROID
+                        AndroidUtils.DismissNotification(global::Android.App.Application.Context, notificationId, broadcast: false);
+#endif
+                    }
+                }
+
+                return; // Don't process as a regular notification
+            }
+
+            // Otherwise, handle this as a regular video notification
             data.TryGetValue("title", out string? title);
             data.TryGetValue("body", out string? body);
             data.TryGetValue("tag", out string? tag);
