@@ -322,15 +322,15 @@ namespace YouTubeHelper.ViewModels
                 List<Inline> inlines = [];
                 Regex urlRegex = new(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
                 string[] parts = urlRegex.Split(Video.Description ?? "");
+                const string trailingPunctuation = ",.;!?";
 
                 foreach (string part in parts)
                 {
                     if (urlRegex.IsMatch(part))
                     {
                         string urlStr = part;
-                        List<char> chars = [',', '.', ';', '!', '?'];
                         char? lastChar = null;
-                        if (!string.IsNullOrEmpty(part) && chars.Contains(part[^1]))
+                        if (!string.IsNullOrEmpty(part) && trailingPunctuation.Contains(part[^1]))
                         {
                             lastChar = part[^1];
                             urlStr = part[..^1];
