@@ -399,35 +399,45 @@ namespace YouTubeHelper.Mobile.ViewModels
                 {
                     if (urlRegex.IsMatch(part))
                     {
-                        Span span = new() { Text = part, TextColor = Colors.Blue, TextDecorations = TextDecorations.Underline };
+                        string urlStr = part;
+                        List<char> chars = [',', '.', ';', '!', '?'];
+                        char? lastChar = null;
+                        if (!string.IsNullOrEmpty(part) && chars.Contains(part[^1]))
+                        {
+                            lastChar = part[^1];
+                            urlStr = part[..^1];
+                        }
+
+                        Span span = new() { Text = urlStr, TextColor = Colors.Blue, TextDecorations = TextDecorations.Underline };
                         TapGestureRecognizer tapGesture = new();
                         tapGesture.Tapped += async (_, _) =>
                         {
-                            Url? url = Url.Parse(part);
+                            Url? url = Url.Parse(urlStr);
                             if (url.Host.EndsWith("youtube.com") || url.Host.EndsWith("youtu.be"))
                             {
                                 bool res = await AppShell.Instance!.DisplayAlert(
                                     Resources.Resources.OpenYouTubeLinkTitle,
-                                    string.Format(Resources.Resources.OpenYouTubeLinkMessage, part),
+                                    string.Format(Resources.Resources.OpenYouTubeLinkMessage, urlStr),
                                     accept: Resources.Resources.OpenInYouTubeHelper,
                                     cancel: Resources.Resources.OpenExternally);
 
                                 if (res)
                                 {
-                                    await AppShell.Instance.HandleSharedLink(part);
+                                    await AppShell.Instance.HandleSharedLink(urlStr);
                                 }
                                 else
                                 {
-                                    _ = await Launcher.Default.OpenAsync(part);
+                                    _ = await Launcher.Default.OpenAsync(urlStr);
                                 }
                             }
                             else
                             {
-                                _ = await Launcher.Default.OpenAsync(part);
+                                _ = await Launcher.Default.OpenAsync(urlStr);
                             }
                         };
                         span.GestureRecognizers.Add(tapGesture);
                         formatted.Spans.Add(span);
+                        formatted.Spans.Add(new Span { Text = lastChar?.ToString() });
                     }
                     else
                     {
