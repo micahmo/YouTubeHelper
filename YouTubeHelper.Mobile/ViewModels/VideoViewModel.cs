@@ -1,16 +1,16 @@
-﻿using System.Text.RegularExpressions;
+﻿using Android.Util;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using Flurl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using System.Windows.Input;
-using Android.Util;
-using Flurl;
 using ServerStatusBot.Definitions;
-using YouTubeHelper.Mobile.Views;
-using ServerStatusBot.Definitions.Models;
-using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Api;
+using ServerStatusBot.Definitions.Database.Models;
+using ServerStatusBot.Definitions.Models;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
+using YouTubeHelper.Mobile.Views;
 using YouTubeHelper.Shared;
 
 namespace YouTubeHelper.Mobile.ViewModels
@@ -28,7 +28,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             Video.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(Video.Excluded) || args.PropertyName == nameof(Video.ExclusionReason) || args.PropertyName == nameof(Video.Status))
+                if (args.PropertyName is (nameof(Video.Excluded)) or (nameof(Video.ExclusionReason)) or (nameof(Video.Status)))
                 {
                     OnPropertyChanged(nameof(ExcludedString));
                     OnPropertyChanged(nameof(HasStatus));
@@ -55,10 +55,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
         private ICommand? _toggleDescriptionCommand;
 
-        public void ToggleDescription()
-        {
-            IsDescriptionExpanded = !IsDescriptionExpanded;
-        }
+        public void ToggleDescription() => IsDescriptionExpanded = !IsDescriptionExpanded;
 
         public string ExcludedString => new ExclusionReasonExtended(Video.ExclusionReason).Description;
 
@@ -95,14 +92,11 @@ namespace YouTubeHelper.Mobile.ViewModels
                         //_channelViewModel.ShowPlayer = true;
                         //_channelViewModel.CurrentVideoUrl = await GetRawUrl(Video.Id);
 
-                        _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
-                        {
-                            v.IsPlaying = false;
-                        });
+                        _page.AppShellViewModel.AllVideos.ToList().ForEach(v => v.IsPlaying = false);
 
                         IsPlaying = true;
 
-                        await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                        _ = await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
                         {
                             LaunchMode = BrowserLaunchMode.SystemPreferred,
                             TitleMode = BrowserTitleMode.Hide,
@@ -134,7 +128,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.Excluded = false;
                     Video.ExclusionReason = ExclusionReason.None;
                     Video.MarkForDeletion = true;
-                    await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
+                    _ = await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
                     Video.MarkForDeletion = false;
                 }
                 else if (action == Resources.Resources.DownloadCustom)
@@ -155,7 +149,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 }
                 else if (action == Resources.Resources.GoToChannel)
                 {
-                    AppShell.Instance?.HandleSharedLink(Video.Id, null, null, null);
+                    _ = (AppShell.Instance?.HandleSharedLink(Video.Id, null, null, null));
                 }
                 else if (action == Resources.Resources.OpenInPlex)
                 {
@@ -172,18 +166,18 @@ namespace YouTubeHelper.Mobile.ViewModels
                     else
                     {
                         string plexUri = $"plex://server://8316eb530162c189b29f3250d4734700515fc5f8/com.plexapp.plugins.library/library/metadata/{ratingKey}";
-                        await Launcher.Default.OpenAsync(new Uri(plexUri));
+                        _ = await Launcher.Default.OpenAsync(new Uri(plexUri));
                     }
                 }
 
                 if (excluded)
                 {
                     Video.Excluded = true;
-                    await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
+                    _ = await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
 
                     if (AppShell.Instance?.AppShellViewModel.ChannelTabSelected == true && !_channelViewModel.SelectedExclusionsMode.Value.HasFlag(ExclusionsMode.ShowExcluded))
                     {
-                        _channelViewModel.Videos.Remove(this);
+                        _ = _channelViewModel.Videos.Remove(this);
                     }
                 }
             }
@@ -196,11 +190,11 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         private string[] GetActionSheetOptions(bool excluded, ExclusionReason exclusionReason, bool queueTabSelected)
         {
-            List<string> options = new List<string>
-            {
+            List<string> options =
+            [
                 Resources.Resources.Watch,
                 Resources.Resources.WatchExternal
-            };
+            ];
 
             if (excluded)
             {
@@ -228,7 +222,6 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             return options.ToArray();
         }
-
 
         public static Task<string> GetRawUrl(string videoId)
         {
@@ -260,7 +253,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
             Video.MarkForDeletion = true;
-            await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
+            _ = await ServerApiClient.Instance.UpdateVideo(Video, AppShell.ClientId);
             Video.MarkForDeletion = false;
 
             try
@@ -280,7 +273,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             }
             catch (Exception ex)
             {
-                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), ToastDuration.Long).Show();
+                await Toast.Make(string.Format(Resources.Resources.VideoDownloadFailed, Video.Title, ex.Message[..ex.Message.IndexOf(':')]), ToastDuration.Long).Show();
                 return;
             }
 
@@ -310,16 +303,13 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             try
             {
-                _page.AppShellViewModel.AllVideos.ToList().ForEach(v =>
-                {
-                    v.IsPlaying = false;
-                });
+                _page.AppShellViewModel.AllVideos.ToList().ForEach(v => v.IsPlaying = false);
 
                 IsPlaying = true;
 
                 // Open the URI in the system default app
-                Uri videoUri = new Uri($"https://www.youtube.com/watch?v={Video.Id}");
-                await Launcher.OpenAsync(videoUri);
+                Uri videoUri = new($"https://www.youtube.com/watch?v={Video.Id}");
+                _ = await Launcher.OpenAsync(videoUri);
             }
             catch
             {
@@ -334,6 +324,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                 // We got an update for a different video
                 return;
             }
+
             _previousRequestId = requestId;
 
             Video.Status = string.Format(Resources.Resources.DownloadingProgress, Utils.FormatProgressPercentage(result.Progress));
@@ -360,10 +351,10 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 if (showInAppNotifications && _statusWasEverNotDone)
                 {
-                    MainThread.BeginInvokeOnMainThread(async () => { await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show(); });
+                    MainThread.BeginInvokeOnMainThread(async () => await Toast.Make(string.Format(Resources.Resources.VideoDownloadSucceeded, Video.Title), ToastDuration.Long).Show());
                 }
 
-                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
             }
 
@@ -388,7 +379,7 @@ namespace YouTubeHelper.Mobile.ViewModels
                     });
                 }
 
-                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
             }
         }
@@ -400,16 +391,16 @@ namespace YouTubeHelper.Mobile.ViewModels
         {
             get
             {
-                FormattedString formatted = new FormattedString();
-                Regex urlRegex = new Regex(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
+                FormattedString formatted = new();
+                Regex urlRegex = new(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
                 string[] parts = urlRegex.Split(Video.Description ?? "");
 
                 foreach (string part in parts)
                 {
                     if (urlRegex.IsMatch(part))
                     {
-                        Span span = new Span { Text = part, TextColor = Colors.Blue, TextDecorations = TextDecorations.Underline };
-                        TapGestureRecognizer tapGesture = new TapGestureRecognizer();
+                        Span span = new() { Text = part, TextColor = Colors.Blue, TextDecorations = TextDecorations.Underline };
+                        TapGestureRecognizer tapGesture = new();
                         tapGesture.Tapped += async (_, _) =>
                         {
                             Url? url = Url.Parse(part);
@@ -427,12 +418,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 }
                                 else
                                 {
-                                    await Launcher.Default.OpenAsync(part);
+                                    _ = await Launcher.Default.OpenAsync(part);
                                 }
                             }
                             else
                             {
-                                await Launcher.Default.OpenAsync(part);
+                                _ = await Launcher.Default.OpenAsync(part);
                             }
                         };
                         span.GestureRecognizers.Add(tapGesture);

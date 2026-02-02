@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using CliWrap;
+﻿using CliWrap;
 using CliWrap.Buffered;
 using Flurl;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
@@ -19,6 +9,16 @@ using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
 using ServerStatusBot.Definitions.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using YouTubeHelper.Properties;
 using YouTubeHelper.Shared;
 using YouTubeHelper.Utilities;
@@ -36,7 +36,7 @@ namespace YouTubeHelper.ViewModels
 
             Video.PropertyChanged += (_, args) =>
             {
-                if (args.PropertyName == nameof(Video.Excluded) || args.PropertyName == nameof(Video.ExclusionReason))
+                if (args.PropertyName is (nameof(Video.Excluded)) or (nameof(Video.ExclusionReason)))
                 {
                     OnPropertyChanged(nameof(ExcludedString));
                 }
@@ -76,7 +76,7 @@ namespace YouTubeHelper.ViewModels
             _channelViewModel.Videos.ToList().ForEach(v => v.Video.IsPlaying = false);
             Video.IsPlaying = true;
 
-            await Cli.Wrap("freetube.exe")
+            _ = await Cli.Wrap("freetube.exe")
                 .WithArguments($"--url https://www.youtube.com/watch?v={Video.Id}")
                 .ExecuteBufferedAsync();
         }
@@ -106,9 +106,9 @@ namespace YouTubeHelper.ViewModels
 
             if (rightClick)
             {
-                (string Text, ContentDialogResult Result) res = await MessageBoxHelper.ShowInputBox(Resources.DownloadDirectoryMessage, Resources.DownloadDirectoryMessage, Settings.Instance!.DownloadDirectory);
+                (string Text, ContentDialogResult Result) = await MessageBoxHelper.ShowInputBox(Resources.DownloadDirectoryMessage, Resources.DownloadDirectoryMessage, Settings.Instance!.DownloadDirectory);
 
-                if (res.Result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(res.Text))
+                if (Result != ContentDialogResult.Primary || string.IsNullOrWhiteSpace(Text))
                 {
                     // Canceled or entered nothing
                     if (_previousRequestId != null)
@@ -116,10 +116,11 @@ namespace YouTubeHelper.ViewModels
                         await ServerApiClient.Instance.LeaveDownloadGroup(_previousRequestId);
                         _previousRequestId = null;
                     }
+
                     return;
                 }
 
-                Settings.Instance!.DownloadDirectory = res.Text;
+                Settings.Instance!.DownloadDirectory = Text;
                 MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CurrentDownloadDirectoryLabel));
             }
 
@@ -142,7 +143,7 @@ namespace YouTubeHelper.ViewModels
             }
             catch (Exception ex)
             {
-                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message.Substring(0, ex.Message.IndexOf(':'))), NotificationType.Error, "NotificationArea");
+                App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, ex.Message[..ex.Message.IndexOf(':')]), NotificationType.Error, "NotificationArea");
                 return;
             }
 
@@ -212,7 +213,7 @@ namespace YouTubeHelper.ViewModels
                     App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadSucceeded, Video.Title), NotificationType.Success, "NotificationArea");
                 }
 
-                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
             }
 
@@ -232,7 +233,7 @@ namespace YouTubeHelper.ViewModels
                     App.NotificationManager.Show(string.Empty, string.Format(Resources.VideoDownloadFailed, Video.Title, status), NotificationType.Error, "NotificationArea");
                 }
 
-                ServerApiClient.Instance.LeaveDownloadGroup(requestId);
+                _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
             }
         }
@@ -262,11 +263,11 @@ namespace YouTubeHelper.ViewModels
             }
 
             Video.Excluded = true;
-            await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
+            _ = await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
 
             if (MainControlViewModel.ChannelMode && !MainControlViewModel.SelectedExclusionsMode.Value.HasFlag(ServerStatusBot.Definitions.ExclusionsMode.ShowExcluded))
             {
-                _channelViewModel.Videos.Remove(this);
+                _ = _channelViewModel.Videos.Remove(this);
             }
         }
 
@@ -278,7 +279,7 @@ namespace YouTubeHelper.ViewModels
             Video.Excluded = false;
             Video.ExclusionReason = ExclusionReason.None;
             Video.MarkForDeletion = true;
-            await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
+            _ = await ServerApiClient.Instance.UpdateVideo(Video, MainWindow.ClientId);
             Video.MarkForDeletion = false;
         }
 
@@ -296,7 +297,7 @@ namespace YouTubeHelper.ViewModels
         public bool ShowChannelName => _channelViewModel.Channel.RealPlaylistId.Count() > 1 || _channelViewModel.QueueMode;
 
         public MainControlViewModel MainControlViewModel { get; }
-        
+
         private readonly ChannelViewModel _channelViewModel;
 
         public static Task<string> GetRawUrl(string videoId)
@@ -318,15 +319,15 @@ namespace YouTubeHelper.ViewModels
         {
             get
             {
-                List<Inline> inlines = new List<Inline>();
-                Regex urlRegex = new Regex(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
+                List<Inline> inlines = [];
+                Regex urlRegex = new(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
                 string[] parts = urlRegex.Split(Video.Description ?? "");
 
                 foreach (string part in parts)
                 {
                     if (urlRegex.IsMatch(part))
                     {
-                        Hyperlink hyperlink = new Hyperlink(new Run(part))
+                        Hyperlink hyperlink = new(new Run(part))
                         {
                             NavigateUri = new Uri(part)
                         };
@@ -346,16 +347,16 @@ namespace YouTubeHelper.ViewModels
 
                                 if (res == ContentDialogResult.Primary)
                                 {
-                                    MainWindow.Instance?.HandleSharedLink(part);
+                                    _ = (MainWindow.Instance?.HandleSharedLink(part));
                                 }
                                 else
                                 {
-                                    Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                                    _ = Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
                                 }
                             }
                             else
                             {
-                                Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                                _ = Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
                             }
                         };
 
