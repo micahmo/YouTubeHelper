@@ -322,24 +322,33 @@ namespace YouTubeHelper.ViewModels
                 List<Inline> inlines = [];
                 Regex urlRegex = new(@"(https?:\/\/[^\s]+)", RegexOptions.Compiled);
                 string[] parts = urlRegex.Split(Video.Description ?? "");
+                const string trailingPunctuation = ",.;!?";
 
                 foreach (string part in parts)
                 {
                     if (urlRegex.IsMatch(part))
                     {
-                        Hyperlink hyperlink = new(new Run(part))
+                        string urlStr = part;
+                        char? lastChar = null;
+                        if (!string.IsNullOrEmpty(part) && trailingPunctuation.Contains(part[^1]))
                         {
-                            NavigateUri = new Uri(part)
+                            lastChar = part[^1];
+                            urlStr = part[..^1];
+                        }
+
+                        Hyperlink hyperlink = new(new Run(urlStr))
+                        {
+                            NavigateUri = new Uri(urlStr)
                         };
 
                         hyperlink.Click += async (_, e) =>
                         {
                             e.Handled = true;
 
-                            Url? url = Url.Parse(part);
+                            Url? url = Url.Parse(urlStr);
                             if (url.Host.EndsWith("youtube.com") || url.Host.EndsWith("youtu.be"))
                             {
-                                ContentDialogResult res = await MessageBoxHelper.Show(string.Format(Resources.OpenYouTubeLinkMessage, part),
+                                ContentDialogResult res = await MessageBoxHelper.Show(string.Format(Resources.OpenYouTubeLinkMessage, urlStr),
                                     Resources.OpenYouTubeLinkTitle,
                                     MessageBoxButton.OKCancel,
                                     primaryButtonText: Resources.OpenInYouTubeHelper,
@@ -347,20 +356,21 @@ namespace YouTubeHelper.ViewModels
 
                                 if (res == ContentDialogResult.Primary)
                                 {
-                                    _ = (MainWindow.Instance?.HandleSharedLink(part));
+                                    _ = (MainWindow.Instance?.HandleSharedLink(urlStr));
                                 }
                                 else
                                 {
-                                    _ = Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                                    _ = Process.Start(new ProcessStartInfo(urlStr) { UseShellExecute = true });
                                 }
                             }
                             else
                             {
-                                _ = Process.Start(new ProcessStartInfo(part) { UseShellExecute = true });
+                                _ = Process.Start(new ProcessStartInfo(urlStr) { UseShellExecute = true });
                             }
                         };
 
                         inlines.Add(hyperlink);
+                        inlines.Add(new Run(lastChar?.ToString()));
                     }
                     else
                     {
