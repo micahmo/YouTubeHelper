@@ -181,6 +181,10 @@ namespace YouTubeHelper.Mobile.ViewModels
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                await Toast.Make(string.Format(Resources.Resources.ErrorProcessingRequestMessage, ex.Message), ToastDuration.Long).Show();
+            }
             finally
             {
                 _isPopupOpen = false;
@@ -223,15 +227,15 @@ namespace YouTubeHelper.Mobile.ViewModels
             return options.ToArray();
         }
 
-        public static Task<string> GetRawUrl(string videoId)
+        public static async Task<string> GetRawUrl(string videoId)
         {
             try
             {
-                return ServerApiClient.Instance.YouTubeLink(videoId: videoId);
+                return await ServerApiClient.Instance.YouTubeLink(videoId: videoId);
             }
             catch
             {
-                return Task.FromResult("https://google.com");
+                return "https://google.com";
             }
         }
 
