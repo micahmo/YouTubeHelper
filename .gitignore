@@ -353,3 +353,6 @@ App.config
 
 # Installer
 Installer/YouTubeHelperSetup-*.exe
+
+# Claude Code
+.claude/
