@@ -501,7 +501,7 @@ namespace YouTubeHelper
 
                         MainControlViewModel.SelectedChannel = foundChannelViewModel;
 
-                        if (foundChannelViewModel.Videos.Count == 1 & foundChannelViewModel.Videos.First().Video.Id == videoId)
+                        if (foundChannelViewModel.Videos.Count == 1 && foundChannelViewModel.Videos.First().Video.Id == videoId)
                         {
                             foundVideo = true;
                         }
