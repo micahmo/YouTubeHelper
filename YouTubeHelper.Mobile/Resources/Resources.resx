@@ -254,7 +254,7 @@
     <value>Battery Optimizations</value>
   </data>
   <data name="BatteryOptimizationsPrompt" xml:space="preserve">
-    <value>YouTubeHelper is currently being optimized. Would you like to open the battery settings?</value>
+    <value>YouTubeHelper is currently being battery optimized, which may cause missed notifications. Would you like to allow it to run unrestricted?</value>
   </data>
   <data name="UnexpectedError" xml:space="preserve">
     <value>The application encountered an unexpected error.
