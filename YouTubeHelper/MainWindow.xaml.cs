@@ -77,7 +77,7 @@ namespace YouTubeHelper
                 await ServerApiClient.Instance.SubscribeToHubEvents(
                     reconnecting: _ => Task.CompletedTask,
                     reconnected: async _ => await ServerApiClient.Instance.ReconnectAllGroups(),
-                    closed: _ => Task.CompletedTask);
+                    closed: async _ => await ServerApiClient.Instance.ReconnectAllGroups());
 
                 await ServerApiClient.Instance.JoinQueueUpdatesGroup(HandleQueueUpdates);
                 await ServerApiClient.Instance.JoinVideoObjectUpdatesGroup(HandleVideoObjectUpdates);

@@ -56,7 +56,7 @@ namespace YouTubeHelper.Mobile
                                 {
                                     try
                                     {
-                                        await ServerApiClient.Instance.ReconnectAllGroups();
+                                        await ServerApiClient.Instance.ReconnectAllGroups(forceReset: true);
                                         break;
                                     }
                                     catch (Exception ex)
