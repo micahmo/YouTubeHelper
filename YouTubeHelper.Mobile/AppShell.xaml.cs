@@ -209,7 +209,7 @@ namespace YouTubeHelper.Mobile
             busyIndicator.Dispose();
 
             // Check for battery restrictions
-            //_ = CheckBatteryOptimizations();
+            _ = CheckBatteryOptimizations();
 
             // Request notifications permissions
             if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
@@ -303,9 +303,11 @@ namespace YouTubeHelper.Mobile
 
                 if (res)
                 {
-                    Intent intent = new(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    Context context = Android.App.Application.Context;
+                    Intent intent = new(Android.Provider.Settings.ActionRequestIgnoreBatteryOptimizations);
+                    intent.SetData(Android.Net.Uri.Parse($"package:{context.PackageName}"));
                     _ = intent.SetFlags(ActivityFlags.NewTask);
-                    Android.App.Application.Context.StartActivity(intent);
+                    context.StartActivity(intent);
                 }
             }
         }
