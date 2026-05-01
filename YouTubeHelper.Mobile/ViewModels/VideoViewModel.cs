@@ -41,7 +41,14 @@ namespace YouTubeHelper.Mobile.ViewModels
         public bool IsDescriptionExpanded
         {
             get => _isDescriptionExpanded;
-            set => SetProperty(ref _isDescriptionExpanded, value);
+            set
+            {
+                if (SetProperty(ref _isDescriptionExpanded, value) && value && _isTopCommentsExpanded)
+                {
+                    _isTopCommentsExpanded = false;
+                    OnPropertyChanged(nameof(IsTopCommentsExpanded));
+                }
+            }
         }
         private bool _isDescriptionExpanded;
 
@@ -385,6 +392,79 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
+            }
+        }
+
+        public bool IsTopCommentsExpanded
+        {
+            get => _isTopCommentsExpanded;
+            set
+            {
+                if (SetProperty(ref _isTopCommentsExpanded, value) && value)
+                {
+                    if (_isDescriptionExpanded)
+                    {
+                        _isDescriptionExpanded = false;
+                        OnPropertyChanged(nameof(IsDescriptionExpanded));
+                    }
+                    if (!_commentsLoaded && !_isLoadingComments)
+                    {
+                        _ = LoadTopComments();
+                    }
+                }
+            }
+        }
+        private bool _isTopCommentsExpanded;
+
+        public List<VideoComment>? TopComments
+        {
+            get => _topComments;
+            private set => SetProperty(ref _topComments, value);
+        }
+        private List<VideoComment>? _topComments;
+
+        public bool IsLoadingComments
+        {
+            get => _isLoadingComments;
+            private set => SetProperty(ref _isLoadingComments, value);
+        }
+        private bool _isLoadingComments;
+
+        public bool CommentsLoaded
+        {
+            get => _commentsLoaded;
+            private set => SetProperty(ref _commentsLoaded, value);
+        }
+        private bool _commentsLoaded;
+
+        public ICommand ToggleTopCommentsCommand => _toggleTopCommentsCommand ??= new RelayCommand(() => IsTopCommentsExpanded = !IsTopCommentsExpanded);
+        private ICommand? _toggleTopCommentsCommand;
+
+        public bool HasNoComments => _commentsLoaded && (_topComments == null || _topComments.Count == 0);
+
+        private async Task LoadTopComments()
+        {
+            MainThread.BeginInvokeOnMainThread(() => IsLoadingComments = true);
+            try
+            {
+                List<VideoComment> comments = await ServerApiClient.Instance.GetTopComments(Video.Id, count: 20);
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    TopComments = comments;
+                    CommentsLoaded = true;
+                    IsLoadingComments = false;
+                    OnPropertyChanged(nameof(HasNoComments));
+                });
+            }
+            catch
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    TopComments = [];
+                    CommentsLoaded = true;
+                    IsLoadingComments = false;
+                    OnPropertyChanged(nameof(HasNoComments));
+                });
             }
         }
 

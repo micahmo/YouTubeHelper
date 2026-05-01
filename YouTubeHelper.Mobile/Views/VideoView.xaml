@@ -85,65 +85,87 @@
             </Grid>
         </StackLayout>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="10" />
-            </Grid.RowDefinitions>
-
+        <!--  Side-by-side Description | Comments headers  -->
+        <HorizontalStackLayout Margin="10,0,10,0">
             <Label
-                Grid.Row="0"
-                Padding="10,0,10,0"
-                LineBreakMode="TailTruncation"
-                MaxLines="1">
-                <Label.Behaviors>
-                    <toolkit:AnimationBehavior>
-                        <toolkit:AnimationBehavior.AnimationType>
-                            <toolkit:FadeAnimation Opacity="0.5" />
-                        </toolkit:AnimationBehavior.AnimationType>
-                    </toolkit:AnimationBehavior>
-                </Label.Behaviors>
-
+                FontAttributes="Bold"
+                Text="▶ Description">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
-
                 <Label.Triggers>
-                    <DataTrigger
-                        Binding="{Binding IsDescriptionExpanded}"
-                        TargetType="Label"
-                        Value="True">
-                        <Setter Property="LineBreakMode" Value="WordWrap" />
-                        <Setter Property="MaxLines" Value="-1" />
-
-                        <!--  Use FormattedText when expanded  -->
-                        <Setter TargetName="" Property="FormattedText">
-                            <Setter.Value>
-                                <Binding Path="FormattedDescription" />
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="Text" Value="{x:Null}" />
-                    </DataTrigger>
-                    <DataTrigger
-                        Binding="{Binding IsDescriptionExpanded}"
-                        TargetType="Label"
-                        Value="False">
-                        <Setter Property="LineBreakMode" Value="TailTruncation" />
-                        <Setter Property="MaxLines" Value="1" />
-
-                        <!--  Just use Text when not expanded  -->
-                        <Setter Property="FormattedText" Value="{x:Null}" />
-                        <Setter Property="Text" Value="{Binding Video.Description}" />
+                    <DataTrigger Binding="{Binding IsDescriptionExpanded}" TargetType="Label" Value="True">
+                        <Setter Property="Text" Value="▼ Description" />
                     </DataTrigger>
                 </Label.Triggers>
             </Label>
+            <Label
+                Margin="16,0,0,0"
+                FontAttributes="Bold"
+                Text="▶ Comments">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleTopCommentsCommand}" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+                <Label.Triggers>
+                    <DataTrigger Binding="{Binding IsTopCommentsExpanded}" TargetType="Label" Value="True">
+                        <Setter Property="Text" Value="▼ Comments" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+        </HorizontalStackLayout>
 
-            <Grid
-                Grid.Row="1"
-                Margin="10,5,10,0"
-                BackgroundColor="LightGray"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill" />
-        </Grid>
+        <!--  Description expanded content  -->
+        <Label
+            IsVisible="{Binding IsDescriptionExpanded}"
+            Padding="10,4,10,0"
+            FormattedText="{Binding FormattedDescription}">
+            <Label.Behaviors>
+                <toolkit:AnimationBehavior>
+                    <toolkit:AnimationBehavior.AnimationType>
+                        <toolkit:FadeAnimation Opacity="0.5" />
+                    </toolkit:AnimationBehavior.AnimationType>
+                </toolkit:AnimationBehavior>
+            </Label.Behaviors>
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
+            </Label.GestureRecognizers>
+        </Label>
+
+        <!--  Top Comments expanded content  -->
+        <VerticalStackLayout IsVisible="{Binding IsTopCommentsExpanded}" Margin="10,4,10,0">
+            <Label
+                IsVisible="{Binding IsLoadingComments}"
+                Text="Loading..."
+                TextColor="Gray" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding TopComments}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <VerticalStackLayout Margin="0,8,0,0">
+                            <HorizontalStackLayout>
+                                <Label FontAttributes="Bold" Text="{Binding AuthorDisplayName}" />
+                                <Label
+                                    Margin="8,0,0,0"
+                                    Text="{Binding LikeCount, StringFormat='👍 {0}'}"
+                                    TextColor="Gray" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding Text}" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <Label
+                IsVisible="{Binding HasNoComments}"
+                Text="No comments available."
+                TextColor="Gray" />
+        </VerticalStackLayout>
+
+        <!--  Divider  -->
+        <Border
+            Margin="10,5,10,0"
+            BackgroundColor="LightGray"
+            HeightRequest="10"
+            HorizontalOptions="Fill"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 5" />
     </VerticalStackLayout>
 </ContentView>
