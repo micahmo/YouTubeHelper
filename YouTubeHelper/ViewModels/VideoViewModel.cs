@@ -315,6 +315,7 @@ namespace YouTubeHelper.ViewModels
                             _isDescriptionExpanded = false;
                             OnPropertyChanged(nameof(IsDescriptionExpanded));
                         }
+
                         if (!_commentsLoaded && !_isLoadingComments)
                         {
                             _ = LoadTopComments();
@@ -351,7 +352,7 @@ namespace YouTubeHelper.ViewModels
             IsLoadingComments = true;
             try
             {
-                TopComments = await ServerApiClient.Instance.GetTopComments(Video.Id);
+                TopComments = await ServerApiClient.Instance.GetTopComments(Video.Id, count: 20);
                 CommentsLoaded = true;
             }
             catch
