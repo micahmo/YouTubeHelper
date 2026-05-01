@@ -290,9 +290,80 @@ namespace YouTubeHelper.ViewModels
         public bool IsDescriptionExpanded
         {
             get => _isDescriptionExpanded;
-            set => SetProperty(ref _isDescriptionExpanded, value);
+            set
+            {
+                if (SetProperty(ref _isDescriptionExpanded, value) && value && _isTopCommentsExpanded)
+                {
+                    _isTopCommentsExpanded = false;
+                    OnPropertyChanged(nameof(IsTopCommentsExpanded));
+                }
+            }
         }
         private bool _isDescriptionExpanded;
+
+        public bool IsTopCommentsExpanded
+        {
+            get => _isTopCommentsExpanded;
+            set
+            {
+                if (SetProperty(ref _isTopCommentsExpanded, value))
+                {
+                    if (value)
+                    {
+                        if (_isDescriptionExpanded)
+                        {
+                            _isDescriptionExpanded = false;
+                            OnPropertyChanged(nameof(IsDescriptionExpanded));
+                        }
+                        if (!_commentsLoaded && !_isLoadingComments)
+                        {
+                            _ = LoadTopComments();
+                        }
+                    }
+                }
+            }
+        }
+        private bool _isTopCommentsExpanded;
+
+        public List<VideoComment> TopComments
+        {
+            get => _topComments;
+            private set => SetProperty(ref _topComments, value);
+        }
+        private List<VideoComment> _topComments = [];
+
+        public bool IsLoadingComments
+        {
+            get => _isLoadingComments;
+            private set => SetProperty(ref _isLoadingComments, value);
+        }
+        private bool _isLoadingComments;
+
+        public bool CommentsLoaded
+        {
+            get => _commentsLoaded;
+            private set => SetProperty(ref _commentsLoaded, value);
+        }
+        private bool _commentsLoaded;
+
+        private async Task LoadTopComments()
+        {
+            IsLoadingComments = true;
+            try
+            {
+                TopComments = await ServerApiClient.Instance.GetTopComments(Video.Id);
+                CommentsLoaded = true;
+            }
+            catch
+            {
+                TopComments = [];
+                CommentsLoaded = true;
+            }
+            finally
+            {
+                IsLoadingComments = false;
+            }
+        }
 
         public bool ShowChannelName => _channelViewModel.Channel.RealPlaylistId.Count() > 1 || _channelViewModel.QueueMode;
 
