@@ -88,8 +88,7 @@
         <!--  Side-by-side Description | Comments headers  -->
         <HorizontalStackLayout Margin="10,0,10,0">
             <Label
-                FontAttributes="Bold"
-                Text="▶ Description">
+Text="▶ Description">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
@@ -101,8 +100,7 @@
             </Label>
             <Label
                 Margin="16,0,0,0"
-                FontAttributes="Bold"
-                Text="▶ Comments">
+Text="▶ Comments">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleTopCommentsCommand}" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
@@ -160,12 +158,11 @@
         </VerticalStackLayout>
 
         <!--  Divider  -->
-        <Border
+        <BoxView
             Margin="10,5,10,0"
-            BackgroundColor="LightGray"
-            HeightRequest="10"
-            HorizontalOptions="Fill"
-            StrokeThickness="0"
-            StrokeShape="RoundRectangle 5" />
+            Color="LightGray"
+            CornerRadius="3"
+            HeightRequest="6"
+            HorizontalOptions="Fill" />
     </VerticalStackLayout>
 </ContentView>
