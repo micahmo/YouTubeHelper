@@ -124,9 +124,6 @@ Text="▶ Comments">
                     </toolkit:AnimationBehavior.AnimationType>
                 </toolkit:AnimationBehavior>
             </Label.Behaviors>
-            <Label.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding ToggleDescriptionCommand}" NumberOfTapsRequired="1" />
-            </Label.GestureRecognizers>
         </Label>
 
         <!--  Top Comments expanded content  -->
