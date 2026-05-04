@@ -23,6 +23,7 @@
     <PackageReference Include="BusyIndicator" Version="2.0.2.1" />
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="CliWrap" Version="3.6.6" />
+    <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Jot" Version="2.1.17" />
     <PackageReference Include="Lib.Harmony" Version="2.3.6" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />

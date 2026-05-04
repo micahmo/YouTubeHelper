@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:YouTubeHelper.Properties"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:utilities="clr-namespace:YouTubeHelper.Utilities"
     xmlns:viewModels="clr-namespace:YouTubeHelper.ViewModels"
     xmlns:views="clr-namespace:YouTubeHelper.Views"
@@ -696,12 +697,12 @@
                                                                         Visibility="{c:Binding Video.New,
                                                                                                FalseToVisibility=Collapsed}" />
 
-                                                                    <TextBlock
+                                                                    <emoji:TextBlock
                                                                         FontWeight="Medium"
                                                                         Text="{Binding Video.Title}"
                                                                         TextWrapping="Wrap" />
 
-                                                                    <TextBlock
+                                                                    <emoji:TextBlock
                                                                         Padding="15,0,7,0"
                                                                         Cursor="Hand"
                                                                         FontWeight="Light"
@@ -766,7 +767,7 @@
                                                                         MaxHeight="200"
                                                                         VerticalScrollBarVisibility="Auto"
                                                                         Visibility="{c:Binding IsDescriptionExpanded, FalseToVisibility=Collapsed}">
-                                                                        <TextBlock
+                                                                        <emoji:TextBlock
                                                                             Margin="0,4,0,10"
                                                                             utilities:InlineHelper.Inlines="{Binding FormattedDescription}"
                                                                             TextWrapping="Wrap" />
@@ -784,13 +785,13 @@
                                                                                 <DataTemplate>
                                                                                     <StackPanel Margin="0,0,0,10">
                                                                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                                                                            <TextBlock FontWeight="Medium" Text="{Binding AuthorDisplayName}" />
-                                                                                            <TextBlock
+                                                                                            <emoji:TextBlock FontWeight="Medium" Text="{Binding AuthorDisplayName}" />
+                                                                                            <emoji:TextBlock
                                                                                                 Margin="8,0,0,0"
                                                                                                 Foreground="Gray"
                                                                                                 Text="{Binding LikeCount, StringFormat='👍 {0}'}" />
                                                                                         </StackPanel>
-                                                                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                                                                                        <emoji:TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
                                                                                     </StackPanel>
                                                                                 </DataTemplate>
                                                                             </ItemsControl.ItemTemplate>
