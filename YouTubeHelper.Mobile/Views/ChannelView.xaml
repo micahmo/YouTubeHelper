@@ -33,6 +33,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
@@ -63,9 +64,9 @@
                     ItemsSource="{Binding ExclusionReasonValues}"
                     SelectedIndex="{Binding SelectedExclusionFilterIndex}" />
 
-                <!--  This is defined "above" row 4 of the grid so that the refresh indicator appears BELOW the button(s)  -->
+                <!--  This is defined "above" row 5 of the grid so that the refresh indicator appears BELOW the button(s)  -->
                 <RefreshView
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Command="{Binding FindVideosCommand}"
                     HorizontalOptions="CenterAndExpand"
                     IsRefreshing="{Binding IsRefreshing}"
@@ -84,6 +85,13 @@
                         </CollectionView>
                     </Grid>
                 </RefreshView>
+
+                <Entry
+                    Grid.Row="4"
+                    Margin="10,5,10,0"
+                    IsVisible="{Binding Page.AppShellViewModel.QueueTabSelected}"
+                    Placeholder="Filter queue..."
+                    Text="{Binding QueueFilterTerm}" />
 
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>

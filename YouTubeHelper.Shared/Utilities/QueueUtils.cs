@@ -9,6 +9,16 @@ namespace YouTubeHelper.Shared.Utilities
 {
     public static class QueueUtils
     {
+        public static bool MatchesQueueFilter(IVideoViewModel vm, string term)
+        {
+            string trimmed = term.Trim();
+            bool exact = trimmed.StartsWith('"') && trimmed.EndsWith('"') && trimmed.Length > 2;
+            string haystack = $"{vm.Video.Title} {vm.Video.Description} {vm.Video.ChannelName}".ToLowerInvariant();
+            return exact
+                ? haystack.Contains(trimmed.Trim('"').ToLowerInvariant())
+                : trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries).All(word => haystack.Contains(word.ToLowerInvariant()));
+        }
+
         /// <summary>
         /// Tries to join the download group (i.e., subscribe to SignalR updates) for the given video(s)
         /// </summary>

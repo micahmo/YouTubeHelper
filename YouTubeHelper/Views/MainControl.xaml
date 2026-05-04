@@ -326,6 +326,16 @@
                                                             </Grid>
                                                         </Button>
 
+                                                        <TextBox
+                                                            Grid.Column="2"
+                                                            Grid.ColumnSpan="11"
+                                                            MinWidth="250"
+                                                            VerticalContentAlignment="Center"
+                                                            ui:ControlHelper.PlaceholderText="Filter queue..."
+                                                            Text="{Binding QueueFilterTerm, UpdateSourceTrigger=PropertyChanged}"
+                                                            Visibility="{c:Binding QueueMode,
+                                                                                   FalseToVisibility=Collapsed}" />
+
                                                         <ComboBox
                                                             Grid.Column="2"
                                                             DisplayMemberPath="Description"

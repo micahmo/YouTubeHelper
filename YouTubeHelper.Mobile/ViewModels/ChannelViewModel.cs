@@ -142,6 +142,29 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = [];
 
+        private readonly List<VideoViewModel> _allQueueVideos = [];
+
+        public string? QueueFilterTerm
+        {
+            get => _queueFilterTerm;
+            set
+            {
+                SetProperty(ref _queueFilterTerm, value);
+                ApplyQueueFilter();
+            }
+        }
+        private string? _queueFilterTerm;
+
+        private void ApplyQueueFilter()
+        {
+            Videos.Clear();
+            IEnumerable<VideoViewModel> filtered = string.IsNullOrWhiteSpace(QueueFilterTerm)
+                ? _allQueueVideos
+                : _allQueueVideos.Where(vm => QueueUtils.MatchesQueueFilter(vm, QueueFilterTerm));
+            Videos.AddRange(filtered.ToList());
+        }
+
+
         public ICommand ToggleEnableCountLimitCommand => _toggleEnableCountLimitCommand ??= new RelayCommand(() => EnableCountLimit = !EnableCountLimit);
         private RelayCommand? _toggleEnableCountLimitCommand;
 
@@ -240,18 +263,22 @@ namespace YouTubeHelper.Mobile.ViewModels
                             }
                             else if (Page.AppShellViewModel.QueueTabSelected)
                             {
+                                _allQueueVideos.Clear();
+
                                 // Get the queue from the server
                                 List<QueueVideoItem> queueItems = await ServerApiClient.Instance.GetQueuePopulated();
 
                                 foreach (QueueVideoItem item in queueItems)
                                 {
                                     VideoViewModel videoViewModel = new(item.Video, Page, this);
-                                    Videos.Add(videoViewModel);
+                                    _allQueueVideos.Add(videoViewModel);
                                     string requestId = item.RequestData.RequestGuid.ToString();
 
                                     // Do not await this, as it slows the loading of the queue page
                                     _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
                                 }
+
+                                ApplyQueueFilter();
                             }
                         }
                     }));

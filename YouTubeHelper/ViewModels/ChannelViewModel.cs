@@ -200,6 +200,7 @@ namespace YouTubeHelper.ViewModels
 
         private async void LoadQueue()
         {
+            _allQueueVideos.Clear();
             Videos.Clear();
 
             try
@@ -212,12 +213,14 @@ namespace YouTubeHelper.ViewModels
                 foreach (QueueVideoItem item in queueItems)
                 {
                     VideoViewModel videoViewModel = new(item.Video, MainControlViewModel, this);
-                    Videos.Add(videoViewModel);
+                    _allQueueVideos.Add(videoViewModel);
                     string requestId = item.RequestData.RequestGuid.ToString();
 
                     // Do not await this, as it slows the loading of the queue page
                     _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
                 }
+
+                ApplyQueueFilter();
             }
             finally
             {
@@ -250,6 +253,29 @@ namespace YouTubeHelper.ViewModels
         private string _deleteGlyph = Icons.Delete;
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = [];
+
+        private readonly List<VideoViewModel> _allQueueVideos = [];
+
+        public string? QueueFilterTerm
+        {
+            get => _queueFilterTerm;
+            set
+            {
+                SetProperty(ref _queueFilterTerm, value);
+                ApplyQueueFilter();
+            }
+        }
+        private string? _queueFilterTerm;
+
+        private void ApplyQueueFilter()
+        {
+            Videos.Clear();
+            IEnumerable<VideoViewModel> filtered = string.IsNullOrWhiteSpace(QueueFilterTerm)
+                ? _allQueueVideos
+                : _allQueueVideos.Where(vm => QueueUtils.MatchesQueueFilter(vm, QueueFilterTerm));
+            Application.Current.Dispatcher.Invoke(() => Videos.AddRange(filtered.ToList()));
+        }
+
 
         public bool ChannelMode => MainControlViewModel.Mode == MainControlMode.Channel;
 
