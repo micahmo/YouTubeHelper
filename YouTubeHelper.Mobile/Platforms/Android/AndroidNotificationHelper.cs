@@ -3,6 +3,7 @@ using Android.App;
 using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
+using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Database.Models;
 
 namespace YouTubeHelper.Mobile.Platforms.Android
@@ -16,7 +17,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             Context context = global::Android.App.Application.Context;
             if (context.PackageName is null) return;
 
-            const int notificationId = int.MaxValue;
+            int notificationId = Utils.SimpleHash(version);
 
             Intent launchAppIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
             launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
@@ -28,7 +29,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             );
 
             Intent obtainiumIntent = new(Intent.ActionView);
-            obtainiumIntent.SetData(Android.Net.Uri.Parse("obtainium://add/https://github.com/micahmo/YouTubeHelper"));
+            obtainiumIntent.SetData(global::Android.Net.Uri.Parse("obtainium://add/https://github.com/micahmo/YouTubeHelper"));
             obtainiumIntent.SetFlags(ActivityFlags.NewTask);
             PendingIntent? obtainiumPendingIntent = PendingIntent.GetActivity(
                 context,
