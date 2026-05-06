@@ -11,6 +11,43 @@ namespace YouTubeHelper.Mobile.Platforms.Android
     {
         private const string ActionNotification = "com.micahmo.youtubehelper.NOTIFICATION_ACTION";
 
+        public static void ShowUpdateNotification(string version)
+        {
+            Context context = global::Android.App.Application.Context;
+            if (context.PackageName is null) return;
+
+            const int notificationId = int.MaxValue;
+
+            Intent launchAppIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
+            launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
+            PendingIntent? launchAppPendingIntent = PendingIntent.GetActivity(
+                context,
+                notificationId * 10 + 0,
+                launchAppIntent,
+                PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+            );
+
+            Intent obtainiumIntent = new(Intent.ActionView);
+            obtainiumIntent.SetData(Android.Net.Uri.Parse("obtainium://add/https://github.com/micahmo/YouTubeHelper"));
+            obtainiumIntent.SetFlags(ActivityFlags.NewTask);
+            PendingIntent? obtainiumPendingIntent = PendingIntent.GetActivity(
+                context,
+                notificationId * 10 + 1,
+                obtainiumIntent,
+                PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
+            );
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId: "completion")
+                .SetContentTitle("Update available")
+                .SetContentText($"Version {version} is available")
+                .SetSmallIcon(ResourceConstant.Drawable.notification_icon)
+                .SetAutoCancel(true)
+                .SetContentIntent(launchAppPendingIntent)
+                .AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Obtainium", obtainiumPendingIntent);
+
+            NotificationManagerCompat.From(context).Notify(notificationId, builder.Build());
+        }
+
         public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool isFailed, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
         {
             bool isDismissable = isDone || isNewVideo;

@@ -44,6 +44,21 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 return; // Don't process as a regular notification
             }
 
+            // Check if this is an app update notification
+            if (data.TryGetValue("updateVersion", out string? updateVersion))
+            {
+                if (Version.TryParse(updateVersion, out Version? latest) &&
+                    Version.TryParse(AppInfo.VersionString, out Version? current) &&
+                    latest > current)
+                {
+#if ANDROID
+                    AndroidNotificationHelper.ShowUpdateNotification(updateVersion);
+#endif
+                }
+
+                return;
+            }
+
             // Otherwise, handle this as a regular video notification
             data.TryGetValue("title", out string? title);
             data.TryGetValue("body", out string? body);
