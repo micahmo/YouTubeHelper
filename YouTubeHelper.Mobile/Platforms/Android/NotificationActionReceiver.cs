@@ -30,6 +30,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 case "dismiss":
                     AndroidUtils.DismissNotification(context, notificationId);
                     break;
+
+                case "openObtainium":
+                    AndroidUtils.DismissNotification(context, notificationId);
+                    Intent obtainiumIntent = new(Intent.ActionView);
+                    obtainiumIntent.SetData(global::Android.Net.Uri.Parse("obtainium://add/https://github.com/micahmo/YouTubeHelper"));
+                    obtainiumIntent.SetFlags(ActivityFlags.NewTask);
+                    context.StartActivity(obtainiumIntent);
+                    break;
             }
 
             if (!string.IsNullOrEmpty(rawUrl) && YouTubeUtils.GetVideoIdFromUrl(rawUrl) is { } videoId && markVideoEnum is not null)

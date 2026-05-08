@@ -28,10 +28,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 PendingIntentFlags.Immutable | PendingIntentFlags.UpdateCurrent
             );
 
-            Intent obtainiumIntent = new(Intent.ActionView);
-            obtainiumIntent.SetData(global::Android.Net.Uri.Parse("obtainium://add/https://github.com/micahmo/YouTubeHelper"));
-            obtainiumIntent.SetFlags(ActivityFlags.NewTask);
-            PendingIntent? obtainiumPendingIntent = PendingIntent.GetActivity(
+            Intent obtainiumIntent = new(ActionNotification);
+            _ = obtainiumIntent.SetPackage(context.PackageName);
+            _ = obtainiumIntent.PutExtra("actionType", "openObtainium");
+            _ = obtainiumIntent.PutExtra("notificationId", notificationId);
+            PendingIntent? obtainiumPendingIntent = PendingIntent.GetBroadcast(
                 context,
                 notificationId * 10 + 1,
                 obtainiumIntent,
