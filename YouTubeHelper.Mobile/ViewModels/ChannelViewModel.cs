@@ -150,10 +150,24 @@ namespace YouTubeHelper.Mobile.ViewModels
             set
             {
                 SetProperty(ref _queueFilterTerm, value);
-                ApplyQueueFilter();
+                _ = ApplyQueueFilterDebounced();
             }
         }
         private string? _queueFilterTerm;
+        private CancellationTokenSource? _filterDebounceTokenSource;
+
+        private async Task ApplyQueueFilterDebounced()
+        {
+            _filterDebounceTokenSource?.Cancel();
+            _filterDebounceTokenSource = new CancellationTokenSource();
+            CancellationToken token = _filterDebounceTokenSource.Token;
+            try
+            {
+                await Task.Delay(300, token);
+                ApplyQueueFilter();
+            }
+            catch (OperationCanceledException) { }
+        }
 
         private void ApplyQueueFilter()
         {
