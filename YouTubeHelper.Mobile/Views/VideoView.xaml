@@ -132,11 +132,39 @@ Text="▶ Comments">
                             <HorizontalStackLayout>
                                 <Label FontAttributes="Bold" Text="{Binding AuthorDisplayName}" />
                                 <Label
+                                    Margin="6,0,0,0"
+                                    Text="• Creator"
+                                    TextColor="#1565C0"
+                                    IsVisible="{Binding IsCreatorComment}" />
+                                <Label
                                     Margin="8,0,0,0"
                                     Text="{Binding LikeCount, StringFormat='👍 {0}'}"
                                     TextColor="Gray" />
                             </HorizontalStackLayout>
                             <Label Text="{Binding Text}" />
+                            <!--  Nested replies: creator replies or replies that beat the parent like count  -->
+                            <VerticalStackLayout Margin="16,4,0,0" BindableLayout.ItemsSource="{Binding Replies}" IsVisible="{Binding HasReplies}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <VerticalStackLayout Margin="0,4,0,0">
+                                            <HorizontalStackLayout>
+                                                <Label Text="↳ " TextColor="Gray" />
+                                                <Label FontAttributes="Bold" Text="{Binding AuthorDisplayName}" />
+                                                <Label
+                                                    Margin="6,0,0,0"
+                                                    Text="• Creator"
+                                                    TextColor="#1565C0"
+                                                    IsVisible="{Binding IsCreatorComment}" />
+                                                <Label
+                                                    Margin="8,0,0,0"
+                                                    Text="{Binding LikeCount, StringFormat='👍 {0}'}"
+                                                    TextColor="Gray" />
+                                            </HorizontalStackLayout>
+                                            <Label Text="{Binding Text}" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>

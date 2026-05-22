@@ -786,12 +786,43 @@
                                                                                     <StackPanel Margin="0,0,0,10">
                                                                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                                                                             <emoji:TextBlock FontWeight="Medium" Text="{Binding AuthorDisplayName}" />
+                                                                                            <TextBlock
+                                                                                                Margin="6,0,0,0"
+                                                                                                Foreground="#1565C0"
+                                                                                                Text="• Creator"
+                                                                                                Visibility="{c:Binding IsCreatorComment, FalseToVisibility=Collapsed}" />
                                                                                             <emoji:TextBlock
                                                                                                 Margin="8,0,0,0"
                                                                                                 Foreground="Gray"
                                                                                                 Text="{Binding LikeCount, StringFormat='👍 {0}'}" />
                                                                                         </StackPanel>
                                                                                         <emoji:TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                                                                                        <!--  Nested replies: creator replies or replies that beat the parent like count  -->
+                                                                                        <ItemsControl
+                                                                                            Margin="16,4,0,0"
+                                                                                            ItemsSource="{Binding Replies}"
+                                                                                            Visibility="{c:Binding 'Replies.Count > 0', FalseToVisibility=Collapsed}">
+                                                                                            <ItemsControl.ItemTemplate>
+                                                                                                <DataTemplate>
+                                                                                                    <StackPanel Margin="0,4,0,0">
+                                                                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                                                                                            <TextBlock Foreground="Gray" Text="↳ " />
+                                                                                                            <emoji:TextBlock FontWeight="Medium" Text="{Binding AuthorDisplayName}" />
+                                                                                                            <TextBlock
+                                                                                                                Margin="6,0,0,0"
+                                                                                                                Foreground="#1565C0"
+                                                                                                                Text="• Creator"
+                                                                                                                Visibility="{c:Binding IsCreatorComment, FalseToVisibility=Collapsed}" />
+                                                                                                            <emoji:TextBlock
+                                                                                                                Margin="8,0,0,0"
+                                                                                                                Foreground="Gray"
+                                                                                                                Text="{Binding LikeCount, StringFormat='👍 {0}'}" />
+                                                                                                        </StackPanel>
+                                                                                                        <emoji:TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+                                                                                                    </StackPanel>
+                                                                                                </DataTemplate>
+                                                                                            </ItemsControl.ItemTemplate>
+                                                                                        </ItemsControl>
                                                                                     </StackPanel>
                                                                                 </DataTemplate>
                                                                             </ItemsControl.ItemTemplate>
