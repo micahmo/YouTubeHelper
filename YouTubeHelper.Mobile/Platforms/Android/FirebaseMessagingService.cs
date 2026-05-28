@@ -75,6 +75,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             data.TryGetValue("thumbnailUrl", out string? thumbnailUrl);
             data.TryGetValue("channelThumbnailUrl", out string? channelThumbnailUrl);
             data.TryGetValue("plexRatingKey", out string? plexRatingKey);
+            data.TryGetValue("plexState", out string? plexState);
             data.TryGetValue("channelName", out string? channelName);
 
             if (title is not null && body is not null && tag is not null)
@@ -104,6 +105,11 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     progress: progress,
                     plexRatingKey: plexRatingKey
                 );
+
+                if (plexState is not null)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(() => AppShell.Instance?.HandlePlexStateUpdate(videoUrl, plexState));
+                }
 #endif
 
             }

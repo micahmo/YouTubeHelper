@@ -779,6 +779,17 @@ namespace YouTubeHelper.Mobile
             });
         }
 
+        public void HandlePlexStateUpdate(string? videoUrl, string plexState)
+        {
+            foreach (VideoViewModel videoViewModel in AppShellViewModel.AllVideos)
+            {
+                if (videoUrl == $"https://www.youtube.com/watch?v={videoViewModel.Video.Id}")
+                {
+                    videoViewModel.PlexState = plexState;
+                }
+            }
+        }
+
         public async Task HandleOpenInPlex(string plexRatingKey)
         {
             BusyIndicator busyIndicator = new(this, Mobile.Resources.Resources.OpeningInPlex);

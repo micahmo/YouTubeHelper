@@ -68,6 +68,25 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public bool HasStatus => Video.Status is not null && Video.Excluded is not true;
 
+        public string? PlexState
+        {
+            get => _plexState;
+            set
+            {
+                if (SetProperty(ref _plexState, value))
+                {
+                    _plexStatePending = false;
+                    OnPropertyChanged(nameof(HasPlexIndicator));
+                    OnPropertyChanged(nameof(PlexIndicator));
+                }
+            }
+        }
+        private string? _plexState;
+        private bool _plexStatePending;
+
+        public bool HasPlexIndicator => _plexState is not null || _plexStatePending;
+        public string PlexIndicator => _plexState == "scanned" ? "📝" : _plexState is not null ? "📺" : "⏳";
+
         public string VideoTitle => $"{Video.Title}{(_channelViewModel.Channel?.RealPlaylistId.Count() > 1 || AppShell.Instance?.AppShellViewModel.QueueTabSelected == true ? $" ({Video.ChannelName})" : string.Empty)}";
 
         public ICommand VideoTappedCommand => _videoTappedCommand ??= new RelayCommand(VideoTapped);
@@ -358,6 +377,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                     Video.ExclusionReason = ExclusionReason.Watched;
                     // NOTE: We no longer need to update the db here because the server does it,
                     // so the above is purely a UI update.
+                    _plexStatePending = true;
+                    OnPropertyChanged(nameof(HasPlexIndicator));
+                    OnPropertyChanged(nameof(PlexIndicator));
                 }
 
                 if (showInAppNotifications && _statusWasEverNotDone)

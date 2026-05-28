@@ -64,18 +64,24 @@
                         IsVisible="{Binding Video.New}"
                         Text="NEW!"
                         TextColor="Goldenrod" />
-                    <Label
-                        Margin="10,0,10,0"
-                        FontAttributes="Bold"
-                        IsVisible="{Binding Video.Excluded}"
-                        Text="{Binding ExcludedString}"
-                        TextColor="FireBrick" />
-                    <Label
-                        Margin="10,0,10,0"
-                        FontAttributes="Bold"
-                        IsVisible="{Binding HasStatus}"
-                        Text="{Binding Video.Status}"
-                        TextColor="Green" />
+                    <HorizontalStackLayout Margin="10,0,10,0">
+                        <Label
+                            FontAttributes="Bold"
+                            IsVisible="{Binding Video.Excluded}"
+                            Text="{Binding ExcludedString}"
+                            TextColor="FireBrick" />
+                        <Label
+                            FontAttributes="Bold"
+                            IsVisible="{Binding HasStatus}"
+                            Text="{Binding Video.Status}"
+                            TextColor="Green" />
+                        <Label
+                            Margin="4,-1,0,0"
+                            FontSize="10"
+                            IsVisible="{Binding HasPlexIndicator}"
+                            Text="{Binding PlexIndicator}"
+                            VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                     <Label
                         Margin="10,0,10,0"
                         FontAttributes="Bold"
