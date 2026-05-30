@@ -797,11 +797,11 @@
                                                                                                 Text="{Binding LikeCount, StringFormat='👍 {0}'}" />
                                                                                         </StackPanel>
                                                                                         <emoji:TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
-                                                                                        <!--  Nested replies: creator replies or replies that beat the parent like count  -->
+                                                                                        <!--  Nested replies: preloaded notable replies, replaced with all replies on expand  -->
                                                                                         <ItemsControl
                                                                                             Margin="16,4,0,0"
-                                                                                            ItemsSource="{Binding Replies}"
-                                                                                            Visibility="{c:Binding 'Replies.Count > 0', FalseToVisibility=Collapsed}">
+                                                                                            ItemsSource="{Binding DisplayedReplies}"
+                                                                                            Visibility="{c:Binding HasDisplayedReplies, FalseToVisibility=Collapsed}">
                                                                                             <ItemsControl.ItemTemplate>
                                                                                                 <DataTemplate>
                                                                                                     <StackPanel Margin="0,4,0,0">
@@ -823,6 +823,25 @@
                                                                                                 </DataTemplate>
                                                                                             </ItemsControl.ItemTemplate>
                                                                                         </ItemsControl>
+                                                                                        <!--  Expand / collapse all replies  -->
+                                                                                        <StackPanel
+                                                                                            Margin="16,4,0,0"
+                                                                                            Orientation="Horizontal"
+                                                                                            Visibility="{c:Binding HasMoreReplies, FalseToVisibility=Collapsed}">
+                                                                                            <TextBlock
+                                                                                                Foreground="Gray"
+                                                                                                Text="Loading replies..."
+                                                                                                Visibility="{c:Binding IsLoadingReplies, FalseToVisibility=Collapsed}" />
+                                                                                            <Button
+                                                                                                Padding="0"
+                                                                                                Background="Transparent"
+                                                                                                BorderThickness="0"
+                                                                                                Command="{Binding ToggleRepliesCommand}"
+                                                                                                Content="{Binding ExpandRepliesText}"
+                                                                                                Focusable="False"
+                                                                                                Foreground="#1565C0"
+                                                                                                Visibility="{c:Binding IsNotLoadingReplies, FalseToVisibility=Collapsed}" />
+                                                                                        </StackPanel>
                                                                                     </StackPanel>
                                                                                 </DataTemplate>
                                                                             </ItemsControl.ItemTemplate>

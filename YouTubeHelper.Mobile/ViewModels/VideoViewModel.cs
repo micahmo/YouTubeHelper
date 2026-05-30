@@ -438,12 +438,12 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private bool _isTopCommentsExpanded;
 
-        public List<VideoComment>? TopComments
+        public List<VideoCommentViewModel>? TopComments
         {
             get => _topComments;
             private set => SetProperty(ref _topComments, value);
         }
-        private List<VideoComment>? _topComments;
+        private List<VideoCommentViewModel>? _topComments;
 
         public bool IsLoadingComments
         {
@@ -464,15 +464,18 @@ namespace YouTubeHelper.Mobile.ViewModels
 
         public bool HasNoComments => _commentsLoaded && (_topComments == null || _topComments.Count == 0);
 
+
+
         private async Task LoadTopComments()
         {
             MainThread.BeginInvokeOnMainThread(() => IsLoadingComments = true);
             try
             {
                 List<VideoComment> comments = await ServerApiClient.Instance.GetTopComments(Video.Id, count: 20);
+                List<VideoCommentViewModel> viewModels = comments.Select(c => new VideoCommentViewModel(c, Video.Id)).ToList();
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    TopComments = comments;
+                    TopComments = viewModels;
                     CommentsLoaded = true;
                     IsLoadingComments = false;
                     OnPropertyChanged(nameof(HasNoComments));

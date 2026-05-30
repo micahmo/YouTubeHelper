@@ -148,8 +148,8 @@ Text="▶ Comments">
                                     TextColor="Gray" />
                             </HorizontalStackLayout>
                             <Label Text="{Binding Text}" />
-                            <!--  Nested replies: creator replies or replies that beat the parent like count  -->
-                            <VerticalStackLayout Margin="16,4,0,0" BindableLayout.ItemsSource="{Binding Replies}" IsVisible="{Binding HasReplies}">
+                            <!--  Nested replies: preloaded notable replies, replaced with all replies on expand  -->
+                            <VerticalStackLayout Margin="16,4,0,0" BindableLayout.ItemsSource="{Binding DisplayedReplies}" IsVisible="{Binding HasDisplayedReplies}">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate>
                                         <VerticalStackLayout Margin="0,4,0,0">
@@ -171,6 +171,21 @@ Text="▶ Comments">
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>
                             </VerticalStackLayout>
+                            <!--  Expand / collapse all replies  -->
+                            <Label
+                                Margin="16,4,0,0"
+                                Text="Loading replies..."
+                                TextColor="Gray"
+                                IsVisible="{Binding IsLoadingReplies}" />
+                            <Label
+                                Margin="16,4,0,0"
+                                TextColor="#1565C0"
+                                Text="{Binding ExpandRepliesText}"
+                                IsVisible="{Binding HasMoreReplies}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ToggleRepliesCommand}" NumberOfTapsRequired="1" />
+                                </Label.GestureRecognizers>
+                            </Label>
                         </VerticalStackLayout>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
