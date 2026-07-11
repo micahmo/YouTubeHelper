@@ -25,10 +25,25 @@ namespace YouTubeHelper.Mobile
                 return localPath;
             }
 
-            byte[] imageBytes = await url.GetBytesAsync();
-            await File.WriteAllBytesAsync(localPath, imageBytes);
+            for (int attempt = 1; attempt <= 2; attempt++)
+            {
+                try
+                {
+                    byte[] imageBytes = await url.GetBytesAsync();
+                    await File.WriteAllBytesAsync(localPath, imageBytes);
+                    return localPath;
+                }
+                catch (Exception ex)
+                {
+                    Android.Util.Log.Warn("YouTubeHelper", $"GetCachedImagePath attempt {attempt} failed for {url}: {ex.Message}");
+                    if (attempt < 2)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
+            }
 
-            return localPath;
+            return null;
         }
 
         private static string GetHashedFileName(string input)
