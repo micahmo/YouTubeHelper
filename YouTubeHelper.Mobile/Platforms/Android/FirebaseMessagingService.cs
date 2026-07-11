@@ -25,14 +25,14 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
         public static async Task HandleNotificationData(IDictionary<string, string> data)
         {
-            Android.Util.Log.Info("YouTubeHelper", "HandleNotificationData: received FCM message");
+            global::Android.Util.Log.Info("YouTubeHelper", "HandleNotificationData: received FCM message");
             try
             {
                 await HandleNotificationDataCore(data);
             }
             catch (Exception ex)
             {
-                Android.Util.Log.Error("YouTubeHelper", $"HandleNotificationData: unhandled exception: {ex}");
+                global::Android.Util.Log.Error("YouTubeHelper", $"HandleNotificationData: unhandled exception: {ex}");
             }
         }
 
@@ -102,7 +102,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 });
 
 #if ANDROID
-                Android.Util.Log.Info("YouTubeHelper", $"HandleNotificationData: posting notification for tag={tag}, title={title}");
+                global::Android.Util.Log.Info("YouTubeHelper", $"HandleNotificationData: posting notification for tag={tag}, title={title}");
                 AndroidNotificationHelper.Show(
                     title: title,
                     channelName: channelName,
