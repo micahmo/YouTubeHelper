@@ -122,12 +122,19 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                         IsPlaying = true;
 
-                        _ = await Browser.Default.OpenAsync(await GetRawUrl(Video.Id), new BrowserLaunchOptions
+                        try
                         {
-                            LaunchMode = BrowserLaunchMode.SystemPreferred,
-                            TitleMode = BrowserTitleMode.Hide,
-                            PreferredToolbarColor = Color.FromArgb("b22222")
-                        });
+                            _ = await Browser.Default.OpenAsync(await ServerApiClient.Instance.YouTubeLink(videoId: Video.Id), new BrowserLaunchOptions
+                            {
+                                LaunchMode = BrowserLaunchMode.SystemPreferred,
+                                TitleMode = BrowserTitleMode.Hide,
+                                PreferredToolbarColor = Color.FromArgb("b22222")
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            await Toast.Make(ex.Message, ToastDuration.Long).Show();
+                        }
                     }
                 }
                 else if (action == Resources.Resources.WatchExternal)
@@ -253,17 +260,6 @@ namespace YouTubeHelper.Mobile.ViewModels
             return options.ToArray();
         }
 
-        public static async Task<string> GetRawUrl(string videoId)
-        {
-            try
-            {
-                return await ServerApiClient.Instance.YouTubeLink(videoId: videoId);
-            }
-            catch
-            {
-                return "https://google.com";
-            }
-        }
 
         internal async Task DownloadVideo(string dataDirectorySubpath)
         {

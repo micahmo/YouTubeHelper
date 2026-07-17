@@ -51,7 +51,7 @@ namespace YouTubeHelper.ViewModels
             Mouse.OverrideCursor = Cursors.Wait;
             try
             {
-                MainControlViewModel.ActiveVideo = Video.RawUrl ??= await GetRawUrl(Video.Id);
+                MainControlViewModel.ActiveVideo = Video.RawUrl ??= await ServerApiClient.Instance.YouTubeLink(videoId: Video.Id);
                 MainControlViewModel.ActiveVideoTitle = Video.Title;
                 _channelViewModel.Videos.ToList().ForEach(v => v.Video.IsPlaying = false);
                 Video.IsPlaying = true;
@@ -373,17 +373,7 @@ namespace YouTubeHelper.ViewModels
 
         private readonly ChannelViewModel _channelViewModel;
 
-        public static Task<string> GetRawUrl(string videoId)
-        {
-            try
-            {
-                return ServerApiClient.Instance.YouTubeLink(videoId: videoId);
-            }
-            catch
-            {
-                return Task.FromResult("https://google.com");
-            }
-        }
+
 
         /// <summary>
         /// Wraps the <see cref="Video.Description"/> and returns it in such a way that it can be displayed with Inlines in a TextBlock
