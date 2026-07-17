@@ -115,9 +115,7 @@ jobs:
         run: dotnet publish YouTubeHelper\YouTubeHelper.csproj -c ${{ env.BUILD_CONFIGURATION }} -f net8.0-windows
 
       - name: Install Inno Setup
-        run: |
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile is.exe
-          Start-Process .\is.exe -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+        run: choco install innosetup --yes
         shell: pwsh
 
       - name: Build Installer (Inno Setup)
