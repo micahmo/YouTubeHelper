@@ -85,7 +85,7 @@ namespace YouTubeHelper.Mobile.ViewModels
         private bool _plexStatePending;
 
         public bool HasPlexIndicator => _plexState is not null || _plexStatePending;
-        public string PlexIndicator => _plexState == "scanned" ? "📝" : _plexState is not null ? "📺" : "⏳";
+        public string PlexIndicator => _plexState == "scanned" ? "📝" : _plexState is not null ? "📺" : "✅";
 
         public string VideoTitle => $"{Video.Title}{(_channelViewModel.Channel?.RealPlaylistId.Count() > 1 || AppShell.Instance?.AppShellViewModel.QueueTabSelected == true ? $" ({Video.ChannelName})" : string.Empty)}";
 
