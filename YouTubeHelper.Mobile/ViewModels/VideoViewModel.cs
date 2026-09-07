@@ -84,8 +84,10 @@ namespace YouTubeHelper.Mobile.ViewModels
         private string? _plexState;
         private bool _plexStatePending;
 
+        private bool _hasWarning;
+
         public bool HasPlexIndicator => _plexState is not null || _plexStatePending;
-        public string PlexIndicator => _plexState == "scanned" ? "📝" : _plexState is not null ? "📺" : "✅";
+        public string PlexIndicator => (_plexState == "scanned" ? "📝" : _plexState is not null ? "📺" : "✅") + (_hasWarning ? "⚠️" : string.Empty);
 
         public string VideoTitle => $"{Video.Title}{(_channelViewModel.Channel?.RealPlaylistId.Count() > 1 || AppShell.Instance?.AppShellViewModel.QueueTabSelected == true ? $" ({Video.ChannelName})" : string.Empty)}";
 
@@ -366,6 +368,9 @@ namespace YouTubeHelper.Mobile.ViewModels
                 // Mark as downloaded (only if succeeded)
                 Video.Status = null;
                 Video.Progress = 100;
+
+                // A Reason on a completed download means it succeeded, but with something worth flagging.
+                _hasWarning = !string.IsNullOrEmpty(result.Reason);
 
                 if (_statusWasEverNotDone)
                 {
