@@ -636,6 +636,14 @@ namespace YouTubeHelper.Mobile
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
+            // If a tab is already showing just this video, switching to it is the whole job. Checking before
+            // the busy indicator avoids a lookup whose result would be discarded, and with it a loading popup
+            // that appears and vanishes without anything changing.
+            if (!string.IsNullOrEmpty(videoId) && TrySelectTabShowingOnlyVideo(videoId))
+            {
+                return;
+            }
+
             BusyIndicator busyIndicator = new(this, Mobile.Resources.Resources.HandlingSharedLink);
 
             Video? video = default;
@@ -763,6 +771,42 @@ namespace YouTubeHelper.Mobile
             }
 
             busyIndicator.Dispose();
+        }
+
+        /// <summary>
+        /// Selects the channel tab that is already showing <paramref name="videoId"/> and nothing else,
+        /// returning whether there was one. Matches the condition HandleSharedLink uses to decide that a
+        /// tab needs no repopulating.
+        /// </summary>
+        private bool TrySelectTabShowingOnlyVideo(string videoId)
+        {
+            foreach (ShellContent? content in ChannelTab.Items)
+            {
+                if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is not { } channelViewModel
+                    || channelViewModel.Videos.Count != 1
+                    || channelViewModel.Videos.First().Video.Id != videoId)
+                {
+                    continue;
+                }
+
+                if (!AppShellViewModel.ChannelTabSelected)
+                {
+                    AppShellViewModel.SelectChannelTab();
+                }
+
+                try
+                {
+                    ChannelTab.CurrentItem = content;
+                }
+                catch
+                {
+                    // This throws an exception, but it gets far enough.
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task NavigateToQueueTab()
