@@ -420,8 +420,6 @@ namespace YouTubeHelper
 
         public async Task HandleSharedLink(string rawUrl)
         {
-            MainControlViewModel!.IsBusy = true;
-
             string? videoId = default;
             string? channelHandle = default;
             string? channelId = default;
@@ -458,6 +456,16 @@ namespace YouTubeHelper
                     channelPlaylist = YouTubeUtils.ToChannelPlaylist(channelId);
                 }
             }
+
+            // If a channel is already showing just this video, selecting it is the whole job. Checking here,
+            // before IsBusy, avoids a lookup whose result would be discarded and the busy state that goes
+            // with it. Parsing the URL above is all in memory, so nothing before this point needs it.
+            if (!string.IsNullOrEmpty(videoId) && TrySelectChannelShowingOnlyVideo(videoId))
+            {
+                return;
+            }
+
+            MainControlViewModel!.IsBusy = true;
 
             if (!string.IsNullOrEmpty(videoId))
             {
@@ -544,6 +552,33 @@ namespace YouTubeHelper
             }
 
             MainControlViewModel.IsBusy = false;
+        }
+
+        /// <summary>
+        /// Selects the channel that is already showing <paramref name="videoId"/> and nothing else,
+        /// returning whether there was one. Matches the condition HandleSharedLink uses to decide that a
+        /// channel needs no repopulating.
+        /// </summary>
+        private bool TrySelectChannelShowingOnlyVideo(string videoId)
+        {
+            foreach (ChannelViewModel channelViewModel in MainControlViewModel!.Channels)
+            {
+                if (channelViewModel.Videos.Count != 1 || channelViewModel.Videos.First().Video.Id != videoId)
+                {
+                    continue;
+                }
+
+                if ((NavigationViewItem)NavigationView.SelectedItem != ChannelNavigationItem)
+                {
+                    NavigationView.SelectedItem = ChannelNavigationItem;
+                    HandleNavigationItemChanged(Properties.Resources.Channel, false);
+                }
+
+                MainControlViewModel.SelectedChannel = channelViewModel;
+                return true;
+            }
+
+            return false;
         }
 
         private async void HandleQueueUpdates(RequestData requestData)
