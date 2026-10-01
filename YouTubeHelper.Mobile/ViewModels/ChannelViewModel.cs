@@ -288,8 +288,12 @@ namespace YouTubeHelper.Mobile.ViewModels
                                     _allQueueVideos.Add(videoViewModel);
                                     string requestId = item.RequestData.RequestGuid.ToString();
 
-                                    // Do not await this, as it slows the loading of the queue page
-                                    _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
+                                    // A finished download never sends anything new, so only one still in progress is worth joining
+                                    if (item.RequestData.Status == DownloadStatus.InProgress)
+                                    {
+                                        // Do not await this, as it slows the loading of the queue page
+                                        _ = ServerApiClient.Instance.JoinDownloadGroup(requestId, requestData => videoViewModel.UpdateCheck(requestId, requestData, showInAppNotifications: false));
+                                    }
                                 }
 
                                 ApplyQueueFilter();

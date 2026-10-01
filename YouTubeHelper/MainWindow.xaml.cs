@@ -595,7 +595,8 @@ namespace YouTubeHelper
                 {
                     int indexOfCurrentVideo = queueChannel.Videos.ToList().FindIndex(videoViewModel => videoViewModel.Video.Id == requestData.VideoId);
 
-                    if (indexOfCurrentVideo > 0)
+                    // A card already following this download is hearing it repeated after a reconnect, so it stays put
+                    if (indexOfCurrentVideo > 0 && queueChannel.Videos[indexOfCurrentVideo].FollowedRequestId != requestData.RequestGuid.ToString())
                     {
                         // It's already in the list, so just remove and re-add at the beginning
                         VideoViewModel targetVideoViewModel = queueChannel.Videos[indexOfCurrentVideo];

@@ -168,6 +168,7 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.RaisePropertyChanged(nameof(MainControlViewModel.CumulativeDownloadProgress));
         }
 
+        public string? FollowedRequestId => _previousRequestId;
         private string? _previousRequestId;
         private bool _statusWasEverNotDone;
 

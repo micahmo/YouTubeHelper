@@ -37,7 +37,8 @@ namespace YouTubeHelper.Shared.Utilities
                 List<RequestData> distinctQueue = await ServerApiClient.Instance.GetQueue();
                 foreach (IVideoViewModel? videoViewModel in videoViewModels)
                 {
-                    Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id)?.RequestGuid;
+                    // A finished download never sends anything new, so only one still in progress is worth joining
+                    Guid? requestId = distinctQueue.FirstOrDefault(v => v.VideoId! == videoViewModel.Video.Id && v.Status == DownloadStatus.InProgress)?.RequestGuid;
                     if (requestId != null)
                     {
                         await ServerApiClient.Instance.JoinDownloadGroup(requestId!.ToString()!, requestData => videoViewModel.UpdateCheck(requestId!.ToString()!, requestData, showInAppNotifications: false));

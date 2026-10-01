@@ -324,6 +324,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Progress = 0;
         }
 
+        public string? FollowedRequestId => _previousRequestId;
         private string? _previousRequestId;
         private bool _statusWasEverNotDone;
 
