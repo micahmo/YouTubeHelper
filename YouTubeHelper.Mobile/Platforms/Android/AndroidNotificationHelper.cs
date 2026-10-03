@@ -17,7 +17,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             Context context = global::Android.App.Application.Context;
             if (context.PackageName is null) return;
 
-            int notificationId = Utils.SimpleHash(version);
+            // One ID for every version, so a newer update notification replaces an older one
+            int notificationId = Utils.SimpleHash("appUpdate");
 
             Intent launchAppIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName)!;
             launchAppIntent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop | ActivityFlags.ReorderToFront);
