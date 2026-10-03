@@ -604,6 +604,15 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This video is no longer available on YouTube..
+        /// </summary>
+        internal static string VideoNoLongerAvailable {
+            get {
+                return ResourceManager.GetString("VideoNoLongerAvailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Video not found in Plex.
         /// </summary>
         internal static string VideoNotFoundInPlex {

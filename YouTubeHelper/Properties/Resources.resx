@@ -218,6 +218,9 @@ Updated the status of {1} video(s).</value>
   <data name="VideoDownloadSucceeded" xml:space="preserve">
     <value>Successfully downloaded '{0}'.</value>
   </data>
+  <data name="VideoNoLongerAvailable" xml:space="preserve">
+    <value>This video is no longer available on YouTube.</value>
+  </data>
   <data name="VideoDownloadFailed" xml:space="preserve">
     <value>Failed to download '{0}'.
 

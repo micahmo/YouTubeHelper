@@ -167,6 +167,9 @@
   <data name="VideoDownloadRequested" xml:space="preserve">
     <value>Sent request to download '{0}'.</value>
   </data>
+  <data name="VideoNoLongerAvailable" xml:space="preserve">
+    <value>This video is no longer available on YouTube.</value>
+  </data>
   <data name="Downloading" xml:space="preserve">
     <value>Downloading...</value>
   </data>

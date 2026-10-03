@@ -666,6 +666,12 @@ namespace YouTubeHelper.Mobile
                     channelPlaylist = video.ChannelPlaylist;
                     channelId = YouTubeUtils.ToChannelId(channelPlaylist);
                 }
+                else
+                {
+                    busyIndicator.Dispose();
+                    await Toast.Make(Mobile.Resources.Resources.VideoNoLongerAvailable, ToastDuration.Long).Show();
+                    return;
+                }
             }
 
             if (!string.IsNullOrEmpty(channelHandle))

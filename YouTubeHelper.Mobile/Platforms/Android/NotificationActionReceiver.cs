@@ -49,6 +49,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     try
                     {
                         bool success = false;
+                        bool unavailable = false;
                         try
                         {
                             if (await AppShell.ConnectToServerSilent())
@@ -73,6 +74,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                                         success = true;
                                     }
                                 }
+                                else
+                                {
+                                    unavailable = true;
+                                }
                             }
                         }
                         catch
@@ -86,6 +91,10 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                         if (success)
                         {
                             AndroidUtils.DismissNotification(context, notificationId);
+                        }
+                        else if (unavailable)
+                        {
+                            UpdateNotificationWithDisabledAction(context, intent, null, unavailable: true);
                         }
                         else
                         {
@@ -111,29 +120,53 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 {
                     try
                     {
-                        if (await AppShell.ConnectToServerSilent())
+                        bool requested = false;
+                        bool unavailable = false;
+                        try
                         {
-                            if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                            if (await AppShell.ConnectToServerSilent())
                             {
-                                ExclusionsMode = ExclusionsMode.ShowAll,
-                                VideoIds = [videoId2],
-                                SortMode = SortMode.AgeDesc,
-                                Count = int.MaxValue
-                            })).FirstOrDefault() is { } video)
-                            {
-                                await ServerApiClient.Instance.DownloadVideo(
-                                    url: rawUrl,
-                                    silent: true,
-                                    requestId: Guid.NewGuid().ToString(),
-                                    dataDirectorySubpath: "plex",
-                                    videoId: video.Id,
-                                    videoName: video.Title ?? string.Empty,
-                                    thumbnailUrl: video.ThumbnailUrl ?? string.Empty,
-                                    channelThumbnailUrl: video.ChannelThumbnailUrl,
-                                    channelPlaylist: video.ChannelPlaylist,
-                                    channelName: video.ChannelName,
-                                    idInChannelFolder: true);
+                                if ((await ServerApiClient.Instance.FindVideos(new FindVideosRequest
+                                {
+                                    ExclusionsMode = ExclusionsMode.ShowAll,
+                                    VideoIds = [videoId2],
+                                    SortMode = SortMode.AgeDesc,
+                                    Count = int.MaxValue
+                                })).FirstOrDefault() is { } video)
+                                {
+                                    await ServerApiClient.Instance.DownloadVideo(
+                                        url: rawUrl,
+                                        silent: true,
+                                        requestId: Guid.NewGuid().ToString(),
+                                        dataDirectorySubpath: "plex",
+                                        videoId: video.Id,
+                                        videoName: video.Title ?? string.Empty,
+                                        thumbnailUrl: video.ThumbnailUrl ?? string.Empty,
+                                        channelThumbnailUrl: video.ChannelThumbnailUrl,
+                                        channelPlaylist: video.ChannelPlaylist,
+                                        channelName: video.ChannelName,
+                                        idInChannelFolder: true);
+                                    requested = true;
+                                }
+                                else
+                                {
+                                    unavailable = true;
+                                }
                             }
+                        }
+                        catch
+                        {
+                            // Don't die due to any server problems; we still want to update the notification
+                        }
+
+                        if (unavailable)
+                        {
+                            UpdateNotificationWithDisabledAction(context, intent, null, unavailable: true);
+                        }
+                        else if (!requested)
+                        {
+                            // Re-enable Download so it can be retried. A download that started replaces this notification with its progress.
+                            UpdateNotificationWithDisabledAction(context, intent, null);
                         }
                     }
                     finally
@@ -144,7 +177,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             }
         }
 
-        private void UpdateNotificationWithDisabledAction(Context context, Intent intent, string? disabledAction)
+        private void UpdateNotificationWithDisabledAction(Context context, Intent intent, string? disabledAction, bool unavailable = false)
         {
             // Extract all the data needed to rebuild the notification
             int notificationId = intent.GetIntExtra("notificationId", -1);
@@ -166,7 +199,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             AndroidNotificationHelper.Show(
                 title: title,
                 channelName: channelName,
-                body: body,
+                body: unavailable ? Resources.Resources.VideoNoLongerAvailable : body,
                 videoUrl: videoUrl,
                 thumbnailPath: thumbnailPath,
                 channelThumbnailPath: channelThumbnailPath,
@@ -178,7 +211,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 hasProgress: hasProgress,
                 progress: progress,
                 plexRatingKey: plexRatingKey,
-                disabledAction: disabledAction
+                disabledAction: disabledAction,
+                unavailable: unavailable
             );
         }
     }

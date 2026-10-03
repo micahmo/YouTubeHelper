@@ -704,6 +704,15 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This video is no longer available on YouTube..
+        /// </summary>
+        public static string VideoNoLongerAvailable {
+            get {
+                return ResourceManager.GetString("VideoNoLongerAvailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to View.
         /// </summary>
         public static string View {

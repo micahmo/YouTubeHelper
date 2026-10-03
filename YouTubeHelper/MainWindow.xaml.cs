@@ -2,6 +2,7 @@
 using Bluegrams.Application.WPF;
 using Flurl;
 using ModernWpf.Controls;
+using Notification.Wpf;
 using ServerStatusBot.Definitions;
 using ServerStatusBot.Definitions.Api;
 using ServerStatusBot.Definitions.Database.Models;
@@ -481,6 +482,12 @@ namespace YouTubeHelper
                 {
                     channelPlaylist = video.ChannelPlaylist;
                     channelId = YouTubeUtils.ToChannelId(channelPlaylist);
+                }
+                else
+                {
+                    App.NotificationManager.Show(string.Empty, Properties.Resources.VideoNoLongerAvailable, NotificationType.Warning, "NotificationArea");
+                    MainControlViewModel.IsBusy = false;
+                    return;
                 }
             }
 

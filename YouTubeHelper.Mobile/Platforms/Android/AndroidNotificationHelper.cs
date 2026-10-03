@@ -49,9 +49,9 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             NotificationManagerCompat.From(context).Notify(notificationId, builder.Build());
         }
 
-        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool isFailed, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null)
+        public static void Show(string title, string body, string? videoUrl, string? thumbnailPath, string? channelThumbnailPath, string notificationChannelId, int notificationId, bool isDone, bool isNewVideo, bool isFailed, bool hasProgress, double progress, string? plexRatingKey, string? channelName, string? disabledAction = null, bool unavailable = false)
         {
-            bool isDismissable = isDone || isNewVideo;
+            bool isDismissable = isDone || isNewVideo || unavailable;
 
             Context context = global::Android.App.Application.Context;
 
@@ -266,7 +266,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             _ = builder.SetContentIntent(navigateToVideoPendingIntent!);
 
             // Set additional actions
-            if (isNewVideo)
+            if (unavailable)
+            {
+                // Nothing else can act on a video YouTube no longer has
+                _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
+            }
+            else if (isNewVideo)
             {
                 // If an action is disabled, set its PendingIntent to null
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Won't Watch", disabledAction == "WontWatch" ? null : markVideoAsWontWatchPendingIntent);
@@ -278,17 +283,17 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Queue", navigateToQueuePendingIntent);
             }
 
-            if (!string.IsNullOrEmpty(plexRatingKey))
+            if (!unavailable && !string.IsNullOrEmpty(plexRatingKey))
             {
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Open in Plex", openInPlexPendingIntent);
             }
 
-            if (isFailed)
+            if (!unavailable && isFailed)
             {
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Re-download", disabledAction == "Download" ? null : downloadVideoPendingIntent);
             }
 
-            if (isDone)
+            if (!unavailable && isDone)
             {
                 _ = builder.AddAction(ResourceConstant.Drawable.abc_ab_share_pack_mtrl_alpha, "Dismiss", dismissPendingIntent);
             }
