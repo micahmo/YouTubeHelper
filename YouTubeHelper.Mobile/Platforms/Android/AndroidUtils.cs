@@ -5,13 +5,13 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 {
     public static class AndroidUtils
     {
-        public static void DismissNotification(Context context, int notificationId, bool broadcast = true)
+        public static Task DismissNotification(Context context, int notificationId, bool broadcast = true)
         {
             AndroidX.Core.App.NotificationManagerCompat.From(context).Cancel(notificationId);
 
             if (broadcast)
             {
-                _ = Task.Run(async () =>
+                return Task.Run(async () =>
                 {
                     if (await AppShell.ConnectToServerSilent())
                     {
@@ -19,6 +19,8 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     }
                 });
             }
+
+            return Task.CompletedTask;
         }
     }
 }

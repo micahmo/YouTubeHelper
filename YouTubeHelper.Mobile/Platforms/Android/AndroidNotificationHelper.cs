@@ -265,6 +265,12 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             // Set notification tap action
             _ = builder.SetContentIntent(navigateToVideoPendingIntent!);
 
+            // Set notification swipe action, so swiping it away (or Clear all) dismisses it on the other devices too
+            if (isDismissable)
+            {
+                _ = builder.SetDeleteIntent(dismissPendingIntent);
+            }
+
             // Set additional actions
             if (unavailable)
             {

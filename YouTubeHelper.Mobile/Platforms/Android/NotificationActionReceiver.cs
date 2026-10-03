@@ -28,11 +28,26 @@ namespace YouTubeHelper.Mobile.Platforms.Android
             switch (actionType)
             {
                 case "dismiss":
-                    AndroidUtils.DismissNotification(context, notificationId);
+                {
+                    // Stay alive until the server has it, since a swipe usually comes while the app is in the background
+                    PendingResult? pendingResult = GoAsync();
+
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await AndroidUtils.DismissNotification(context, notificationId);
+                        }
+                        finally
+                        {
+                            pendingResult?.Finish();
+                        }
+                    });
                     break;
+                }
 
                 case "openObtainium":
-                    AndroidUtils.DismissNotification(context, notificationId);
+                    _ = AndroidUtils.DismissNotification(context, notificationId);
                     break;
             }
 
@@ -90,7 +105,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
                         if (success)
                         {
-                            AndroidUtils.DismissNotification(context, notificationId);
+                            await AndroidUtils.DismissNotification(context, notificationId);
                         }
                         else if (unavailable)
                         {

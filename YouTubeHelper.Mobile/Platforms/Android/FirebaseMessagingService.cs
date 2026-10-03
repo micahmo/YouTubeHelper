@@ -49,7 +49,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
                     if (clientId != AppShell.ClientId)
                     {
 #if ANDROID
-                        AndroidUtils.DismissNotification(global::Android.App.Application.Context, notificationId, broadcast: false);
+                        _ = AndroidUtils.DismissNotification(global::Android.App.Application.Context, notificationId, broadcast: false);
 #endif
                     }
                 }

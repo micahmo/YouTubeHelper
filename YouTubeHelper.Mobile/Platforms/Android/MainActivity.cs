@@ -44,7 +44,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             if (isDismissable)
             {
-                AndroidUtils.DismissNotification(this, notificationId);
+                _ = AndroidUtils.DismissNotification(this, notificationId);
             }
 
             if (!string.IsNullOrEmpty(rawUrl))
