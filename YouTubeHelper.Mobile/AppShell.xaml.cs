@@ -690,10 +690,11 @@ namespace YouTubeHelper.Mobile
 
                 ChannelViewModel? foundChannelViewModel = default;
                 bool foundVideo = false;
-                foreach (ShellContent? content in ChannelTab.Items)
+                // The channel's own tab comes first, otherwise use a multi-channel tab that includes it
+                foreach (ShellContent? content in ChannelTab.Items.OrderByDescending(c => ((c.Content as ChannelView)?.BindingContext as ChannelViewModel)?.Channel?.ChannelPlaylist == channelPlaylist))
                 {
                     if ((content.Content as ChannelView)?.BindingContext as ChannelViewModel is { } channelViewModel
-                        && channelViewModel.Channel?.ChannelPlaylist == channelPlaylist)
+                        && channelViewModel.Channel?.RealPlaylistId.Contains(channelPlaylist) == true)
                     {
                         foundChannelViewModel = channelViewModel;
 
