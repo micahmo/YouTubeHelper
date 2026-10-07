@@ -159,6 +159,7 @@
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
 
@@ -611,8 +612,25 @@
                                                 </Grid>
                                             </ScrollViewer>
 
-                                            <ItemsControl
+                                            <Border
                                                 Grid.Row="2"
+                                                Margin="15,0,30,10"
+                                                Padding="10,6"
+                                                Background="#14B22222"
+                                                BorderBrush="FireBrick"
+                                                BorderThickness="4,0,0,0"
+                                                CornerRadius="4"
+                                                Visibility="{c:Binding HasOpenedFrom,
+                                                                       FalseToVisibility=Collapsed}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <emoji:TextBlock FontWeight="SemiBold" Text="{Binding OpenedFrom}" />
+                                                    <TextBlock Text="  ·  " />
+                                                    <TextBlock Text="{x:Static properties:Resources.OpenedVideoHint}" />
+                                                </StackPanel>
+                                            </Border>
+
+                                            <ItemsControl
+                                                Grid.Row="3"
                                                 ItemsSource="{Binding Videos}"
                                                 VirtualizingPanel.ScrollUnit="Pixel">
                                                 <!--

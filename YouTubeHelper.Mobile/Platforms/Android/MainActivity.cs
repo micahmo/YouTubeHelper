@@ -49,7 +49,7 @@ namespace YouTubeHelper.Mobile.Platforms.Android
 
             if (!string.IsNullOrEmpty(rawUrl))
             {
-                _ = AppShell.Instance?.HandleSharedLink(rawUrl, downloadVideo, watchVideo);
+                _ = AppShell.Instance?.HandleSharedLink(rawUrl, downloadVideo, watchVideo, fromNotification: notificationId != -1);
             }
 
             // See if we got an intent to navigate to the queue tab

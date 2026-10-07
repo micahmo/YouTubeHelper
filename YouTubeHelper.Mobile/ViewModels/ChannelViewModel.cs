@@ -206,6 +206,8 @@ namespace YouTubeHelper.Mobile.ViewModels
 
             _findInProgress = true;
             IsRefreshing = false;
+            OpenedFrom = null;
+            int generation = ++_listGeneration;
 
             await Policy
                 .Handle<Exception>().FallbackAsync(_ => Task.CompletedTask, async ex =>
@@ -270,6 +272,13 @@ namespace YouTubeHelper.Mobile.ViewModels
                                 });
 
                                 List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, Page, this)).ToList());
+
+                                // A video opened from a link or notification while this was loading is the newer request, so it stays
+                                if (generation != _listGeneration)
+                                {
+                                    return;
+                                }
+
                                 Videos.AddRange(videoViewModels);
 
                                 // Do not await this, as it slows the loading of the page
@@ -417,6 +426,45 @@ namespace YouTubeHelper.Mobile.ViewModels
             set => SetProperty(ref _isRefreshing, value);
         }
         private bool _isRefreshing;
+
+        /// <summary>
+        /// Says where a single video opened into this tab came from, since it isn't the result of the filters above it.
+        /// Cleared by the next search.
+        /// </summary>
+        public string? OpenedFrom
+        {
+            get => _openedFrom;
+            set
+            {
+                if (SetProperty(ref _openedFrom, value))
+                {
+                    OnPropertyChanged(nameof(HasOpenedFrom));
+                }
+            }
+        }
+        private string? _openedFrom;
+
+        public bool HasOpenedFrom => OpenedFrom is not null;
+
+        public string OpenedVideoHint => Resources.Resources.OpenedVideoHint;
+
+        /// <summary>
+        /// Shows a single video opened from a link or notification in place of the list
+        /// </summary>
+        public void ShowOpenedVideo(VideoViewModel videoViewModel, bool fromNotification)
+        {
+            // Any search still loading is now stale, so it drops its results when they arrive
+            _listGeneration++;
+
+            Videos.Clear();
+            Videos.Add(videoViewModel);
+            SetOpenedFrom(fromNotification);
+        }
+
+        public void SetOpenedFrom(bool fromNotification) =>
+            OpenedFrom = fromNotification ? Resources.Resources.OpenedFromNotification : Resources.Resources.OpenedFromLink;
+
+        private int _listGeneration;
 
         public AppShell Page { get; }
 

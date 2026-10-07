@@ -89,6 +89,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -134,6 +135,36 @@
                                 Size="19" />
                         </Button.ImageSource>
                     </Button>
+
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Margin="10,12,10,0"
+                        Padding="0"
+                        BackgroundColor="#14B22222"
+                        IsVisible="{Binding HasOpenedFrom}"
+                        StrokeThickness="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="4" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="4,*">
+                            <BoxView Grid.Column="0" Color="{StaticResource Primary}" />
+                            <Label
+                                Grid.Column="1"
+                                Margin="10,7"
+                                FontSize="13"
+                                TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span FontAttributes="Bold" Text="{Binding OpenedFrom}" />
+                                        <Span Text="  ·  " />
+                                        <Span Text="{Binding OpenedVideoHint}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Grid>
 

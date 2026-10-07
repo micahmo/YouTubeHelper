@@ -130,6 +130,8 @@ namespace YouTubeHelper.ViewModels
             MainControlViewModel.IsPlayerExpanded = false;
 
             Videos.Clear();
+            OpenedFrom = null;
+            int generation = ++_listGeneration;
 
             await Policy
                 .Handle<Exception>().RetryAsync(5, (ex, _) =>
@@ -182,6 +184,13 @@ namespace YouTubeHelper.ViewModels
                         });
 
                         List<VideoViewModel> videoViewModels = await Task.Run(() => videos.Select(v => new VideoViewModel(v, MainControlViewModel, this)).ToList());
+
+                        // A video opened from a link while this was loading is the newer request, so it stays
+                        if (generation != _listGeneration)
+                        {
+                            return;
+                        }
+
                         Application.Current.Dispatcher.Invoke(() => Videos.AddRange(videoViewModels));
 
                         _ = QueueUtils.TryJoinDownloadGroup(videoViewModels);
@@ -258,6 +267,40 @@ namespace YouTubeHelper.ViewModels
         private string _deleteGlyph = Icons.Delete;
 
         public MyObservableCollection<VideoViewModel> Videos { get; } = [];
+
+        /// <summary>
+        /// Says where a single video opened into this tab came from, since it isn't the result of the filters above it.
+        /// Cleared by the next search.
+        /// </summary>
+        public string? OpenedFrom
+        {
+            get => _openedFrom;
+            set
+            {
+                if (SetProperty(ref _openedFrom, value))
+                {
+                    OnPropertyChanged(nameof(HasOpenedFrom));
+                }
+            }
+        }
+        private string? _openedFrom;
+
+        public bool HasOpenedFrom => OpenedFrom is not null;
+
+        /// <summary>
+        /// Shows a single video opened from a link in place of the list
+        /// </summary>
+        public void ShowOpenedVideo(VideoViewModel videoViewModel)
+        {
+            // Any search still loading is now stale, so it drops its results when they arrive
+            _listGeneration++;
+
+            Videos.Clear();
+            Videos.Add(videoViewModel);
+            OpenedFrom = Resources.OpenedFromLink;
+        }
+
+        private int _listGeneration;
 
         private readonly List<VideoViewModel> _allQueueVideos = [];
 

@@ -608,12 +608,12 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        public async Task HandleSharedLink(string rawUrl, bool downloadVideo = false, bool watchVideo = false)
+        public async Task HandleSharedLink(string rawUrl, bool downloadVideo = false, bool watchVideo = false, bool fromNotification = false)
         {
             string? videoId = YouTubeUtils.GetVideoIdFromUrl(rawUrl);
             if (!string.IsNullOrEmpty(YouTubeUtils.GetVideoIdFromUrl(rawUrl)))
             {
-                await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo);
+                await HandleSharedLink(videoId, null, null, null, downloadVideo: downloadVideo, watchVideo: watchVideo, fromNotification: fromNotification);
             }
 
             Url url = new(rawUrl);
@@ -630,7 +630,7 @@ namespace YouTubeHelper.Mobile
             }
         }
 
-        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist, bool downloadVideo = false, bool watchVideo = false)
+        public async Task HandleSharedLink(string? videoId, string? channelHandle, string? channelId, string? channelPlaylist, bool downloadVideo = false, bool watchVideo = false, bool fromNotification = false)
         {
             while (!_loaded)
             {
@@ -640,7 +640,7 @@ namespace YouTubeHelper.Mobile
             // If a tab is already showing just this video, switching to it is the whole job. Checking before
             // the busy indicator avoids a lookup whose result would be discarded, and with it a loading popup
             // that appears and vanishes without anything changing.
-            if (!string.IsNullOrEmpty(videoId) && TrySelectTabShowingOnlyVideo(videoId))
+            if (!string.IsNullOrEmpty(videoId) && TrySelectTabShowingOnlyVideo(videoId, fromNotification))
             {
                 return;
             }
@@ -757,11 +757,12 @@ namespace YouTubeHelper.Mobile
                 if (!foundVideo)
                 {
                     foundChannelViewModel.Videos.Clear();
+                    foundChannelViewModel.OpenedFrom = null;
 
                     if (video is not null)
                     {
                         VideoViewModel videoViewModel = new(video, this, foundChannelViewModel) { IsDescriptionExpanded = true };
-                        foundChannelViewModel.Videos.Add(videoViewModel);
+                        foundChannelViewModel.ShowOpenedVideo(videoViewModel, fromNotification);
 
                         Task _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
 
@@ -786,7 +787,7 @@ namespace YouTubeHelper.Mobile
         /// returning whether there was one. Matches the condition HandleSharedLink uses to decide that a
         /// tab needs no repopulating.
         /// </summary>
-        private bool TrySelectTabShowingOnlyVideo(string videoId)
+        private bool TrySelectTabShowingOnlyVideo(string videoId, bool fromNotification)
         {
             foreach (ShellContent? content in ChannelTab.Items)
             {
@@ -809,6 +810,12 @@ namespace YouTubeHelper.Mobile
                 catch
                 {
                     // This throws an exception, but it gets far enough.
+                }
+
+                // Opening it again from somewhere else updates where it was opened from
+                if (channelViewModel.HasOpenedFrom)
+                {
+                    channelViewModel.SetOpenedFrom(fromNotification);
                 }
 
                 return true;

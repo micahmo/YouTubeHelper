@@ -396,6 +396,33 @@ namespace YouTubeHelper.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 🔗 Opened from a link.
+        /// </summary>
+        internal static string OpenedFromLink {
+            get {
+                return ResourceManager.GetString("OpenedFromLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🔔 Opened from a notification.
+        /// </summary>
+        internal static string OpenedFromNotification {
+            get {
+                return ResourceManager.GetString("OpenedFromNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search to apply the filters above.
+        /// </summary>
+        internal static string OpenedVideoHint {
+            get {
+                return ResourceManager.GetString("OpenedVideoHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Externally.
         /// </summary>
         internal static string OpenExternally {

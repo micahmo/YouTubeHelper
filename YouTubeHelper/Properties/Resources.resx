@@ -336,4 +336,10 @@ Updated the status of {1} video(s).</value>
   <data name="AutoDownloadNewVideos" xml:space="preserve">
     <value>Automatically download new videos</value>
   </data>
+  <data name="OpenedFromLink" xml:space="preserve">
+    <value>🔗 Opened from a link</value>
+  </data>
+  <data name="OpenedVideoHint" xml:space="preserve">
+    <value>Search to apply the filters above</value>
+  </data>
 </root>

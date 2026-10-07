@@ -548,11 +548,12 @@ namespace YouTubeHelper
                 if (!foundVideo)
                 {
                     foundChannelViewModel.Videos.Clear();
+                    foundChannelViewModel.OpenedFrom = null;
 
                     if (video is not null)
                     {
                         VideoViewModel videoViewModel = new(video, MainControlViewModel, foundChannelViewModel) { IsDescriptionExpanded = true };
-                        foundChannelViewModel.Videos.Add(videoViewModel);
+                        foundChannelViewModel.ShowOpenedVideo(videoViewModel);
 
                         _ = QueueUtils.TryJoinDownloadGroup(videoViewModel);
                     }

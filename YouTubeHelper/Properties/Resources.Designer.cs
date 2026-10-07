@@ -453,6 +453,24 @@ namespace YouTubeHelper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 🔗 Opened from a link.
+        /// </summary>
+        public static string OpenedFromLink {
+            get {
+                return ResourceManager.GetString("OpenedFromLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search to apply the filters above.
+        /// </summary>
+        public static string OpenedVideoHint {
+            get {
+                return ResourceManager.GetString("OpenedVideoHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Externally.
         /// </summary>
         public static string OpenExternally {
