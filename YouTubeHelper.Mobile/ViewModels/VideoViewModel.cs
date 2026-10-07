@@ -59,6 +59,19 @@ namespace YouTubeHelper.Mobile.ViewModels
         }
         private bool _isPlaying;
 
+        public bool IsDownloading
+        {
+            get => _isDownloading;
+            private set
+            {
+                if (SetProperty(ref _isDownloading, value))
+                {
+                    _page.UpdateKeepScreenOn();
+                }
+            }
+        }
+        private bool _isDownloading;
+
         public ICommand ToggleDescriptionCommand => _toggleDescriptionCommand ??= new RelayCommand(ToggleDescription);
         private ICommand? _toggleDescriptionCommand;
 
@@ -322,6 +335,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             Video.Status = string.Format(Resources.Resources.DownloadingProgress, "0.0%");
             Video.ExclusionReason = ExclusionReason.None;
             Video.Progress = 0;
+            IsDownloading = true;
         }
 
         public string? FollowedRequestId => _previousRequestId;
@@ -362,6 +376,7 @@ namespace YouTubeHelper.Mobile.ViewModels
             if (result.Status == DownloadStatus.InProgress)
             {
                 _statusWasEverNotDone = true;
+                IsDownloading = true;
             }
 
             if (result.Status == DownloadStatus.Completed)
@@ -391,6 +406,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
+                IsDownloading = false;
             }
 
             if (result.Status == DownloadStatus.Failed)
@@ -416,6 +432,7 @@ namespace YouTubeHelper.Mobile.ViewModels
 
                 _ = ServerApiClient.Instance.LeaveDownloadGroup(requestId);
                 _statusWasEverNotDone = false;
+                IsDownloading = false;
             }
         }
 

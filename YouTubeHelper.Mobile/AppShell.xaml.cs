@@ -830,6 +830,15 @@ namespace YouTubeHelper.Mobile
             });
         }
 
+        /// <summary>
+        /// Keeps the screen on while any download is in progress, so its progress can be watched.
+        /// Android only applies this while the app is in the foreground.
+        /// </summary>
+        public void UpdateKeepScreenOn()
+        {
+            MainThread.BeginInvokeOnMainThread(() => DeviceDisplay.Current.KeepScreenOn = AppShellViewModel.AllVideos.Any(v => v.IsDownloading));
+        }
+
         public void HandlePlexStateUpdate(string? videoUrl, string plexState)
         {
             foreach (VideoViewModel videoViewModel in AppShellViewModel.AllVideos)
