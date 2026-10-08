@@ -175,7 +175,7 @@ jobs:
           $version = "${{ env.WINDOWS_VERSION_TAG }}"
           $date = Get-Date -Format "yyyy-MM-dd"
           $downloadLink = "https://github.com/micahmo/YouTubeHelper/releases/download/v$version/YouTubeHelperSetup-$version.exe"
-          $fileName = "WS4WSetup-$version.exe"
+          $fileName = "YouTubeHelperSetup-$version.exe"
 
           $xmlContent = @"
           <?xml version="1.0" encoding="utf-8" ?>
